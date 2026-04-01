@@ -1,0 +1,26 @@
+{
+  "name": "bioagent",
+  "version": "0.1.0",
+  "description": "医学编辑 AI 员工 — 基于飞书的类真人内容助手",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["feishu", "lark", "medical", "ai-agent"],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.11.0",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.81.0",
+    "dotenv": "^17.3.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0"
+  }
+}

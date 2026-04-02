@@ -46,7 +46,7 @@ export async function handleUserMessage(
     ? formatProfile(memory.companyProfile)
     : undefined;
 
-  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514";
+  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
   const systemPrompt = buildSystemPrompt(profileText);
 
   try {

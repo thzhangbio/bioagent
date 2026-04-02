@@ -1,5 +1,4 @@
-import { spawn, type ChildProcess } from "node:child_process";
-import { createInterface } from "node:readline";
+import * as Lark from "@larksuiteoapi/node-sdk";
 import { EventEmitter } from "node:events";
 
 export interface LarkMessageEvent {
@@ -14,118 +13,102 @@ export interface LarkMessageEvent {
 }
 
 export class LarkEventBridge extends EventEmitter {
-  private process: ChildProcess | null = null;
+  private wsClient: Lark.WSClient | null = null;
 
-  start(eventTypes = "im.message.receive_v1"): void {
-    if (this.process) return;
+  start(): void {
+    if (this.wsClient) return;
 
-    const args = [
-      "event",
-      "+subscribe",
-      "--event-types",
-      eventTypes,
-      "--compact",
-    ];
+    const appId = process.env.FEISHU_APP_ID;
+    const appSecret = process.env.FEISHU_APP_SECRET;
 
-    console.log(`[lark-event] 启动事件监听: lark-cli ${args.join(" ")}`);
-    this.process = spawn("lark-cli", args, {
-      stdio: ["ignore", "pipe", "pipe"],
+    if (!appId || !appSecret) {
+      console.error("[lark-event] 缺少 FEISHU_APP_ID 或 FEISHU_APP_SECRET");
+      process.exit(1);
+    }
+
+    const baseConfig = { appId, appSecret };
+
+    console.log("[lark-event] 使用飞书 SDK WebSocket 建立长连接...");
+
+    const eventDispatcher = new Lark.EventDispatcher({}).register({
+      "im.message.receive_v1": async (data: any) => {
+        try {
+          if (process.env.DEBUG_LARK === "1") {
+            console.log("[lark-event][debug] 回调 keys:", Object.keys(data || {}));
+          }
+
+          const event = this.parseSDKEvent(data);
+          if (!event) {
+            console.warn(
+              "[lark-event] 已收到 im.message.receive_v1，但未能解析出 message（请设 DEBUG_LARK=1 查看结构）"
+            );
+            return;
+          }
+
+          console.log(
+            `[lark-event] 收到消息: ${event.chatType === "p2p" ? "私聊" : "群聊"} | ${event.content.slice(0, 50)}`
+          );
+          this.emit("message", event);
+        } catch (err) {
+          console.error("[lark-event] 事件处理异常:", err);
+        }
+      },
+      // 开放平台若订阅了「消息已读」，需占位处理，否则 SDK 会 warn: no handle
+      "im.message.message_read_v1": async () => {},
     });
 
-    const rl = createInterface({ input: this.process.stdout! });
-    rl.on("line", (line) => this.handleLine(line));
-
-    this.process.stderr?.on("data", (chunk: Buffer) => {
-      const msg = chunk.toString().trim();
-      if (msg) console.log(`[lark-event] ${msg}`);
+    this.wsClient = new Lark.WSClient({
+      ...baseConfig,
+      // debug 时可看到 [ws] receive message ... 与分片合并情况
+      loggerLevel:
+        process.env.DEBUG_LARK === "1" ? Lark.LoggerLevel.debug : Lark.LoggerLevel.info,
     });
 
-    this.process.on("close", (code) => {
-      console.log(`[lark-event] 进程退出 code=${code}`);
-      this.process = null;
-      this.emit("close", code);
-    });
-
-    this.process.on("error", (err) => {
-      console.error("[lark-event] 进程错误:", err.message);
-      this.emit("error", err);
-    });
+    this.wsClient.start({ eventDispatcher });
   }
 
   stop(): void {
-    if (this.process) {
-      this.process.kill("SIGTERM");
-      this.process = null;
-    }
+    this.wsClient = null;
   }
 
-  private handleLine(line: string): void {
-    if (!line.trim()) return;
+  private parseSDKEvent(data: any): LarkMessageEvent | null {
+    const message = data?.message ?? data?.event?.message;
+    if (!message) return null;
 
-    try {
-      const raw = JSON.parse(line);
-      const event = this.parseEvent(raw);
-      if (event) {
-        console.log(
-          `[lark-event] 收到消息: ${event.chatType === "p2p" ? "私聊" : "群聊"} | ${event.content.slice(0, 50)}`
-        );
-        this.emit("message", event);
-      }
-    } catch {
-      console.warn("[lark-event] 无法解析行:", line.slice(0, 100));
+    const sender = data.sender ?? data.event?.sender;
+
+    // 集群模式下仅一个连接能收到事件；忽略机器人自己发出的消息，避免自触发
+    if (sender?.sender_type === "app") {
+      console.log("[lark-event] 跳过机器人自身消息");
+      return null;
     }
-  }
 
-  private parseEvent(raw: Record<string, unknown>): LarkMessageEvent | null {
-    const eventType = this.dig(raw, "header.event_type") as string
-      ?? this.dig(raw, "event_type") as string
-      ?? raw["event_type"] as string;
+    const messageId: string = message.message_id ?? "";
+    const chatId: string = message.chat_id ?? "";
+    const chatType: "p2p" | "group" = message.chat_type ?? "p2p";
+    const messageType: string = message.message_type ?? "text";
 
-    if (!eventType?.includes("im.message")) return null;
-
-    const event = (raw["event"] ?? raw) as Record<string, unknown>;
-    const message = (event["message"] ?? {}) as Record<string, unknown>;
-    const sender = (event["sender"] ?? {}) as Record<string, unknown>;
-    const senderId = (sender["sender_id"] ?? sender) as Record<string, unknown>;
-
-    const messageId =
-      (message["message_id"] as string) ?? (raw["message_id"] as string) ?? "";
-    const chatId =
-      (message["chat_id"] as string) ?? (raw["chat_id"] as string) ?? "";
-    const chatType =
-      ((message["chat_type"] as string) ?? (raw["chat_type"] as string) ?? "p2p") as
-        | "p2p"
-        | "group";
-    const messageType =
-      (message["message_type"] as string) ?? (raw["message_type"] as string) ?? "text";
+    const senderId: string = sender?.sender_id?.open_id ?? "";
 
     let content = "";
-    const rawContent = (message["content"] as string) ?? (raw["content"] as string) ?? (raw["text"] as string) ?? "";
     try {
-      const parsed = JSON.parse(rawContent);
-      content = parsed.text ?? rawContent;
+      const parsed = JSON.parse(message.content ?? "{}");
+      content = parsed.text ?? "";
     } catch {
-      content = rawContent;
+      content = message.content ?? "";
     }
 
     if (!content && !messageId) return null;
 
     return {
-      eventType,
+      eventType: "im.message.receive_v1",
       messageId,
       chatId,
       chatType,
-      senderId: (senderId["open_id"] as string) ?? (senderId["user_id"] as string) ?? "",
+      senderId,
       messageType,
       content,
-      raw,
+      raw: data,
     };
-  }
-
-  private dig(obj: Record<string, unknown>, path: string): unknown {
-    return path.split(".").reduce<unknown>((acc, key) => {
-      if (acc && typeof acc === "object") return (acc as Record<string, unknown>)[key];
-      return undefined;
-    }, obj);
   }
 }

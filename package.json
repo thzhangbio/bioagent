@@ -8,19 +8,29 @@
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "build": "tsc",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "probe:feishu": "tsx scripts/feishu-ws-probe.ts"
   },
-  "keywords": ["feishu", "lark", "medical", "ai-agent"],
+  "keywords": [
+    "feishu",
+    "lark",
+    "medical",
+    "ai-agent"
+  ],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.81.0",
+    "@larksuiteoapi/node-sdk": "^1.60.0",
     "dotenv": "^17.3.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
   "devDependencies": {
     "@types/node": "^25.5.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "protobufjs"]
   }
 }

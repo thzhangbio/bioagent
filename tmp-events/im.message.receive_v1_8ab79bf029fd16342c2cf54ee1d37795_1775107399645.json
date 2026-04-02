@@ -1,0 +1,31 @@
+{
+  "schema": "2.0",
+  "header": {
+    "event_id": "8ab79bf029fd16342c2cf54ee1d37795",
+    "event_type": "im.message.receive_v1",
+    "app_id": "cli_a9386ed838389bb5",
+    "tenant_key": "136896cc000d1758",
+    "create_time": "1775107399645",
+    "token": ""
+  },
+  "event": {
+    "message": {
+      "chat_id": "oc_05b11636691a833604e35df278ae4fd7",
+      "chat_type": "p2p",
+      "content": "{\"text\":\"你可以接收到消息吗\"}",
+      "create_time": "1775107399309",
+      "message_id": "om_x100b53eb9abe80a8c1450b0cedbd58e",
+      "message_type": "text",
+      "update_time": "1775107399309"
+    },
+    "sender": {
+      "sender_id": {
+        "open_id": "ou_b2a0ec409747773deb6d7c84810619b3",
+        "union_id": "on_ce35cd7e184d270fee1aa0638979bd7f",
+        "user_id": null
+      },
+      "sender_type": "user",
+      "tenant_key": "136896cc000d1758"
+    }
+  }
+}

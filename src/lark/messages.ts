@@ -1,7 +1,4 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const exec = promisify(execFile);
+import { getFeishuClient } from "./feishu-client.js";
 
 interface SendOptions {
   chatId?: string;
@@ -16,40 +13,61 @@ interface ReplyOptions {
   markdown?: string;
 }
 
-async function run(args: string[]): Promise<string> {
-  try {
-    const { stdout, stderr } = await exec("lark-cli", args, {
-      timeout: 15_000,
-    });
-    if (stderr?.trim()) console.log(`[lark-im] ${stderr.trim()}`);
-    return stdout.trim();
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[lark-im] 执行失败: lark-cli ${args.join(" ")}\n  ${msg}`);
-    throw err;
+function pickBody(opts: { text?: string; markdown?: string }): string {
+  const body = opts.markdown ?? opts.text;
+  if (!body?.trim()) {
+    throw new Error("sendMessage / replyMessage 需要 text 或 markdown");
   }
+  return body;
+}
+
+/** 文本消息 content 字段（JSON 字符串） */
+function textContent(body: string): string {
+  return JSON.stringify({ text: body });
 }
 
 export async function sendMessage(opts: SendOptions): Promise<string> {
-  const args = ["im", "+messages-send"];
+  const body = pickBody(opts);
+  const client = getFeishuClient();
 
-  if (opts.chatId) args.push("--chat-id", opts.chatId);
-  else if (opts.userId) args.push("--user-id", opts.userId);
-  else throw new Error("sendMessage 需要 chatId 或 userId");
+  if (opts.chatId) {
+    const res = await client.im.v1.message.create({
+      params: { receive_id_type: "chat_id" },
+      data: {
+        receive_id: opts.chatId,
+        msg_type: "text",
+        content: textContent(body),
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
 
-  if (opts.markdown) args.push("--markdown", opts.markdown);
-  else if (opts.text) args.push("--text", opts.text);
-  else throw new Error("sendMessage 需要 text 或 markdown");
+  if (opts.userId) {
+    const res = await client.im.v1.message.create({
+      params: { receive_id_type: "open_id" },
+      data: {
+        receive_id: opts.userId,
+        msg_type: "text",
+        content: textContent(body),
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
 
-  return run(args);
+  throw new Error("sendMessage 需要 chatId 或 userId");
 }
 
 export async function replyMessage(opts: ReplyOptions): Promise<string> {
-  const args = ["im", "+messages-reply", "--message-id", opts.messageId];
+  const body = pickBody(opts);
+  const client = getFeishuClient();
 
-  if (opts.markdown) args.push("--markdown", opts.markdown);
-  else if (opts.text) args.push("--text", opts.text);
-  else throw new Error("replyMessage 需要 text 或 markdown");
+  const res = await client.im.v1.message.reply({
+    path: { message_id: opts.messageId },
+    data: {
+      msg_type: "text",
+      content: textContent(body),
+    },
+  });
 
-  return run(args);
+  return JSON.stringify(res?.data ?? res);
 }

@@ -11,7 +11,12 @@ function selectOptions(opts: { label: string; value: string }[]) {
   }));
 }
 
-/** 飞书消息卡片 1.0（interactive）JSON，与 im.message.create msg_type=interactive 兼容 */
+/**
+ * 飞书消息卡片 1.0（interactive）。
+ * 所有下拉与提交必须在 **tag: "form"** 容器内，且提交按钮 **action_type: "form_submit"**，
+ * 否则点击后不会聚合 form_value，服务端无法收到选项。
+ * @see https://open.feishu.cn/document/feishu-cards/card-components/containers/form-container
+ */
 export function buildContentCreateInteractiveCard(params: {
   sessionId: string;
   originalRequestPreview: string;
@@ -19,135 +24,82 @@ export function buildContentCreateInteractiveCard(params: {
 }): Record<string, unknown> {
   const { sessionId, originalRequestPreview, dynamicFields } = params;
 
-  const submitValue = JSON.stringify({
+  const submitPayload = {
     action: "content_create_submit",
     session_id: sessionId,
-  });
+  };
 
-  const elements: Record<string, unknown>[] = [
+  /** 表单项必须直接挂在 form.elements 下，才能随 form_submit 进入 form_value */
+  const formInner: Record<string, unknown>[] = [
     {
-      tag: "div",
-      text: {
-        tag: "lark_md",
-        content: `**内容创作 — 结构化确认**\n请勾选下列选项；已根据你第一句话做了**建议**（见各题说明），可随时更改。\n\n**你的任务摘要**：${escapeMd(originalRequestPreview.slice(0, 200))}${originalRequestPreview.length > 200 ? "…" : ""}`,
-      },
-    },
-    { tag: "hr" },
-    {
-      tag: "div",
-      text: {
-        tag: "lark_md",
-        content: "**【常规项】**",
-      },
+      tag: "select_static",
+      name: "cc_audience",
+      placeholder: plain("受众"),
+      options: selectOptions([
+        { label: "大众 / 患者科普", value: "public" },
+        { label: "医疗专业人士（HCP）", value: "hcp" },
+      ]),
     },
     {
-      tag: "action",
-      actions: [
-        {
-          tag: "select_static",
-          name: "cc_audience",
-          placeholder: plain("受众"),
-          options: selectOptions([
-            { label: "大众 / 患者科普", value: "public" },
-            { label: "医疗专业人士（HCP）", value: "hcp" },
-          ]),
-        },
-        {
-          tag: "select_static",
-          name: "cc_deliverable",
-          placeholder: plain("稿型"),
-          options: selectOptions([
-            { label: "内审草稿（可后置合规）", value: "draft" },
-            { label: "对外终稿", value: "final" },
-          ]),
-        },
-      ],
+      tag: "select_static",
+      name: "cc_deliverable",
+      placeholder: plain("稿型"),
+      options: selectOptions([
+        { label: "内审草稿（可后置合规）", value: "draft" },
+        { label: "对外终稿", value: "final" },
+      ]),
     },
     {
-      tag: "action",
-      actions: [
-        {
-          tag: "select_static",
-          name: "cc_brand_stance",
-          placeholder: plain("品牌/品名"),
-          options: selectOptions([
-            { label: "不出现具体商品名", value: "no_brand" },
-            { label: "通用名/机制表述，可谨慎", value: "generic" },
-            { label: "可适度点名（审慎合规）", value: "naming_ok" },
-          ]),
-        },
-        {
-          tag: "select_static",
-          name: "cc_voice",
-          placeholder: plain("叙事身份"),
-          options: selectOptions([
-            { label: "KOL / 种草感", value: "kol" },
-            { label: "机构 / 科普", value: "institution" },
-            { label: "中立第三方", value: "neutral" },
-          ]),
-        },
-      ],
+      tag: "select_static",
+      name: "cc_brand_stance",
+      placeholder: plain("品牌/品名"),
+      options: selectOptions([
+        { label: "不出现具体商品名", value: "no_brand" },
+        { label: "通用名/机制表述，可谨慎", value: "generic" },
+        { label: "可适度点名（审慎合规）", value: "naming_ok" },
+      ]),
     },
     {
-      tag: "action",
-      actions: [
-        {
-          tag: "select_static",
-          name: "cc_delegate",
-          placeholder: plain("其余细节"),
-          options: selectOptions([
-            { label: "其余由编辑默认（不再追问）", value: "yes" },
-            { label: "我仍要补充细节（聊天说明）", value: "no" },
-          ]),
-        },
-      ],
+      tag: "select_static",
+      name: "cc_voice",
+      placeholder: plain("叙事身份"),
+      options: selectOptions([
+        { label: "KOL / 种草感", value: "kol" },
+        { label: "机构 / 科普", value: "institution" },
+        { label: "中立第三方", value: "neutral" },
+      ]),
+    },
+    {
+      tag: "select_static",
+      name: "cc_delegate",
+      placeholder: plain("其余细节"),
+      options: selectOptions([
+        { label: "其余由编辑默认（不再追问）", value: "yes" },
+        { label: "我仍要补充细节（聊天说明）", value: "no" },
+      ]),
     },
   ];
 
-  if (dynamicFields.length > 0) {
-    elements.push({
-      tag: "div",
-      text: {
-        tag: "lark_md",
-        content: `**【补充项】**（最多 ${dynamicFields.length} 题，来自对你任务的智能拆解）`,
-      },
-    });
-    const dynActions = dynamicFields.map((d) => ({
-      tag: "select_static" as const,
+  for (const d of dynamicFields) {
+    formInner.push({
+      tag: "select_static",
       name: d.id,
       placeholder: plain(d.title),
       options: selectOptions(d.options),
-    }));
-    for (let i = 0; i < dynActions.length; i += 2) {
-      elements.push({
-        tag: "action",
-        actions: dynActions.slice(i, i + 2),
-      });
-    }
+    });
   }
 
-  elements.push(
-    { tag: "hr" },
-    {
-      tag: "div",
-      text: {
-        tag: "lark_md",
-        content:
-          "**合规提示**：处方药/功效表述以审慎为原则；对外终稿投放前请走客户合规流程。",
-      },
+  formInner.push({
+    tag: "button",
+    action_type: "form_submit",
+    name: "ccf_submit",
+    text: {
+      tag: "lark_md",
+      content: "细节已明，开始生成",
     },
-    {
-      tag: "action",
-      actions: [
-        {
-          tag: "button",
-          text: plain("细节已明，开始生成"),
-          type: "primary",
-          value: submitValue,
-        },
-      ],
-    },
-  );
+    type: "primary",
+    value: submitPayload,
+  });
 
   return {
     config: { wide_screen_mode: true },
@@ -155,7 +107,36 @@ export function buildContentCreateInteractiveCard(params: {
       template: "blue",
       title: { tag: "plain_text", content: "撰稿参数确认" },
     },
-    elements,
+    elements: [
+      {
+        tag: "div",
+        text: {
+          tag: "lark_md",
+          content: `**内容创作 — 结构化确认**\n请在下方面板内选择后点「开始生成」。\n\n**任务摘要**：${escapeMd(originalRequestPreview.slice(0, 200))}${originalRequestPreview.length > 200 ? "…" : ""}`,
+        },
+      },
+      { tag: "hr" },
+      {
+        tag: "div",
+        text: {
+          tag: "lark_md",
+          content: "**【常规项】与【补充项】**（均在下方表单内提交）",
+        },
+      },
+      {
+        tag: "form",
+        name: "content_create_form_v1",
+        elements: formInner,
+      },
+      {
+        tag: "div",
+        text: {
+          tag: "lark_md",
+          content:
+            "**合规提示**：处方药/功效表述以审慎为原则；对外终稿投放前请走客户合规流程。",
+        },
+      },
+    ],
   };
 }
 

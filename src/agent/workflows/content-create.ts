@@ -47,6 +47,17 @@ const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动
 
 在「可交内审草稿」与「必须再追问」之间犹豫时，**倾向 \`GATE: READY\`**。`;
 
+/** 系统规则仍认为材料不齐时，由模型根据全文生成「只补缺」的追问（替代写死模板） */
+const ALIGNMENT_FOLLOW_UP_SYSTEM = `你是医学新媒体编辑，正在与用户对齐一篇对外稿件（小红书/公众号等）的创作需求。
+
+你的任务：阅读下方**完整用户原话**与【从用户原话中读取的要点】，判断**还有哪些信息对成稿仍然关键、且尚未说清**；输出**编号追问列表**供用户补充。
+
+硬性要求：
+- **禁止**重复用户已经明确回答过的维度（例如已说「科普向」「个人内容号」就不要再问「受众是大众还是医生」「账号类型」等同义问题）。
+- 若用户已覆盖受众、账号/发布侧、目的与合规取向中的大部分，只问**仍缺的一两项**，或一条收口确认即可；**不要**为凑数硬凑 4 条。
+- 追问要**具体、可一句答清**；涉及处方药/品牌/功效时，问的是**本篇要采用的表述边界**，而不是泛泛普法。
+- 输出格式：使用 Markdown 编号列表，从 \`1.\` 起；每条可加粗小标题；**不要**开场白、结语、GATE 行或「以下是」类套话。`;
+
 const GENERATION_SYSTEM = `你是医学新媒体编辑。根据用户任务、已确认的信息与知识库参考片段，撰写可直接对外使用的稿件。
 要求：
 - **输出结构（必须严格遵守，否则下游无法解析）**：
@@ -421,6 +432,41 @@ function buildFallbackClarificationBlock(userText: string): string {
   ].join("\n");
 }
 
+/**
+ * 机械规则与简报仍认为不齐时，由大模型根据合并上下文生成**仅针对缺口**的追问（API 失败则回退模板）。
+ */
+async function generateAlignmentFollowUpQuestions(
+  userPayload: string,
+  model: string,
+): Promise<string> {
+  try {
+    const res = await getAnthropicClient().messages.create({
+      model,
+      max_tokens: 900,
+      system: ALIGNMENT_FOLLOW_UP_SYSTEM,
+      messages: [
+        {
+          role: "user",
+          content: `${userPayload}\n\n请只输出仍需对齐的编号追问（1～4 条）；若你认为材料已足够，只输出 1 条收口确认即可。`,
+        },
+      ],
+    });
+    const raw =
+      res.content
+        .filter((b): b is Anthropic.TextBlock => b.type === "text")
+        .map((b) => b.text)
+        .join("\n") || "";
+    const cleaned = stripAssistantNoise(raw);
+    if (cleaned.length >= 12) {
+      return cleaned;
+    }
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[content-create] 动态对齐追问生成失败:", msg);
+  }
+  return buildFallbackClarificationBlock(userPayload);
+}
+
 /** 用户可见追问里去掉模型误露的 GATE 行与代码块标记 */
 function sanitizeAskQuestionsForUser(raw: string): string {
   return raw
@@ -577,11 +623,17 @@ export async function runContentCreateWorkflow(
 
   if (shouldOverrideReadyToAsk(userText)) {
     const preamble = buildBriefAcknowledgmentPreamble(userText);
+    const questionsBlock = await generateAlignmentFollowUpQuestions(
+      userPayload,
+      model,
+    );
     return [
-      preamble ? `${preamble}\n\n` : "",
-      "**还需要确认这些**（机械规则触发；若你前面已说过可忽略重复项）：",
+      preamble ?
+        `${preamble}\n\n`
+      : "收到，我会基于你前面已经说的来对齐，只问还没覆盖的点。\n\n",
+      "**若补充下面即可动笔**（你已确认过的我不再重复问）：",
       "",
-      buildFallbackClarificationBlock(userText),
+      questionsBlock,
       "",
       "确认后我再撰写并写入飞书云文档（未确认前不会杜撰成稿）。",
     ].join("\n");

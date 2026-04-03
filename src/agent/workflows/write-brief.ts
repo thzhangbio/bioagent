@@ -44,7 +44,7 @@ export function extractWriteBriefSignals(mergedUserText: string): WriteBriefSign
   const hasPublisherHint =
     /发布主体|账号|署名|良医汇|泰诺麦博|品牌方|甲方|合作方|官方账号|医疗账户|有资质|医疗机构|第三方|矩阵|委托/.test(
       t,
-    );
+    ) || /对外(?:终稿|发布)?|终稿|公域投放|公开发布|可对外/.test(t);
 
   const delegatedBrand =
     /品牌(?:名)?(?:由你|你来)|由你(?:定|判断).{0,12}(?:品牌|点名|商品)|能不能(?:直接)?点.*由你|涉不涉及品牌.*由你/.test(

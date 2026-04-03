@@ -384,16 +384,20 @@ function shouldOverrideReadyToAsk(userText: string): boolean {
     /发布主体|哪.{0,8}(?:账号|方)|署名|账号|良医汇|泰诺麦博|品牌方|甲方|合作方|我方|客户方|有资质|医疗账户|医疗机构|广审|广告审批/.test(
       t,
     );
+  /** 未说具体账号，但已明确对外/终稿/公域等发布场景，不应再被机械规则挡 */
+  const hasPublishScene =
+    /对外(?:终稿|发布)?|终稿|公域|公开发布|可对外|对外投放/.test(t);
+  const publisherOk = hasPublisher || hasPublishScene;
   const hasBrandOrGoal =
-    /品牌|商品名|通用科普|不提.{0,4}品牌|处方药|合规|功效|推广|背书|草稿|侧重|目的|科普为主|认知|转化|是否点名/.test(
+    /品牌|商品名|通用科普|不提.{0,4}品牌|处方药|合规|功效|推广|背书|草稿|侧重|目的|科普为主|认知|转化|是否点名|科普/.test(
       t,
     );
 
   if (isPublicPlatformMedicalMarketingRisk(t)) {
-    return !(hasAudience && hasPublisher && hasBrandOrGoal);
+    return !(hasAudience && publisherOk && hasBrandOrGoal);
   }
 
-  return !(hasAudience && hasPublisher && hasBrandOrGoal);
+  return !(hasAudience && publisherOk && hasBrandOrGoal);
 }
 
 function buildFallbackClarificationBlock(userText: string): string {

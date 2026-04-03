@@ -2,6 +2,40 @@ import { randomUUID } from "node:crypto";
 
 import { getFeishuClient } from "./feishu-client.js";
 
+function isTransientFeishuNetworkError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /TLS|ECONNRESET|ETIMEDOUT|socket disconnected|ENOTFOUND|ECONNREFUSED|timeout|UND_ERR_SOCKET|fetch failed/i.test(
+    msg,
+  );
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+/** 飞书 OpenAPI 偶发 TLS/断连，短重试可提高写入成功率 */
+async function withFeishuRetry<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  const max = Math.max(1, Number(process.env.FEISHU_API_MAX_RETRIES ?? 4));
+  let last: unknown;
+  for (let attempt = 0; attempt < max; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      last = e;
+      if (!isTransientFeishuNetworkError(e) || attempt === max - 1) {
+        throw e;
+      }
+      const ms = 400 * (attempt + 1);
+      console.warn(
+        `[docx] ${label} 网络可重试错误，${ms}ms 后重试 (${attempt + 1}/${max}):`,
+        e instanceof Error ? e.message.slice(0, 160) : e,
+      );
+      await sleep(ms);
+    }
+  }
+  throw last;
+}
+
 /** 飞书 docx 块类型（常用）：页面、文本段落 */
 const BLOCK_TYPE_PAGE = 1;
 const BLOCK_TYPE_TEXT = 2;
@@ -43,24 +77,26 @@ function assertOk<T extends { code?: number; msg?: string }>(
 export async function createCloudDocument(
   options: CreateDocumentOptions = {},
 ): Promise<CreateDocumentResult> {
-  const client = getFeishuClient();
-  const res = await client.docx.v1.document.create({
-    data: {
-      title: options.title,
-      folder_token: options.folderToken,
-    },
+  return withFeishuRetry("document.create", async () => {
+    const client = getFeishuClient();
+    const res = await client.docx.v1.document.create({
+      data: {
+        title: options.title,
+        folder_token: options.folderToken,
+      },
+    });
+    assertOk(res, "docx.document.create");
+    const doc = res.data?.document;
+    const documentId = doc?.document_id;
+    if (!documentId) {
+      throw new Error("docx.document.create: 未返回 document_id");
+    }
+    return {
+      documentId,
+      revisionId: doc?.revision_id,
+      title: doc?.title,
+    };
   });
-  assertOk(res, "docx.document.create");
-  const doc = res.data?.document;
-  const documentId = doc?.document_id;
-  if (!documentId) {
-    throw new Error("docx.document.create: 未返回 document_id");
-  }
-  return {
-    documentId,
-    revisionId: doc?.revision_id,
-    title: doc?.title,
-  };
 }
 
 /**
@@ -69,22 +105,24 @@ export async function createCloudDocument(
 export async function findDocumentPageRootBlockId(
   documentId: string,
 ): Promise<string> {
-  const client = getFeishuClient();
-  const res = await client.docx.v1.documentBlock.list({
-    path: { document_id: documentId },
-    params: { page_size: 50 },
+  return withFeishuRetry("documentBlock.list", async () => {
+    const client = getFeishuClient();
+    const res = await client.docx.v1.documentBlock.list({
+      path: { document_id: documentId },
+      params: { page_size: 50 },
+    });
+    assertOk(res, "docx.documentBlock.list");
+    const items = res.data?.items;
+    if (!items?.length) {
+      throw new Error("docx.documentBlock.list: 文档无块");
+    }
+    const page = items.find((i) => i.block_type === BLOCK_TYPE_PAGE) ?? items[0];
+    const id = page?.block_id;
+    if (!id) {
+      throw new Error("docx: 无法解析页面 block_id");
+    }
+    return id;
   });
-  assertOk(res, "docx.documentBlock.list");
-  const items = res.data?.items;
-  if (!items?.length) {
-    throw new Error("docx.documentBlock.list: 文档无块");
-  }
-  const page = items.find((i) => i.block_type === BLOCK_TYPE_PAGE) ?? items[0];
-  const id = page?.block_id;
-  if (!id) {
-    throw new Error("docx: 无法解析页面 block_id");
-  }
-  return id;
 }
 
 function splitPlainTextToParagraphs(body: string): string[] {
@@ -113,29 +151,31 @@ export async function appendTextParagraphsToBlock(options: {
   index?: number;
   documentRevisionId?: number;
 }): Promise<void> {
-  const client = getFeishuClient();
-  const children = options.paragraphs.map((content) => ({
-    block_type: BLOCK_TYPE_TEXT,
-    text: {
-      elements: [{ text_run: { content } }],
-    },
-  }));
+  await withFeishuRetry("documentBlockChildren.create", async () => {
+    const client = getFeishuClient();
+    const children = options.paragraphs.map((content) => ({
+      block_type: BLOCK_TYPE_TEXT,
+      text: {
+        elements: [{ text_run: { content } }],
+      },
+    }));
 
-  const res = await client.docx.v1.documentBlockChildren.create({
-    path: {
-      document_id: options.documentId,
-      block_id: options.parentBlockId,
-    },
-    data: {
-      children,
-      index: options.index ?? 0,
-    },
-    params: {
-      document_revision_id: options.documentRevisionId,
-      client_token: randomUUID(),
-    },
+    const res = await client.docx.v1.documentBlockChildren.create({
+      path: {
+        document_id: options.documentId,
+        block_id: options.parentBlockId,
+      },
+      data: {
+        children,
+        index: options.index ?? 0,
+      },
+      params: {
+        document_revision_id: options.documentRevisionId,
+        client_token: randomUUID(),
+      },
+    });
+    assertOk(res, "docx.documentBlockChildren.create");
   });
-  assertOk(res, "docx.documentBlockChildren.create");
 }
 
 /**
@@ -153,18 +193,20 @@ export async function grantDocxCollaboratorFullAccess(
     return false;
   }
   try {
-    const client = getFeishuClient();
-    const res = await client.drive.permissionMember.create({
-      path: { token: documentToken },
-      params: { type: "docx", need_notification: false },
-      data: {
-        member_type: "openid",
-        member_id: id,
-        perm: "full_access",
-        type: "user",
-      },
+    await withFeishuRetry("permissionMember.create", async () => {
+      const client = getFeishuClient();
+      const res = await client.drive.permissionMember.create({
+        path: { token: documentToken },
+        params: { type: "docx", need_notification: false },
+        data: {
+          member_type: "openid",
+          member_id: id,
+          perm: "full_access",
+          type: "user",
+        },
+      });
+      assertOk(res, "drive.permissionMember.create");
     });
-    assertOk(res, "drive.permissionMember.create");
     return true;
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

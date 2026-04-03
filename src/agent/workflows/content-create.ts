@@ -510,6 +510,10 @@ function parseClarificationGateResponse(text: string): { ready: true } | { ready
 export interface ContentCreateWorkflowOptions {
   /** 当前发消息用户的 open_id，用于创建 docx 后授予「可管理」协作者权限 */
   senderOpenId?: string;
+  /**
+   * 用户已在飞书交互卡片提交结构化参数：跳过动笔前闸门、机械追问与动态追问，直接成稿。
+   */
+  skipAlignmentGates?: boolean;
 }
 
 /**
@@ -551,7 +555,11 @@ export async function runContentCreateWorkflow(
 
   const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
-  let gateReady = shouldSkipClarificationGate(userText);
+  const skipGates = workflowOpts.skipAlignmentGates === true;
+
+  let gateReady =
+    skipGates ||
+    shouldSkipClarificationGate(userText);
   if (
     !gateReady &&
     (shouldForceReadyForDraftCollaboration(userText) ||
@@ -561,10 +569,14 @@ export async function runContentCreateWorkflow(
     console.log(
       "[content-create] 简报满足草稿协作或编辑全权条件，跳过动笔前闸门",
     );
-  } else if (gateReady) {
+  } else if (gateReady && !skipGates) {
     console.log(
       "[content-create] 用户已说明要素并授权编辑把握边界，跳过动笔前闸门，直接成稿",
     );
+  }
+
+  if (skipGates) {
+    console.log("[content-create] 飞书卡片结构化参数已确认，跳过对齐闸门");
   }
 
   if (!gateReady) {
@@ -621,7 +633,7 @@ export async function runContentCreateWorkflow(
     }
   }
 
-  if (shouldOverrideReadyToAsk(userText)) {
+  if (!skipGates && shouldOverrideReadyToAsk(userText)) {
     const preamble = buildBriefAcknowledgmentPreamble(userText);
     const questionsBlock = await generateAlignmentFollowUpQuestions(
       userPayload,

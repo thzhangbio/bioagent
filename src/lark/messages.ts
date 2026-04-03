@@ -71,3 +71,39 @@ export async function replyMessage(opts: ReplyOptions): Promise<string> {
 
   return JSON.stringify(res?.data ?? res);
 }
+
+/** 飞书交互卡片（消息卡片 JSON，与开放平台「自定义发送消息」结构一致） */
+export async function sendInteractiveCard(opts: {
+  chatId?: string;
+  userId?: string;
+  card: Record<string, unknown>;
+}): Promise<string> {
+  const client = getFeishuClient();
+  const content = JSON.stringify(opts.card);
+
+  if (opts.chatId) {
+    const res = await client.im.v1.message.create({
+      params: { receive_id_type: "chat_id" },
+      data: {
+        receive_id: opts.chatId,
+        msg_type: "interactive",
+        content,
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
+
+  if (opts.userId) {
+    const res = await client.im.v1.message.create({
+      params: { receive_id_type: "open_id" },
+      data: {
+        receive_id: opts.userId,
+        msg_type: "interactive",
+        content,
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
+
+  throw new Error("sendInteractiveCard 需要 chatId 或 userId");
+}

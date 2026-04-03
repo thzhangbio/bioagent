@@ -11,6 +11,13 @@ export function getWriteMergeGate(chatId: string): WriteMergeGateState {
   return gateByChat.get(chatId) ?? "closed";
 }
 
+export function setWriteMergeGate(
+  chatId: string,
+  state: WriteMergeGateState,
+): void {
+  gateByChat.set(chatId, state);
+}
+
 /**
  * 根据本轮 `runContentCreateWorkflow` 的回复更新状态（在 router 写入历史前调用）。
  */

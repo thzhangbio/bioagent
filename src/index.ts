@@ -2,7 +2,13 @@ import "dotenv/config";
 import { LarkEventBridge, type LarkMessageEvent } from "./lark/events.js";
 import { handleUserFileMessage } from "./lark/file-upload-handler.js";
 import { replyMessage, sendMessage } from "./lark/messages.js";
-import { handleUserMessage } from "./agent/router.js";
+import {
+  appendConversationMessages,
+  handleUserMessage,
+} from "./agent/router.js";
+import { isContentCreateIntent, normalizeUserTextForIntent } from "./agent/workflows/content-create.js";
+import { sendContentCreateFormCard } from "./lark/content-create-card-flow.js";
+import { setWriteMergeGate } from "./agent/write-merge-gate.js";
 import { acquireFeishuWsLock } from "./lark/ws-lock.js";
 
 const bridge = new LarkEventBridge();
@@ -45,6 +51,31 @@ bridge.on("message", async (event: LarkMessageEvent) => {
   console.log(`[main] 用户: ${event.content}`);
 
   try {
+    const normalized = normalizeUserTextForIntent(event.content);
+    if (
+      process.env.FEISHU_CONTENT_CARD_FORM === "1" &&
+      isContentCreateIntent(normalized) &&
+      (event.chatId || event.senderId)
+    ) {
+      console.log("[main] 内容创作：下发飞书交互卡片（FEISHU_CONTENT_CARD_FORM=1）");
+      await sendContentCreateFormCard({
+        chatId: event.chatId || undefined,
+        userId: event.chatId ? undefined : event.senderId,
+        senderOpenId: event.senderId || "",
+        userText: event.content.trim(),
+      });
+      const ack =
+        "已为你展开**撰稿参数卡片**（见上方消息）。请勾选选项后点击 **「细节已明，开始生成」**；也可用文字继续补充说明。";
+      appendConversationMessages(chatKey, event.content, ack);
+      setWriteMergeGate(chatKey, "awaiting_supplement");
+      if (event.messageId) {
+        await replyMessage({ messageId: event.messageId, markdown: ack });
+      } else {
+        await sendMessage({ chatId: event.chatId, markdown: ack });
+      }
+      return;
+    }
+
     const reply = await handleUserMessage(chatKey, event.content, {
       senderOpenId: event.senderId || undefined,
     });

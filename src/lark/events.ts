@@ -1,6 +1,8 @@
 import * as Lark from "@larksuiteoapi/node-sdk";
 import { EventEmitter } from "node:events";
 
+import { handleContentCreateCardEvent } from "./content-create-card-flow.js";
+
 export interface LarkMessageEvent {
   eventType: string;
   messageId: string;
@@ -63,6 +65,18 @@ export class LarkEventBridge extends EventEmitter {
       },
       // 开放平台若订阅了「消息已读」，需占位处理，否则 SDK 会 warn: no handle
       "im.message.message_read_v1": async () => {},
+      /** 交互卡片按钮 / 表单提交（需在开放平台订阅「卡片回传交互」并启用长连接） */
+      "card.action.trigger": async (data: unknown) => {
+        if (process.env.FEISHU_CONTENT_CARD_FORM !== "1") {
+          return undefined;
+        }
+        try {
+          return await handleContentCreateCardEvent(data as Record<string, unknown>);
+        } catch (e) {
+          console.error("[lark-event] card.action.trigger 处理失败:", e);
+          return undefined;
+        }
+      },
     });
 
     this.wsClient = new Lark.WSClient({

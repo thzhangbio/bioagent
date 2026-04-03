@@ -32,6 +32,20 @@ function getHistory(chatId: string): ConversationMessage[] {
   return conversations.get(chatId)!;
 }
 
+/** 飞书卡片模式下仅记录一轮对话（不跑成稿路由） */
+export function appendConversationMessages(
+  chatId: string,
+  user: string,
+  assistant: string,
+): void {
+  const history = getHistory(chatId);
+  history.push({ role: "user", content: user });
+  history.push({ role: "assistant", content: assistant });
+  if (history.length > MAX_HISTORY * 2) {
+    history.splice(0, history.length - MAX_HISTORY * 2);
+  }
+}
+
 export async function handleUserMessage(
   chatId: string,
   userText: string,
@@ -158,6 +172,14 @@ function extractAndSaveInfo(
   userText: string,
   memory: ReturnType<typeof loadMemory>
 ): void {
+  if (
+    /你是小编|我说了原则|补充.{0,8}一轮又一轮|不要选了|元对话|吐槽机器人/i.test(
+      userText,
+    )
+  ) {
+    return;
+  }
+
   const profile = memory.companyProfile || ({} as CompanyProfile);
   let changed = false;
 

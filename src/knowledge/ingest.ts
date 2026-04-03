@@ -12,7 +12,10 @@ import { mergeStoreByReplacingCollections } from "./store-merge.js";
 
 const DEFAULT_BATCH = 16;
 
-export { mergeStoreByReplacingCollections } from "./store-merge.js";
+export {
+  mergeStoreByReplacingCollections,
+  mergeStoreAppendChunks,
+} from "./store-merge.js";
 
 /**
  * 将文本块批量嵌入为带向量的块（顺序与输入一致）。

@@ -18,3 +18,20 @@ export function mergeStoreByReplacingCollections(
     chunks: [...kept, ...incoming],
   };
 }
+
+/**
+ * 在现有库末尾追加块（用于 `personal` 多次上传累积，不影响其它集合）。
+ */
+export function mergeStoreAppendChunks(
+  existing: VectorStoreFile | null,
+  incoming: StoredVectorChunk[],
+  embeddingModel: string,
+): VectorStoreFile {
+  const prev = existing?.chunks ?? [];
+  return {
+    version: 1,
+    embeddingModel,
+    createdAt: new Date().toISOString(),
+    chunks: [...prev, ...incoming],
+  };
+}

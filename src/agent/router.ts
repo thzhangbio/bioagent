@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { augmentUserTextWithRag } from "./rag-context.js";
 import { buildSystemPrompt } from "../prompts/medical-editor.js";
 import { loadMemory, saveMemory, type CompanyProfile } from "../memory/store.js";
 
@@ -35,7 +36,8 @@ export async function handleUserMessage(
   userText: string
 ): Promise<string> {
   const history = getHistory(chatId);
-  history.push({ role: "user", content: userText });
+  const effectiveUser = await augmentUserTextWithRag(userText);
+  history.push({ role: "user", content: effectiveUser });
 
   if (history.length > MAX_HISTORY * 2) {
     history.splice(0, history.length - MAX_HISTORY * 2);

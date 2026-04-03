@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { LarkEventBridge, type LarkMessageEvent } from "./lark/events.js";
+import { handleUserFileMessage } from "./lark/file-upload-handler.js";
 import { replyMessage, sendMessage } from "./lark/messages.js";
 import { handleUserMessage } from "./agent/router.js";
 import { acquireFeishuWsLock } from "./lark/ws-lock.js";
@@ -13,6 +14,29 @@ bridge.on("message", async (event: LarkMessageEvent) => {
   if (processedMessages.has(event.messageId)) return;
   processedMessages.add(event.messageId);
   setTimeout(() => processedMessages.delete(event.messageId), MESSAGE_DEDUP_TTL);
+
+  if (event.attachment) {
+    const chatKey = event.chatId || event.senderId;
+    console.log(`\n[main] 处理文件消息 chatKey=${chatKey}`);
+    try {
+      const reply = await handleUserFileMessage(event);
+      console.log(`[main] 文件处理回复: ${reply.slice(0, 120)}...`);
+      if (event.messageId) {
+        await replyMessage({ messageId: event.messageId, markdown: reply });
+      } else if (event.chatId) {
+        await sendMessage({ chatId: event.chatId, markdown: reply });
+      }
+    } catch (err) {
+      console.error("[main] 处理文件失败:", err);
+      const fallback = "文件处理失败，请稍后重试或换用 .txt / .md 上传。";
+      if (event.messageId) {
+        await replyMessage({ messageId: event.messageId, text: fallback });
+      } else if (event.chatId) {
+        await sendMessage({ chatId: event.chatId, text: fallback });
+      }
+    }
+    return;
+  }
 
   if (!event.content?.trim()) return;
 
@@ -71,6 +95,9 @@ console.log(
   "[config] 提示：同一应用只允许一个长连接收事件；请关闭其它终端里的 lark-cli event / 重复 pnpm start"
 );
 console.log("[config] 排查时可执行: DEBUG_LARK=1 pnpm start");
+console.log(
+  "[config] RAG：需 OPENAI_API_KEY + 已执行 ingest:all；对话检索不含 job_post；文件上传见 data/uploads/",
+);
 console.log("[config] 独立探测长连接: pnpm run probe:feishu（需先停掉本服务）\n");
 console.log("[config] FEISHU_APP_ID =", process.env.FEISHU_APP_ID);
 

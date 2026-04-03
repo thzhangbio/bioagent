@@ -9,6 +9,11 @@ export interface LarkMessageEvent {
   senderId: string;
   messageType: string;
   content: string;
+  /** 用户发送文件消息时存在（`message_type` 一般为 `file`） */
+  attachment?: {
+    fileKey: string;
+    fileName: string;
+  };
   raw: Record<string, unknown>;
 }
 
@@ -45,8 +50,11 @@ export class LarkEventBridge extends EventEmitter {
             return;
           }
 
+          const preview = event.attachment ?
+            `[文件] ${event.attachment.fileName}`
+          : event.content.slice(0, 50);
           console.log(
-            `[lark-event] 收到消息: ${event.chatType === "p2p" ? "私聊" : "群聊"} | ${event.content.slice(0, 50)}`
+            `[lark-event] 收到消息: ${event.chatType === "p2p" ? "私聊" : "群聊"} | ${preview}`,
           );
           this.emit("message", event);
         } catch (err) {
@@ -91,14 +99,23 @@ export class LarkEventBridge extends EventEmitter {
     const senderId: string = sender?.sender_id?.open_id ?? "";
 
     let content = "";
+    let attachment: LarkMessageEvent["attachment"];
     try {
       const parsed = JSON.parse(message.content ?? "{}");
       content = parsed.text ?? "";
+      const fk = parsed.file_key ?? parsed.fileKey;
+      if (typeof fk === "string" && fk.length > 0) {
+        attachment = {
+          fileKey: fk,
+          fileName: String(parsed.file_name ?? parsed.fileName ?? "file"),
+        };
+      }
     } catch {
       content = message.content ?? "";
     }
 
-    if (!content && !messageId) return null;
+    if (!messageId) return null;
+    if (!content?.trim() && !attachment) return null;
 
     return {
       eventType: "im.message.receive_v1",
@@ -108,6 +125,7 @@ export class LarkEventBridge extends EventEmitter {
       senderId,
       messageType,
       content,
+      attachment,
       raw: data,
     };
   }

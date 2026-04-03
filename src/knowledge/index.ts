@@ -1,6 +1,7 @@
 export {
   COLLECTION_JOB_POST,
   COLLECTION_MEDICAL,
+  COLLECTION_PERSONAL,
   COLLECTION_PLATFORM_TONE,
 } from "./collections.js";
 export { chunkText } from "./chunk.js";
@@ -15,7 +16,12 @@ export {
   buildMergedStore,
   loadRagStoreOrLegacy,
 } from "./ingest.js";
-export { mergeStoreByReplacingCollections } from "./store-merge.js";
+export {
+  mergeStoreAppendChunks,
+  mergeStoreByReplacingCollections,
+} from "./store-merge.js";
+export { extractPlainTextFromFile, UnsupportedExtractError } from "./extract-text.js";
+export { ingestPersonalPlainText } from "./personal-ingest.js";
 export {
   DEFAULT_RAG_STORE_PATH,
   LEGACY_JOB_POSTS_STORE_PATH,

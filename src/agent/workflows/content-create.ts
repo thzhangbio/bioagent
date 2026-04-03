@@ -36,14 +36,17 @@ const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动
 
 在「材料不足但可凑合写」与「必须先问清」之间犹豫时，**倾向 \`GATE: ASK\`**。`;
 
-const GENERATION_SYSTEM = `你是医学新媒体编辑。根据用户任务、已确认的信息与知识库参考片段，撰写可直接对外使用的营销正文。
+const GENERATION_SYSTEM = `你是医学新媒体编辑。根据用户任务、已确认的信息与知识库参考片段，撰写可直接对外使用的稿件。
 要求：
-- 输出为纯文本，段落之间空一行；不要使用 Markdown 标题符号（如 #）。
+- **输出结构（必须严格遵守，否则下游无法解析）**：
+  - 第 1 行：**仅一行**——本篇拟在平台使用的**发布标题**（面向读者、符合该平台阅读习惯：小红书要抓人、口语化；公众号可稍正式；避免把「新型××制剂」「关于××的科普」这类偏学术或像论文主题词的短语直接当标题，除非用户明确要求；合规前提下可适度用问句、场景或痛点，禁止标题党与违规用语）。
+  - 第 2 行：必须为空行。
+  - 第 3 行起：**正文**，段落之间空一行；正文内不要重复第一行的标题；不要使用 Markdown 标题符号（如 #）。
 - **只使用用户已确认的事实与知识库片段**；不得编造数据、病例、批文、疗效细节或产品信息；不确定处用审慎表述或删去，禁止杜撰补全。
 - 医学表述审慎，不夸大疗效；遵守广告法，避免绝对化用语。
 - 知识库片段仅供风格与事实参考；若与用户最新说明冲突，以用户为准。
 - **平台与体裁**：若用户指定了小红书、知乎、微信公众号、朋友圈等，须按该平台的**常识级阅读习惯与语气**写作（短段落、节奏、称呼等）；后续接入专属「运营知识库」时仅作增强，**没有知识库时也应具备基本平台感**。医学与合规底线不因平台而降低。
-- 只输出正文，不要开场白或后记说明；不要在正文里向读者列出「待确认」类运营问题（运营侧确认应在成稿前完成）。`;
+- 不要开场白或后记说明；不要在正文里向读者列出「待确认」类运营问题（运营侧确认应在成稿前完成）。`;
 
 /**
  * 去掉飞书 @、零宽字符等，避免意图识别失败。
@@ -251,6 +254,45 @@ function stripAssistantNoise(text: string): string {
     .replace(/^[\s\n]*(?:以下是|下面是|正文如下)[:：]?\s*/i, "")
     .replace(/```[\s\S]*?```/g, (block) => block.replace(/```/g, "").trim())
     .trim();
+}
+
+/**
+ * 解析生成结果：第 1 行为发布标题，第 2 行为空行，第 3 行起为正文。若格式不符则回退为从任务句抽标题 + 全文作正文。
+ */
+function splitGeneratedTitleAndBody(
+  cleaned: string,
+  userText: string,
+): { title: string; body: string } {
+  const normalized = cleaned.trim();
+  const lines = normalized.split(/\r?\n/);
+  if (lines.length < 2) {
+    return {
+      title: deriveDocumentTitle(userText),
+      body: normalized || cleaned.trim(),
+    };
+  }
+
+  const titleLine = lines[0]!
+    .replace(/^【\s*标题\s*】\s*/u, "")
+    .replace(/^TITLE[:：]\s*/i, "")
+    .trim();
+  let i = 1;
+  while (i < lines.length && lines[i]!.trim() === "") i++;
+  const body = lines.slice(i).join("\n").trim();
+
+  const titleOk =
+    titleLine.length >= 2 &&
+    titleLine.length <= 80 &&
+    !/^#{1,6}\s/.test(titleLine);
+
+  if (!titleOk || !body) {
+    return {
+      title: deriveDocumentTitle(userText),
+      body: normalized,
+    };
+  }
+
+  return { title: titleLine.slice(0, 80), body };
 }
 
 /** 小红书等 + 医药营销敏感词：未显式豁免时不得跳过闸门、不得 READY */
@@ -486,6 +528,7 @@ export async function runContentCreateWorkflow(
   }
 
   let body: string;
+  let title: string;
   try {
     const response = await getAnthropicClient().messages.create({
       model,
@@ -493,12 +536,15 @@ export async function runContentCreateWorkflow(
       system: GENERATION_SYSTEM,
       messages: [{ role: "user", content: userPayload }],
     });
-    body =
+    const rawBody =
       response.content
         .filter((b): b is Anthropic.TextBlock => b.type === "text")
         .map((b) => b.text)
         .join("\n") || "";
-    body = stripAssistantNoise(body);
+    const cleaned = stripAssistantNoise(rawBody);
+    const split = splitGeneratedTitleAndBody(cleaned, userText);
+    body = split.body;
+    title = split.title;
     if (!body.trim()) {
       throw new Error("模型未返回正文");
     }
@@ -510,8 +556,6 @@ export async function runContentCreateWorkflow(
     }
     return `抱歉，正文生成失败：${msg.slice(0, 200)}`;
   }
-
-  const title = deriveDocumentTitle(userText);
   const folderToken = process.env.FEISHU_DOC_FOLDER_TOKEN;
 
   try {

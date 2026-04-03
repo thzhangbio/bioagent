@@ -9,7 +9,9 @@
     "start": "tsx src/index.ts",
     "build": "tsc",
     "lint": "tsc --noEmit",
-    "probe:feishu": "tsx scripts/feishu-ws-probe.ts"
+    "probe:feishu": "tsx scripts/feishu-ws-probe.ts",
+    "ingest:jobs": "tsx scripts/ingest-job-posts.ts",
+    "search:jobs": "tsx scripts/search-job-posts.ts"
   },
   "keywords": [
     "feishu",
@@ -24,6 +26,7 @@
     "@anthropic-ai/sdk": "^0.81.0",
     "@larksuiteoapi/node-sdk": "^1.60.0",
     "dotenv": "^17.3.1",
+    "openai": "^6.33.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
@@ -31,6 +34,9 @@
     "@types/node": "^25.5.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "protobufjs"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "protobufjs"
+    ]
   }
 }

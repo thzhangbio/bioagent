@@ -1,5 +1,13 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { getAnthropicClient } from "./anthropic.js";
 import { augmentUserTextWithRag } from "./rag-context.js";
+import {
+  assistantSeemedToAskWriteClarification,
+  buildMergedWriteRequest,
+  isContentCreateIntent,
+  normalizeUserTextForIntent,
+  runContentCreateWorkflow,
+} from "./workflows/content-create.js";
 import { buildSystemPrompt } from "../prompts/medical-editor.js";
 import { loadMemory, saveMemory, type CompanyProfile } from "../memory/store.js";
 
@@ -11,18 +19,6 @@ interface ConversationMessage {
 const MAX_HISTORY = 30;
 
 const conversations = new Map<string, ConversationMessage[]>();
-
-let client: Anthropic | null = null;
-
-function getClient(): Anthropic {
-  if (!client) {
-    client = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      baseURL: process.env.ANTHROPIC_BASE_URL || undefined,
-    });
-  }
-  return client;
-}
 
 function getHistory(chatId: string): ConversationMessage[] {
   if (!conversations.has(chatId)) {
@@ -36,14 +32,64 @@ export async function handleUserMessage(
   userText: string
 ): Promise<string> {
   const history = getHistory(chatId);
+  const memory = loadMemory();
+  const normalized = normalizeUserTextForIntent(userText);
+  const createIntent = isContentCreateIntent(normalized);
+  console.log(
+    `[router] content-create intent=${createIntent} text=${JSON.stringify(normalized.slice(0, 72))}${normalized.length > 72 ? "…" : ""}`,
+  );
+
+  if (createIntent) {
+    history.push({ role: "user", content: userText });
+    if (history.length > MAX_HISTORY * 2) {
+      history.splice(0, history.length - MAX_HISTORY * 2);
+    }
+    try {
+      const reply = await runContentCreateWorkflow(chatId, normalized);
+      history.push({ role: "assistant", content: reply });
+      extractAndSaveInfo(userText, memory);
+      return reply;
+    } catch (err) {
+      history.pop();
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[agent] content-create 工作流失败:", msg);
+      return "抱歉，内容创作流程暂时失败，请稍后再试。";
+    }
+  }
+
+  const lastAssistant = [...history]
+    .reverse()
+    .find((m) => m.role === "assistant");
+  const mergedWrite = buildMergedWriteRequest(history, userText);
+  if (
+    mergedWrite &&
+    lastAssistant &&
+    assistantSeemedToAskWriteClarification(lastAssistant.content)
+  ) {
+    console.log("[router] content-create 合并追问上下文，走 docx 工作流");
+    history.push({ role: "user", content: userText });
+    if (history.length > MAX_HISTORY * 2) {
+      history.splice(0, history.length - MAX_HISTORY * 2);
+    }
+    try {
+      const reply = await runContentCreateWorkflow(chatId, mergedWrite);
+      history.push({ role: "assistant", content: reply });
+      extractAndSaveInfo(userText, memory);
+      return reply;
+    } catch (err) {
+      history.pop();
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[agent] content-create（合并）失败:", msg);
+      return "抱歉，内容创作流程暂时失败，请稍后再试。";
+    }
+  }
+
   const effectiveUser = await augmentUserTextWithRag(userText);
   history.push({ role: "user", content: effectiveUser });
 
   if (history.length > MAX_HISTORY * 2) {
     history.splice(0, history.length - MAX_HISTORY * 2);
   }
-
-  const memory = loadMemory();
   const profileText = memory.companyProfile
     ? formatProfile(memory.companyProfile)
     : undefined;
@@ -52,7 +98,7 @@ export async function handleUserMessage(
   const systemPrompt = buildSystemPrompt(profileText);
 
   try {
-    const response = await getClient().messages.create({
+    const response = await getAnthropicClient().messages.create({
       model,
       max_tokens: 2048,
       system: systemPrompt,

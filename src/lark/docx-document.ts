@@ -22,6 +22,11 @@ export interface CreateDocumentResult {
   title?: string;
 }
 
+export interface PlainTextDocumentOptions extends Pick<CreateDocumentOptions, "folderToken"> {
+  /** 对话用户 open_id：创建成功后为其添加云文档「可管理」协作者权限，便于用户自行编辑 */
+  grantEditToOpenId?: string;
+}
+
 function assertOk<T extends { code?: number; msg?: string }>(
   res: T,
   action: string,
@@ -134,13 +139,50 @@ export async function appendTextParagraphsToBlock(options: {
 }
 
 /**
+ * 为指定用户（open_id）增加云文档协作者权限：`full_access`（飞书侧「可管理」，含编辑、分享等，具体以租户策略为准）。
+ * @see https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/reference/drive-v1/permission-member/create
+ */
+export async function grantDocxCollaboratorFullAccess(
+  documentToken: string,
+  userOpenId: string,
+): Promise<boolean> {
+  const id = userOpenId.trim();
+  if (!id) return false;
+  if (process.env.FEISHU_DOC_DISABLE_USER_GRANT === "1") {
+    console.log("[docx] 已跳过授予用户协作者（FEISHU_DOC_DISABLE_USER_GRANT=1）");
+    return false;
+  }
+  try {
+    const client = getFeishuClient();
+    const res = await client.drive.permissionMember.create({
+      path: { token: documentToken },
+      params: { type: "docx", need_notification: false },
+      data: {
+        member_type: "openid",
+        member_id: id,
+        perm: "full_access",
+        type: "user",
+      },
+    });
+    assertOk(res, "drive.permissionMember.create");
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[docx] 授予用户协作者权限失败:", msg);
+    return false;
+  }
+}
+
+/**
  * 创建云文档并写入纯文本正文（按空行分段；超长段会截断为多块）。
  */
 export async function createDocumentWithPlainText(
   title: string,
   body: string,
-  options: Pick<CreateDocumentOptions, "folderToken"> = {},
-): Promise<CreateDocumentResult & { url: string }> {
+  options: PlainTextDocumentOptions = {},
+): Promise<
+  CreateDocumentResult & { url: string; collaboratorGranted?: boolean }
+> {
   const created = await createCloudDocument({
     title,
     folderToken: options.folderToken,
@@ -154,9 +196,17 @@ export async function createDocumentWithPlainText(
     index: 0,
     documentRevisionId: created.revisionId,
   });
+  let collaboratorGranted: boolean | undefined;
+  if (options.grantEditToOpenId) {
+    collaboratorGranted = await grantDocxCollaboratorFullAccess(
+      created.documentId,
+      options.grantEditToOpenId,
+    );
+  }
   return {
     ...created,
     url: buildDocxWebUrl(created.documentId),
+    collaboratorGranted,
   };
 }
 

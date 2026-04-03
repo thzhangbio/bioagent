@@ -2,13 +2,17 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getAnthropicClient } from "./anthropic.js";
 import { augmentUserTextWithRag } from "./rag-context.js";
 import {
-  assistantSeemedToAskWriteClarification,
   buildMergedWriteRequest,
   isContentCreateIntent,
   isPlausibleWriteMergeFollowUp,
   normalizeUserTextForIntent,
   runContentCreateWorkflow,
+  type ContentCreateWorkflowOptions,
 } from "./workflows/content-create.js";
+import {
+  getWriteMergeGate,
+  syncWriteMergeGateFromWorkflowReply,
+} from "./write-merge-gate.js";
 import { buildSystemPrompt } from "../prompts/medical-editor.js";
 import { loadMemory, saveMemory, type CompanyProfile } from "../memory/store.js";
 
@@ -30,7 +34,8 @@ function getHistory(chatId: string): ConversationMessage[] {
 
 export async function handleUserMessage(
   chatId: string,
-  userText: string
+  userText: string,
+  meta?: Pick<ContentCreateWorkflowOptions, "senderOpenId">,
 ): Promise<string> {
   const history = getHistory(chatId);
   const memory = loadMemory();
@@ -46,7 +51,10 @@ export async function handleUserMessage(
       history.splice(0, history.length - MAX_HISTORY * 2);
     }
     try {
-      const reply = await runContentCreateWorkflow(chatId, normalized);
+      const reply = await runContentCreateWorkflow(chatId, normalized, {
+        senderOpenId: meta?.senderOpenId,
+      });
+      syncWriteMergeGateFromWorkflowReply(chatId, reply);
       history.push({ role: "assistant", content: reply });
       extractAndSaveInfo(userText, memory);
       return reply;
@@ -58,23 +66,24 @@ export async function handleUserMessage(
     }
   }
 
-  const lastAssistant = [...history]
-    .reverse()
-    .find((m) => m.role === "assistant");
   const mergedWrite = buildMergedWriteRequest(history, userText);
   if (
     mergedWrite &&
-    lastAssistant &&
-    assistantSeemedToAskWriteClarification(lastAssistant.content) &&
+    getWriteMergeGate(chatId) === "awaiting_supplement" &&
     isPlausibleWriteMergeFollowUp(userText)
   ) {
-    console.log("[router] content-create 合并追问上下文，走 docx 工作流");
+    console.log(
+      `[router] content-create 合并追问上下文，gate=awaiting_supplement，走 docx 工作流`,
+    );
     history.push({ role: "user", content: userText });
     if (history.length > MAX_HISTORY * 2) {
       history.splice(0, history.length - MAX_HISTORY * 2);
     }
     try {
-      const reply = await runContentCreateWorkflow(chatId, mergedWrite);
+      const reply = await runContentCreateWorkflow(chatId, mergedWrite, {
+        senderOpenId: meta?.senderOpenId,
+      });
+      syncWriteMergeGateFromWorkflowReply(chatId, reply);
       history.push({ role: "assistant", content: reply });
       extractAndSaveInfo(userText, memory);
       return reply;

@@ -45,7 +45,9 @@ bridge.on("message", async (event: LarkMessageEvent) => {
   console.log(`[main] 用户: ${event.content}`);
 
   try {
-    const reply = await handleUserMessage(chatKey, event.content);
+    const reply = await handleUserMessage(chatKey, event.content, {
+      senderOpenId: event.senderId || undefined,
+    });
     console.log(`[main] 回复: ${reply.slice(0, 100)}...`);
 
     if (event.messageId) {

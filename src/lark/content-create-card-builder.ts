@@ -143,3 +143,96 @@ export function buildContentCreateInteractiveCard(params: {
 function escapeMd(s: string): string {
   return s.replace(/[*#[\]`]/g, "");
 }
+
+/** 飞书客户端 ≥ V7.9 才完整展示折叠面板；低版本可能显示升级提示 */
+const WORKFLOW_MODE_HELP =
+  "我将给你一个关于写作主题的多选项内容卡片，勾选沟通完成，以飞书文档的形式交付文章，后续可改。";
+
+/**
+ * 进入结构化撰稿前的确认卡片：Yes / No + 可折叠「工作流模式说明」。
+ */
+export function buildContentCreateConsentCard(params: {
+  consentId: string;
+  /** 展示在文案中的工作流名称，如「内容创作」 */
+  workflowName: string;
+}): Record<string, unknown> {
+  const { consentId, workflowName } = params;
+
+  const consentPayload = (choice: "yes" | "no") => ({
+    action: "content_create_consent",
+    choice,
+    consent_id: consentId,
+  });
+
+  return {
+    config: { wide_screen_mode: true },
+    header: {
+      template: "wathet",
+      title: { tag: "plain_text", content: "是否进入创作工作流" },
+    },
+    elements: [
+      {
+        tag: "div",
+        text: {
+          tag: "lark_md",
+          content: `你想进入 **${escapeMd(workflowName)}** 工作流吗？\n选 **Yes**，我们进入**创作工作模式**（结构化卡片 + 飞书文档交付）。`,
+        },
+      },
+      {
+        tag: "collapsible_panel",
+        expanded: false,
+        header: {
+          title: {
+            tag: "plain_text",
+            content: "该工作流模式说明",
+          },
+        },
+        elements: [
+          {
+            tag: "div",
+            text: {
+              tag: "plain_text",
+              content: WORKFLOW_MODE_HELP,
+            },
+          },
+        ],
+      },
+      { tag: "hr" },
+      {
+        tag: "action",
+        actions: [
+          {
+            tag: "button",
+            type: "primary_filled",
+            size: "medium",
+            text: {
+              tag: "plain_text",
+              content: "Yes",
+            },
+            behaviors: [
+              {
+                type: "callback",
+                value: consentPayload("yes"),
+              },
+            ],
+          },
+          {
+            tag: "button",
+            type: "default",
+            size: "medium",
+            text: {
+              tag: "plain_text",
+              content: "No",
+            },
+            behaviors: [
+              {
+                type: "callback",
+                value: consentPayload("no"),
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}

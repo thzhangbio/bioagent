@@ -7,8 +7,7 @@ import {
   handleUserMessage,
 } from "./agent/router.js";
 import { isContentCreateIntent, normalizeUserTextForIntent } from "./agent/workflows/content-create.js";
-import { sendContentCreateFormCard } from "./lark/content-create-card-flow.js";
-import { setWriteMergeGate } from "./agent/write-merge-gate.js";
+import { sendContentCreateConsentCard } from "./lark/content-create-card-flow.js";
 import { acquireFeishuWsLock } from "./lark/ws-lock.js";
 
 const bridge = new LarkEventBridge();
@@ -57,17 +56,16 @@ bridge.on("message", async (event: LarkMessageEvent) => {
       isContentCreateIntent(normalized) &&
       (event.chatId || event.senderId)
     ) {
-      console.log("[main] 内容创作：下发飞书交互卡片（FEISHU_CONTENT_CARD_FORM=1）");
-      await sendContentCreateFormCard({
+      console.log("[main] 内容创作：先下发「是否进入创作工作流」确认卡片（FEISHU_CONTENT_CARD_FORM=1）");
+      await sendContentCreateConsentCard({
         chatId: event.chatId || undefined,
         userId: event.chatId ? undefined : event.senderId,
         senderOpenId: event.senderId || "",
         userText: event.content.trim(),
       });
       const ack =
-        "已为你展开**撰稿参数卡片**（见上方消息）。请勾选选项后点击 **「细节已明，开始生成」**；也可用文字继续补充说明。";
+        "请先在上方的确认卡片中选择 **Yes** 或 **No**：选 **Yes** 将进入创作工作模式（多选项卡片 + 飞书文档交付）；选 **No** 则按日常对话继续。也可展开 **「该工作流模式说明」** 查看流程介绍。";
       appendConversationMessages(chatKey, event.content, ack);
-      setWriteMergeGate(chatKey, "awaiting_supplement");
       if (event.messageId) {
         await replyMessage({ messageId: event.messageId, markdown: ack });
       } else {

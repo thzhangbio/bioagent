@@ -46,15 +46,27 @@ export function appendConversationMessages(
   }
 }
 
+/** 从会话末尾移除若干条消息（用于卡片确认后回滚「用户句 + 机器人 ack」再重走路由） */
+export function popLastConversationMessages(chatId: string, count: number): void {
+  const history = getHistory(chatId);
+  const n = Math.min(Math.max(0, count), history.length);
+  if (n === 0) return;
+  history.splice(history.length - n, n);
+}
+
 export async function handleUserMessage(
   chatId: string,
   userText: string,
-  meta?: Pick<ContentCreateWorkflowOptions, "senderOpenId">,
+  meta?: Pick<ContentCreateWorkflowOptions, "senderOpenId"> & {
+    /** 为 true 时跳过内容创作工作流（含合并成稿），按日常对话处理 */
+    forceGeneralChat?: boolean;
+  },
 ): Promise<string> {
   const history = getHistory(chatId);
   const memory = loadMemory();
   const normalized = normalizeUserTextForIntent(userText);
-  const createIntent = isContentCreateIntent(normalized);
+  const createIntent =
+    meta?.forceGeneralChat === true ? false : isContentCreateIntent(normalized);
   console.log(
     `[router] content-create intent=${createIntent} text=${JSON.stringify(normalized.slice(0, 72))}${normalized.length > 72 ? "…" : ""}`,
   );

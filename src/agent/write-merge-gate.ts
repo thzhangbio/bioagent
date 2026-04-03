@@ -23,8 +23,11 @@ export function syncWriteMergeGateFromWorkflowReply(
     return;
   }
   if (
-    /动笔前需要先对齐下面几项/.test(reply) &&
-    /未确认前不会成稿/.test(reply)
+    (/动笔前需要先对齐下面几项|若补充下面即可动笔|还需要确认这些/.test(
+      reply,
+    ) ||
+      /确认后我再撰写并写入飞书云文档/.test(reply)) &&
+    /未确认前不会(?:成稿|杜撰)/.test(reply)
   ) {
     gateByChat.set(chatId, "awaiting_supplement");
     return;

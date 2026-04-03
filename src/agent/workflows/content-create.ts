@@ -10,6 +10,14 @@ import {
   createDocumentWithPlainText,
 } from "../../lark/docx-document.js";
 import { loadMemory, saveMemory, type MemoryStore } from "../../memory/store.js";
+import {
+  buildBriefAcknowledgmentPreamble,
+  buildBriefSummaryBlock,
+  extractWriteBriefSignals,
+  shouldForceReadyForDraftCollaboration,
+  shouldForceReadyForEditorHandoff,
+  shouldRelaxXhsOverride,
+} from "./write-brief.js";
 
 /** 内容创作检索：与对话 RAG 一致，不含 job_post */
 const CONTENT_RAG_COLLECTIONS: KnowledgeCollection[] = [
@@ -22,19 +30,22 @@ const CONTENT_RAG_COLLECTIONS: KnowledgeCollection[] = [
 const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动笔前核对」环节。判断：当前材料是否已足以**在合规前提下**撰写对外稿件（科普/营销类）。
 
 **硬性规则（高于一切）**：
-- 若任务涉及**小红书/抖音等公域投放**且内容可能涉及**处方药、具体药品商品名、功效宣传或品牌背书**，而用户在**本轮对话材料**中尚未明确：受众、是否点名品牌/如何表述药品、发布主体（账号归属）、传播目的与合规边界——则**必须**输出 \`GATE: ASK\`。不得因知识库检索片段较丰富、或公司画像有部分记录，就推断为已确认。
-- 知识库与公司画像**不能替代**用户对本篇稿件的确认；「似乎做过类似方向」不等于本篇已授权。
+- 若 **【从用户原话中读取的要点】** 已写明：用户将品牌/合规交由编辑判断、且明确**内审草稿/先出稿再谈合规**、并已提及受众与发布侧信息——则**必须**输出 \`GATE: READY\`，不得再以「材料矛盾」「缺批文号」等理由继续追问；成稿中可用审慎表述与文末风险说明代替反复确认。
+- 若 **【从用户原话中读取的要点】** 显示用户已说明广审/资质账户/品牌认知向/由编辑把关，且材料已覆盖受众与主体——倾向 \`GATE: READY\`，**不要**用知识库里的公司画像与用户最新说明打架。
+- 仅当用户**完全未**给出受众或发布场景、且未授权编辑裁量时，才因「公域处方药」输出 \`GATE: ASK\`。
+- 知识库与公司画像**不能替代**用户对本篇的授权；但若用户原话已授权编辑，**不得以知识库推断未确认**。
 
 **可输出 \`GATE: READY\` 的情况**：
-- 用户已明确授权编辑决定剩余选项（如由你定、边界你看着办、可以动笔），**且**在同一轮材料中能看出受众、发布场景/主体、传播目的已说清楚；或
-- 用户已明确说本篇只做通用科普、不提具体处方药商品名与功效承诺、且主体与场景清楚。
+- 用户已授权编辑决定剩余选项，且【要点】中受众、发布侧、目的至少已覆盖；或
+- 用户明确内审草稿、合规后置；或
+- 用户明确只做通用科普、不提具体处方药承诺。
 
 **输出格式（必须严格遵守）**：
 - 第一行只能是：\`GATE: READY\` 或 \`GATE: ASK\`（不要加反引号、不要加 Markdown）。
-- \`GATE: ASK\` 时：第二行起为编号追问（含合规与平台风险提醒时可简短说明）；最多 5 条。
+- \`GATE: ASK\` 时：第二行起为编号追问；**只问当前仍缺失、且未被【要点】覆盖的 1～3 条**，勿重复用户已回答的维度。
 - \`GATE: READY\` 时：第一行后不要输出任何字符。
 
-在「材料不足但可凑合写」与「必须先问清」之间犹豫时，**倾向 \`GATE: ASK\`**。`;
+在「可交内审草稿」与「必须再追问」之间犹豫时，**倾向 \`GATE: READY\`**。`;
 
 const GENERATION_SYSTEM = `你是医学新媒体编辑。根据用户任务、已确认的信息与知识库参考片段，撰写可直接对外使用的稿件。
 要求：
@@ -311,6 +322,9 @@ function isPublicPlatformMedicalMarketingRisk(userText: string): boolean {
 function userWaivedOrBoundedCompliance(userText: string): boolean {
   const t = normalizeUserTextForIntent(userText);
   return (
+    /(?:只是|这)?一篇?草稿|讨论稿|内审|先写|写完(?:再|之后)|合规.{0,14}(?:等|之后|再来|再谈)|(?:等|之后).{0,8}(?:再)?谈合规/.test(
+      t,
+    ) ||
     /(?:草稿|初稿|内部|先不管|暂不|不计).{0,8}(?:合规|审核|投放)/.test(t) ||
     /只做通用科普|通用科普|不提(?:具体)?(?:品牌|商品名|药名)|不写品牌|不出现.{0,4}商品名/.test(
       t,
@@ -357,6 +371,7 @@ function shouldSkipClarificationGate(userText: string): boolean {
 function shouldOverrideReadyToAsk(userText: string): boolean {
   const t = normalizeUserTextForIntent(userText);
   if (userWaivedOrBoundedCompliance(t)) return false;
+  if (shouldRelaxXhsOverride(t)) return false;
 
   const xhsWrite =
     /(?:小红书|小红薯)/.test(t) &&
@@ -366,7 +381,7 @@ function shouldOverrideReadyToAsk(userText: string): boolean {
   const hasAudience =
     /受众|面向|给(?:谁|读者)|普通大众|患者|医生|专业人士|大众|医护|用户/.test(t);
   const hasPublisher =
-    /发布主体|哪.{0,8}(?:账号|方)|署名|账号|良医汇|泰诺麦博|品牌方|甲方|合作方|我方|客户方/.test(
+    /发布主体|哪.{0,8}(?:账号|方)|署名|账号|良医汇|泰诺麦博|品牌方|甲方|合作方|我方|客户方|有资质|医疗账户|医疗机构|广审|广告审批/.test(
       t,
     );
   const hasBrandOrGoal =
@@ -459,11 +474,23 @@ export async function runContentCreateWorkflow(
   const ragBlock = await fetchRagContext(userText);
   const profileBlock = formatProfileBlock(memory);
 
+  const briefSignals = extractWriteBriefSignals(userText);
+  const draftOrientation =
+    briefSignals.draftMode || userWaivedOrBoundedCompliance(userText) ?
+      [
+        "",
+        "【成稿取向】用户若要求内审草稿或合规后置：正文用审慎医学表述；可在文末简短标注待合规与投放确认，不视为可直接公域投放终稿。",
+      ]
+    : [];
+
   const userPayload = [
-    "【用户任务】",
+    "【用户任务（含多轮合并时的完整原文）】",
     userText.trim(),
     "",
+    buildBriefSummaryBlock(userText),
+    "",
     buildPlatformStyleBlock(userText),
+    ...draftOrientation,
     "",
     "【公司画像】",
     profileBlock,
@@ -475,7 +502,16 @@ export async function runContentCreateWorkflow(
   const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
   let gateReady = shouldSkipClarificationGate(userText);
-  if (gateReady) {
+  if (
+    !gateReady &&
+    (shouldForceReadyForDraftCollaboration(userText) ||
+      shouldForceReadyForEditorHandoff(userText))
+  ) {
+    gateReady = true;
+    console.log(
+      "[content-create] 简报满足草稿协作或编辑全权条件，跳过动笔前闸门",
+    );
+  } else if (gateReady) {
     console.log(
       "[content-create] 用户已说明要素并授权编辑把握边界，跳过动笔前闸门，直接成稿",
     );
@@ -509,21 +545,41 @@ export async function runContentCreateWorkflow(
       return `抱歉，动笔前核对环节失败：${msg.slice(0, 200)}`;
     }
 
-    const gate = parseClarificationGateResponse(gateText);
+    let gate = parseClarificationGateResponse(gateText);
+    if (
+      !gate.ready &&
+      (shouldForceReadyForDraftCollaboration(userText) ||
+        shouldForceReadyForEditorHandoff(userText))
+    ) {
+      console.warn(
+        "[content-create] 模型闸门返回 ASK，但简报规则判定应 READY，覆盖为成稿",
+      );
+      gate = { ready: true };
+    }
     if (!gate.ready) {
+      const preamble = buildBriefAcknowledgmentPreamble(userText);
       return [
-        "动笔前需要先对齐下面几项，确认后我再撰写并写入飞书云文档（**未确认前不会成稿或杜撰**）：",
+        preamble ?
+          `${preamble}\n\n`
+        : "收到，我会基于你前面已经说的来对齐，只问还没覆盖的点。\n\n",
+        "**若补充下面即可动笔**（你已确认过的我不再重复问）：",
         "",
         gate.questions,
+        "",
+        "确认后我再撰写并写入飞书云文档（未确认前不会杜撰成稿）。",
       ].join("\n");
     }
   }
 
   if (shouldOverrideReadyToAsk(userText)) {
+    const preamble = buildBriefAcknowledgmentPreamble(userText);
     return [
-      "动笔前需要先对齐下面几项，确认后我再撰写并写入飞书云文档（**未确认前不会成稿或杜撰**）：",
+      preamble ? `${preamble}\n\n` : "",
+      "**还需要确认这些**（机械规则触发；若你前面已说过可忽略重复项）：",
       "",
       buildFallbackClarificationBlock(userText),
+      "",
+      "确认后我再撰写并写入飞书云文档（未确认前不会杜撰成稿）。",
     ].join("\n");
   }
 

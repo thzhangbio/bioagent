@@ -79,12 +79,38 @@ export function isContentCreateIntent(userText: string): boolean {
 
 /**
  * 上一轮助手是否在「追问需求」而未交付文档（用于合并后续补充说明并走 docx）。
+ * 注意：不可匹配成功交付模板里的「补充要点」，否则会误把「已写好…链接…」当成仍在追问。
  */
 export function assistantSeemedToAskWriteClarification(assistantText: string): boolean {
   const t = assistantText.slice(0, 1200);
-  return /先确认|确认几个|动笔前需要先对齐|未确认前不会成稿|补充.*点|还需要|哪(几)?点|说清楚|方便告知|什么(受众|平台)|是否点名|写入.*失败|正文生成失败|预览/.test(
+  /** 已成功写入飞书 docx 的回复：后续用户句应走正常对话，禁止合并进写作任务 */
+  if (
+    /已写好并保存到飞书云文档|飞书云文档（新版 docx）/.test(t) &&
+    /(链接：|https?:\/\/)/.test(t)
+  ) {
+    return false;
+  }
+  /** 仅失败/预览类交付仍可视作「待用户补充后再试」 */
+  return /先确认|确认几个|动笔前需要先对齐|未确认前不会成稿|还需补充|请补充以下|补充说明(?!要点)|哪(几)?点|说清楚|方便告知|什么(受众|平台)|是否点名|写入.*失败|正文生成失败|—— 以下为生成正文预览/.test(
     t,
   );
+}
+
+/**
+ * 当前用户句是否像「写作任务补充说明」，而非元对话/闲聊（避免与历史写作任务误合并）。
+ */
+export function isPlausibleWriteMergeFollowUp(userText: string): boolean {
+  const t = normalizeUserTextForIntent(userText);
+  if (t.length < 6) return false;
+  if (isContentCreateIntent(t)) return false;
+  if (
+    /(?:你)?现在.{0,8}(?:对|跟).{0,10}(?:我|咱).{0,10}(?:的)?(?:了解|认识|知道)|了解多少|知道我多少|你还记得|刚才|你为什么|什么模型|谁开发|测试|你好|谢谢|再见|离谱|怎么回事/.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /**

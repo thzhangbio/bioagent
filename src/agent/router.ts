@@ -5,6 +5,7 @@ import {
   assistantSeemedToAskWriteClarification,
   buildMergedWriteRequest,
   isContentCreateIntent,
+  isPlausibleWriteMergeFollowUp,
   normalizeUserTextForIntent,
   runContentCreateWorkflow,
 } from "./workflows/content-create.js";
@@ -64,7 +65,8 @@ export async function handleUserMessage(
   if (
     mergedWrite &&
     lastAssistant &&
-    assistantSeemedToAskWriteClarification(lastAssistant.content)
+    assistantSeemedToAskWriteClarification(lastAssistant.content) &&
+    isPlausibleWriteMergeFollowUp(userText)
   ) {
     console.log("[router] content-create 合并追问上下文，走 docx 工作流");
     history.push({ role: "user", content: userText });

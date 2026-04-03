@@ -10,7 +10,10 @@
     "build": "tsc",
     "lint": "tsc --noEmit",
     "probe:feishu": "tsx scripts/feishu-ws-probe.ts",
+    "ingest:presets": "tsx scripts/ingest-presets.ts",
     "ingest:jobs": "tsx scripts/ingest-job-posts.ts",
+    "ingest:all": "pnpm run ingest:presets && pnpm run ingest:jobs",
+    "search:rag": "tsx scripts/search-rag.ts",
     "search:jobs": "tsx scripts/search-job-posts.ts"
   },
   "keywords": [

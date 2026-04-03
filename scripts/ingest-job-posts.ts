@@ -1,6 +1,9 @@
 /**
- * 将 research/医学编辑岗-苏州-整理 下编号岗位 Markdown 切块、Embedding 后写入本地向量文件。
+ * 将 research/医学编辑岗-苏州-整理 下编号岗位 Markdown 切块、Embedding 后合并进统一向量库 `data/knowledge/rag-store.json`。
  * 用法: pnpm run ingest:jobs
+ *
+ * 仅替换集合 `job_post`，保留 `platform_tone` / `medical` / `personal` 等其它集合。
+ * 若仅有旧版 `job-posts.json` 而无 `rag-store.json`，会先作为迁移基座再合并。
  *
  * 需配置: OPENAI_API_KEY, OPENAI_BASE_URL, EMBEDDING_MODEL（见 .env.example）
  */
@@ -11,15 +14,15 @@ import { fileURLToPath } from "node:url";
 
 import { COLLECTION_JOB_POST } from "../src/knowledge/collections.js";
 import { chunkText } from "../src/knowledge/chunk.js";
-import { createEmbeddingClient, embedTexts, getEmbeddingModel } from "../src/knowledge/embeddings.js";
+import { createEmbeddingClient } from "../src/knowledge/embeddings.js";
+import { buildMergedStore, embedTextChunks } from "../src/knowledge/ingest.js";
+import { DEFAULT_RAG_STORE_PATH } from "../src/knowledge/paths.js";
+import type { TextChunk } from "../src/knowledge/types.js";
 import { saveVectorStore } from "../src/knowledge/vector-file-store.js";
-import type { StoredVectorChunk, TextChunk, VectorStoreFile } from "../src/knowledge/types.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = join(__dirname, "..");
 const JOB_DIR = join(ROOT, "research", "医学编辑岗-苏州-整理");
-const OUT_FILE = join(ROOT, "data", "knowledge", "job-posts.json");
-const BATCH = 16;
 
 function listJobMarkdownFiles(): string[] {
   if (!existsSync(JOB_DIR)) {
@@ -37,7 +40,6 @@ function labelFromFilename(file: string): string {
 }
 
 function roughTokenEstimate(text: string): number {
-  // 粗算：中文约每 1.5～2 字 1 token，此处取中值偏保守
   return Math.ceil(text.length / 1.7);
 }
 
@@ -49,7 +51,6 @@ async function main(): Promise<void> {
   }
 
   const client = createEmbeddingClient();
-  const model = getEmbeddingModel();
 
   const textChunks: TextChunk[] = [];
   for (const file of files) {
@@ -71,42 +72,23 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `岗位文件 ${files.length} 个，切块 ${textChunks.length} 条，模型 ${model}`,
+    `岗位文件 ${files.length} 个，切块 ${textChunks.length} 条 → 合并入 ${DEFAULT_RAG_STORE_PATH}`,
   );
 
-  const embeddings: number[][] = [];
-  for (let i = 0; i < textChunks.length; i += BATCH) {
-    const batch = textChunks.slice(i, i + BATCH);
-    const vectors = await embedTexts(
-      client,
-      batch.map((c) => c.text),
-    );
-    embeddings.push(...vectors);
-    console.log(`  已嵌入 ${Math.min(i + BATCH, textChunks.length)}/${textChunks.length}`);
-  }
-
-  const chunks: StoredVectorChunk[] = textChunks.map((c, i) => ({
-    ...c,
-    embedding: embeddings[i]!,
-  }));
-
-  const store: VectorStoreFile = {
-    version: 1,
-    embeddingModel: model,
-    createdAt: new Date().toISOString(),
-    chunks,
-  };
+  const stored = await embedTextChunks(client, textChunks);
+  const store = buildMergedStore([COLLECTION_JOB_POST], stored);
 
   mkdirSync(join(ROOT, "data", "knowledge"), { recursive: true });
-  saveVectorStore(OUT_FILE, store);
+  saveVectorStore(DEFAULT_RAG_STORE_PATH, store);
 
   const totalChars = textChunks.reduce((s, c) => s + c.text.length, 0);
   const estTokens = textChunks.reduce((s, c) => s + roughTokenEstimate(c.text), 0);
-  console.log(`\n已写入: ${OUT_FILE}`);
+  console.log(`\n已写入: ${DEFAULT_RAG_STORE_PATH}`);
+  console.log(`库内总块数: ${store.chunks.length}`);
   console.log(
-    `粗估输入 token 约 ${estTokens.toLocaleString()}（用于成本参考；以服务商账单为准）`,
+    `本批岗位粗估 token 约 ${estTokens.toLocaleString()}（以服务商账单为准）`,
   );
-  console.log(`总字符约 ${totalChars.toLocaleString()}`);
+  console.log(`本批岗位总字符约 ${totalChars.toLocaleString()}`);
 }
 
 main().catch((e) => {

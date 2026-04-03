@@ -18,19 +18,23 @@ const CONTENT_RAG_COLLECTIONS: KnowledgeCollection[] = [
   "personal",
 ];
 
-/** 第一跳：判断是否可成稿；若用户已授权编辑把握边界，应放行避免重复追问 */
+/** 第一跳：判断是否可成稿；若用户已授权编辑把握边界，可放行避免重复追问 */
 const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动笔前核对」环节。判断：当前材料是否已足以**在合规前提下**撰写对外稿件（科普/营销类）。
 
-**必须先识别用户是否已授权编辑**：若用户明确表示「由你/编辑决定剩余选项」「把握原则即可」「边界你看着办」「目的已说明清楚」「不必再追问」「可以动笔」等，且**受众、发布主体/场景、传播目的**已在对话中说清，则必须输出 \`GATE: READY\`，不得在可专业推断处继续追问。成稿时采用审慎表述：科普为主、避免处方药面向大众的推广式话术；具体合规细节由正文内保守处理，不占用闸门反复确认。
+**硬性规则（高于一切）**：
+- 若任务涉及**小红书/抖音等公域投放**且内容可能涉及**处方药、具体药品商品名、功效宣传或品牌背书**，而用户在**本轮对话材料**中尚未明确：受众、是否点名品牌/如何表述药品、发布主体（账号归属）、传播目的与合规边界——则**必须**输出 \`GATE: ASK\`。不得因知识库检索片段较丰富、或公司画像有部分记录，就推断为已确认。
+- 知识库与公司画像**不能替代**用户对本篇稿件的确认；「似乎做过类似方向」不等于本篇已授权。
 
-仅当**关键事实仍完全缺失**（例如完全未提受众或发布场景）或**用户明确要求你先问清**时，才使用 \`GATE: ASK\`（简短编号列表，最多 4 条）。
+**可输出 \`GATE: READY\` 的情况**：
+- 用户已明确授权编辑决定剩余选项（如由你定、边界你看着办、可以动笔），**且**在同一轮材料中能看出受众、发布场景/主体、传播目的已说清楚；或
+- 用户已明确说本篇只做通用科普、不提具体处方药商品名与功效承诺、且主体与场景清楚。
 
 **输出格式（必须严格遵守）**：
 - 第一行只能是：\`GATE: READY\` 或 \`GATE: ASK\`（不要加反引号、不要加 Markdown）。
-- \`GATE: ASK\` 时：第二行起为编号追问；不要输出 \`GATE:\` 字样在正文里。
+- \`GATE: ASK\` 时：第二行起为编号追问（含合规与平台风险提醒时可简短说明）；最多 5 条。
 - \`GATE: READY\` 时：第一行后不要输出任何字符。
 
-在「用户已授权 + 三要素已齐」与「仍缺关键信息」之间犹豫时，**倾向 \`GATE: READY\`**。`;
+在「材料不足但可凑合写」与「必须先问清」之间犹豫时，**倾向 \`GATE: ASK\`**。`;
 
 const GENERATION_SYSTEM = `你是医学新媒体编辑。根据用户任务、已确认的信息与知识库参考片段，撰写可直接对外使用的营销正文。
 要求：
@@ -249,25 +253,111 @@ function stripAssistantNoise(text: string): string {
     .trim();
 }
 
+/** 小红书等 + 医药营销敏感词：未显式豁免时不得跳过闸门、不得 READY */
+function isPublicPlatformMedicalMarketingRisk(userText: string): boolean {
+  const t = normalizeUserTextForIntent(userText);
+  const publicPlatform =
+    /小红书|小红薯|抖音|快手|微博|B站|bilibili|视频号/.test(t);
+  const medicalProductAngle =
+    /处方|处方药|药品|商品名|品牌名|单抗|疫苗|斯泰度塔|泰诺麦博|功效|适应症|推广|背书|带货|种草/.test(
+      t,
+    );
+  return publicPlatform && medicalProductAngle;
+}
+
+/** 用户声明本篇可先草稿、不提品牌、或合规边界已说明 */
+function userWaivedOrBoundedCompliance(userText: string): boolean {
+  const t = normalizeUserTextForIntent(userText);
+  return (
+    /(?:草稿|初稿|内部|先不管|暂不|不计).{0,8}(?:合规|审核|投放)/.test(t) ||
+    /只做通用科普|通用科普|不提(?:具体)?(?:品牌|商品名|药名)|不写品牌|不出现.{0,4}商品名/.test(
+      t,
+    ) ||
+    /合规(?:风险|边界|方案).{0,12}(?:已|都|你定|由你|清楚|说明)/.test(t) ||
+    /(?:受众|发布主体|账号|品牌表述).{0,20}(?:已|都)(?:说|讲|定|明确)/.test(t)
+  );
+}
+
 /**
- * 用户已说明受众/主体/目的，并授权编辑把握剩余边界时，跳过闸门，避免无限追问。
+ * 用户已说明受众/主体/目的，并授权编辑把握剩余边界时，可跳过闸门。
+ * 公域平台 + 医药敏感题材时，除非用户已豁免/划界，否则绝不跳过。
  */
 function shouldSkipClarificationGate(userText: string): boolean {
   const t = normalizeUserTextForIntent(userText);
   if (t.length < 24) return false;
+
+  if (isPublicPlatformMedicalMarketingRisk(t) && !userWaivedOrBoundedCompliance(t)) {
+    return false;
+  }
 
   const delegated =
     /(?:由你|你来)(?:定|判断|把握|决定)|你看着(?:办|定)|自己看着|把握原则|不必再追问|别再问|可以动笔|剩下的|授权|目的(?:已经|也已|都)?[^。]{0,12}明确|我知道你想|选项.*(?:由你|你来)|由你来定|你定就好|你把握|边界.*你|怎样好.*由你/.test(
       t,
     );
   const hasAudience =
-    /受众|面向[^。，]{0,8}(?:大众|用户|患者|读者)|普通大众|目标受众|给患者|给大众|专业人士/.test(t);
+    /受众|面向[^。，]{0,12}(?:大众|用户|患者|读者)|普通大众|目标受众|给患者|给大众|专业人士|医生|患者端/.test(
+      t,
+    );
   const hasPublisher =
-    /发布主体|主体是|账号|署名|品牌方|良医汇|发布(?:方|账号)|小红书(?:笔记|账号)?/.test(t);
+    /发布主体|主体是|账号|署名|品牌方|良医汇|泰诺麦博|发布(?:方|账号)|(?:的|在)(?:小红书|公众号|知乎)(?:账号|笔记|矩阵)?/.test(
+      t,
+    );
   const hasPurpose =
-    /科普|传播|草稿|审核|宣传|目的|带着|产品/.test(t);
+    /科普|传播|认知|教育|草稿|审核|宣传|目的|带着|产品|转化|投放/.test(t);
 
   return delegated && hasAudience && hasPublisher && hasPurpose;
+}
+
+/**
+ * 模型若误报 READY，用规则兜底再打回追问（避免无确认直接成稿）。
+ * 小红书类对外稿：用户一句话里须能看出受众、发布主体、以及品牌/目的或合规取向（知识库不能算）。
+ */
+function shouldOverrideReadyToAsk(userText: string): boolean {
+  const t = normalizeUserTextForIntent(userText);
+  if (userWaivedOrBoundedCompliance(t)) return false;
+
+  const xhsWrite =
+    /(?:小红书|小红薯)/.test(t) &&
+    /(?:写|撰|起草|来一|笔记|文章|文案)/.test(t);
+  if (!xhsWrite) return false;
+
+  const hasAudience =
+    /受众|面向|给(?:谁|读者)|普通大众|患者|医生|专业人士|大众|医护|用户/.test(t);
+  const hasPublisher =
+    /发布主体|哪.{0,8}(?:账号|方)|署名|账号|良医汇|泰诺麦博|品牌方|甲方|合作方|我方|客户方/.test(
+      t,
+    );
+  const hasBrandOrGoal =
+    /品牌|商品名|通用科普|不提.{0,4}品牌|处方药|合规|功效|推广|背书|草稿|侧重|目的|科普为主|认知|转化|是否点名/.test(
+      t,
+    );
+
+  if (isPublicPlatformMedicalMarketingRisk(t)) {
+    return !(hasAudience && hasPublisher && hasBrandOrGoal);
+  }
+
+  return !(hasAudience && hasPublisher && hasBrandOrGoal);
+}
+
+function buildFallbackClarificationBlock(userText: string): string {
+  const t = normalizeUserTextForIntent(userText);
+  const rxNote =
+    isPublicPlatformMedicalMarketingRisk(t) || /破伤风|处方|单抗|疫苗|药/.test(t) ?
+      [
+        "",
+        "有一点提前说明：若涉及具体处方药商品名与功效宣传，在公域平台公开投放可能存在合规风险；若只做通用机制科普、不出现商品名，风险相对可控。请先对齐边界。",
+      ]
+    : [];
+
+  return [
+    "先确认几个点，写完再动笔：",
+    "",
+    "1. **受众**：面向普通大众，还是医疗专业人士？",
+    "2. **是否点名产品**：需要出现具体品牌/商品名，还是通用科普、不做品牌背书？",
+    "3. **发布主体**：哪一方账号发布（例如合作方/自有矩阵）？影响免责声明与语气。",
+    "4. **核心诉求**：以疾病科普为主，还是产品/品类认知教育为主？",
+    ...rxNote,
+  ].join("\n");
 }
 
 /** 用户可见追问里去掉模型误露的 GATE 行与代码块标记 */
@@ -385,6 +475,14 @@ export async function runContentCreateWorkflow(
         gate.questions,
       ].join("\n");
     }
+  }
+
+  if (shouldOverrideReadyToAsk(userText)) {
+    return [
+      "动笔前需要先对齐下面几项，确认后我再撰写并写入飞书云文档（**未确认前不会成稿或杜撰**）：",
+      "",
+      buildFallbackClarificationBlock(userText),
+    ].join("\n");
   }
 
   let body: string;

@@ -54,29 +54,37 @@ function stripTagsToText(html: string): string {
   return s;
 }
 
-const FOOTER_PATTERNS: RegExp[] = [
+/**
+ * 仅当 `stripFooterPatterns === true` 时应用：去掉微信页里偏「壳子」的尾部（预览提示、英文关注引导等）。
+ * 默认不裁文末，以便保留运营话术、版权声明、转载说明等——写作时经常要对齐或改写自家声明。
+ * （若需更强裁剪，在编辑器里手工删。）
+ */
+const STRIP_FOOTER_UI_ONLY_PATTERNS: RegExp[] = [
   /预览时标签不可点[\s\S]*$/i,
   /Scan to Follow[\s\S]*$/i,
   /继续滑动看下一个[\s\S]*$/i,
-  /轻触阅读原文[\s\S]*$/i,
   /\[Got It\][\s\S]*$/i,
   /Scan with Weixin[\s\S]*$/i,
-  /授权转载等事宜请联系[\s\S]*$/i,
-  /点击[「"]阅读原文[\s\S]*$/i,
-  /版权声明[\s\S]*$/i,
 ];
 
 /** 清洗为段落文本，可选文件头元信息 */
 export function cleanWeChatArticleRaw(
   raw: string,
-  meta?: { sourceUrl?: string; fetchedAt?: string },
+  meta?: {
+    sourceUrl?: string;
+    fetchedAt?: string;
+    /** 为 true 时仅裁上述「壳子」尾部，仍保留版权声明/阅读原文/转载说明等 */
+    stripFooterPatterns?: boolean;
+  },
 ): string {
   const inner = extractJsContentHtml(raw);
   const base = inner ?? raw;
   let text = stripTagsToText(base);
 
-  for (const re of FOOTER_PATTERNS) {
-    text = text.replace(re, "");
+  if (meta?.stripFooterPatterns) {
+    for (const re of STRIP_FOOTER_UI_ONLY_PATTERNS) {
+      text = text.replace(re, "");
+    }
   }
 
   text = text

@@ -6,6 +6,7 @@
  *   pnpm run wechat-article-pipeline           # fetch + clean
  *   pnpm run wechat-article-pipeline -- --fetch-only
  *   pnpm run wechat-article-pipeline -- --clean-only
+ *   pnpm run wechat-article-pipeline -- --clean-only --strip-footer  # 可选：仅裁 App/预览类尾部，保留版权声明等
  *
  * 抓取可能遇到验证页；可将浏览器中「另存」或复制的 HTML 放入 `inbox/` 后 `--clean-only`。
  */
@@ -63,7 +64,7 @@ async function runFetch(): Promise<void> {
   }
 }
 
-function runClean(): void {
+function runClean(stripFooter: boolean): void {
   mkdirSync(OUT, { recursive: true });
   const files = readdirSync(INBOX).filter(
     (f) => f.endsWith(".raw.html") || f.endsWith(".raw.htm"),
@@ -80,6 +81,7 @@ function runClean(): void {
     const cleaned = cleanWeChatArticleRaw(raw, {
       sourceUrl: sourceUrl || undefined,
       fetchedAt: new Date().toISOString(),
+      stripFooterPatterns: stripFooter,
     });
     const outPath = join(OUT, `${slug}.md`);
     writeFileSync(outPath, cleaned, "utf-8");
@@ -91,9 +93,10 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const fetchOnly = args.includes("--fetch-only");
   const cleanOnly = args.includes("--clean-only");
+  const stripFooter = args.includes("--strip-footer");
 
   if (cleanOnly) {
-    runClean();
+    runClean(stripFooter);
     return;
   }
   if (fetchOnly) {
@@ -101,7 +104,7 @@ async function main(): Promise<void> {
     return;
   }
   await runFetch();
-  runClean();
+  runClean(stripFooter);
 }
 
 main().catch((e) => {

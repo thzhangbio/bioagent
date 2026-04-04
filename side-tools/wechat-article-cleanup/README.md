@@ -10,13 +10,31 @@
 | `inbox/` | 抓取或手动的 **`*.raw.html` 全文** |
 | `out/` | 清洗后的 **`*.md`**（待校对、灌库）；YAML 头含 **`wechat-meta.ts`** 抽取的运营字段，见下节 |
 | `wechat-meta.ts` | 从页面 HTML 解析 **`title` / `is_original` / `editor` / `mp_name` / `published_at` / `published_at_cn`** |
+| `wechat-kb-id.ts` | 计算 **`kb_wechat_id`**：灌库与后续补数据时的稳定唯一键（见下节） |
 | `appmsg-stats.ts` | 可选：通过 `getappmsgext` 拉取 **阅读 / 点赞 / 分享 / 评论 / 收藏** 等互动数（需 Cookie，见下节） |
 | `archive/` | 两类子目录，见下节 |
+
+### `kb_wechat_id`（知识库主键，类比文献 DOI）
+
+每篇清洗文 **必有** `kb_wechat_id`，用于：
+
+- 与后续补录的 **互动指标**、**运营备注** 等挂在 **同一篇** 上；
+- 向量化 / 入库时 **去重、合并、更新**（同一 `kb_wechat_id` 视为同一文档）。
+
+**生成规则**（`wechat-kb-id.ts`）：
+
+1. **优先**：HTML 内 `biz`、`mid`、`idx`、`sn` → `mp1|<biz>|<mid>|<idx>|<sn>`（与微信消息一致，换短链形式不变）。
+2. **否则**：文章 URL 的 `/s/` 后 token → `mp1|s|<token>`。
+3. **再否则**：inbox 文件名中的片段 → `mp1|s|<slug>`。
+4. **极罕见**：以上皆无 → `mp1|h|<内容哈希前缀>`（同一份 raw 稳定）。
+
+互动数据 **可留空**；日后用任意方式拿到统计后，按 **`kb_wechat_id`** 对齐写入即可再灌库。
 
 ### `out/*.md` 的 YAML 头（运营参考）
 
 | 字段 | 含义 |
 |------|------|
+| `kb_wechat_id` | 知识库主键（见上一节）；**勿手改**，除非确认与微信侧一致 |
 | `title` | 文章标题（`msg_title` / `og:title`） |
 | `is_original` | 是否标为原创（`copyright_stat` / `#copyright_logo`） |
 | `editor` | 文首作者/编辑展示名（meta `author` / `#js_author_name_text`） |
@@ -42,6 +60,16 @@
 | `stats_fetch_error` | 失败原因（如无 Cookie 时常见 `no_appmsgstat`） |
 
 **用法**：在已登录微信的浏览器中打开 `mp.weixin.qq.com` 文章页，从开发者工具复制 **Cookie**，设置环境变量 **`WECHAT_MP_COOKIE`**，再执行带 **`--fetch-stats`** 的 pipeline 或单篇清洗。未设置 Cookie 时仍会尝试请求，但通常拿不到 `appmsgstat`，YAML 中可能仅有 `stats_fetch_error`。
+
+**常见卡点（尤其 Mac）**：用 **Chrome / Safari 直接打开文章链接** 时，常出现「需登录、且仅允许手机查看」等限制，**拿不到与微信客户端一致的 Cookie**，`--fetch-stats` 会失败。而 **Mac 微信内置浏览器**里往往能看到阅读量、点赞、转发等，但该窗口**一般没有开发者工具**，无法像普通网页那样复制 Cookie。
+
+可行替代：
+
+| 做法 | 说明 |
+|------|------|
+| **系统 HTTPS 代理抓包** | 在 Mac 上为微信开启系统代理（Charles、Proxyman、mitmproxy 等），在微信里打开同一篇文章，在抓包记录里筛选 **`getappmsgext`**，从该请求的 **Request Headers** 里复制完整 **`Cookie`**（以及若脚本需要可对照 **Payload** 里的 `key` / `pass_ticket` 等）。注意安装并信任抓包证书，且微信可能对部分连接做证书固定，不一定 100% 成功。 |
+| **能登录的浏览器会话** | 若你能在 **桌面浏览器**里正常打开该文（例如已用扫码登录过网页版、或未触发「仅手机查看」），仍可用 Network → `getappmsgext` → Cookie 的方式。 |
+| **手工补 YAML** | 不跑 `--fetch-stats`，在生成好的 `out/*.md` 里于 front matter **手动增加** `stats_read`、`stats_like`、`stats_share`、`stats_comment`、`stats_collect` 等（与上表字段名一致），把 Mac 微信里看到的数字填进去；可另加一行 `stats_note: manual` 标明人工录入，便于区分。 |
 
 ## 两类归档（不要混用）
 

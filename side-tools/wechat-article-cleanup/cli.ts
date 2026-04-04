@@ -44,6 +44,7 @@ async function main(): Promise<void> {
   }
   const cleaned = cleanWeChatArticleRaw(raw, {
     sourceUrl,
+    slugHint: base,
     fetchedAt: new Date().toISOString(),
     stripFooterPatterns: stripFooter,
     engagement,

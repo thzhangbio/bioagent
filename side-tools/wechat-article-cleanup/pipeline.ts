@@ -103,6 +103,7 @@ async function runClean(
     }
     const cleaned = cleanWeChatArticleRaw(raw, {
       sourceUrl: sourceUrl || undefined,
+      slugHint: slug,
       fetchedAt: new Date().toISOString(),
       stripFooterPatterns: stripFooter,
       engagement,

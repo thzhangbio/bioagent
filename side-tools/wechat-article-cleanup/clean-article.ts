@@ -8,6 +8,7 @@ import {
   extractWechatArticleMeta,
   yamlDoubleQuotedScalar,
 } from "./wechat-meta.js";
+import { computeKbWechatId } from "./wechat-kb-id.js";
 
 /** 自 HTML 中取出 `id="js_content"` 外层 div 的内层 HTML */
 function extractJsContentHtml(html: string): string | null {
@@ -256,9 +257,11 @@ export function cleanWeChatArticleRaw(
   meta?: {
     sourceUrl?: string;
     fetchedAt?: string;
+    /** 与 inbox 文件名一致，用于 `kb_wechat_id` 短链兜底 */
+    slugHint?: string;
     /** 为 true 时仅裁上述「壳子」尾部，仍保留版权声明/阅读原文/转载说明等 */
     stripFooterPatterns?: boolean;
-    /** 由 `fetchWechatEngagementStats` 填入（需 `--fetch-stats` + Cookie） */
+    /** 由 `fetchWechatEngagementStats` 填入（需 `--fetch-stats` + Cookie）；可留空，后续按 `kb_wechat_id` 补录 */
     engagement?: WechatEngagementMetrics;
   },
 ): string {
@@ -280,7 +283,12 @@ export function cleanWeChatArticleRaw(
     .trim();
 
   const wx = extractWechatArticleMeta(raw);
+  const kbWechatId = computeKbWechatId(raw, {
+    sourceUrl: meta?.sourceUrl,
+    slugHint: meta?.slugHint,
+  });
   const headerLines: string[] = ["---", "source: wechat_mp_article"];
+  headerLines.push(`kb_wechat_id: ${yamlDoubleQuotedScalar(kbWechatId)}`);
   if (meta?.sourceUrl) headerLines.push(`url: ${meta.sourceUrl}`);
   if (meta?.fetchedAt) headerLines.push(`fetchedAt: ${meta.fetchedAt}`);
   if (wx.title) headerLines.push(`title: ${yamlDoubleQuotedScalar(wx.title)}`);

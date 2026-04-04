@@ -1,10 +1,48 @@
-# 微信公众号文章链接：每行一条 URL。以 # 开头的行为注释。
-# 去重：同一 URL 只处理一次。
-# 流水线：pnpm run wechat-article-pipeline（抓取 → inbox → 清洗 → out）
-# 若抓取为验证页，可将浏览器另存的完整 HTML 放入 inbox/，命名 *.raw.html，再：
-#   pnpm run wechat-article-pipeline -- --clean-only
-#
-# 归档 ①（out 满意后）：pnpm run wechat-article-archive-inbox  →  archive/processed-inbox/
-# 归档 ②（向量化入库后）：pnpm run wechat-article-archive-out  →  archive/ingested-out/
+# 微信公众号文章链接（批次）。良医汇会在抓取时自动搁置到 links-liangyi-deferred.txt。
+# 流水线：pnpm run wechat-article-pipeline
+# 去重后共 44 条（与下列唯一 URL 一致）
 
+https://mp.weixin.qq.com/s/Ak6eW4ZVZeXH57Q_I1CGlQ
+https://mp.weixin.qq.com/s/nWEwS7hjG8OF9gjJzs81JA
+https://mp.weixin.qq.com/s/BHisQroNsxlyCHMiFgDv5Q
+https://mp.weixin.qq.com/s/tVoPLpQMamNBrm5DWF7Tfw
+https://mp.weixin.qq.com/s/VcB9W_L0aluY5B39Qx57pA
+https://mp.weixin.qq.com/s/XH-alkGqIw-_6aBYAikS4g
+https://mp.weixin.qq.com/s/gDuRgM8dfpIAzQMZhhvWoA
+https://mp.weixin.qq.com/s/V4mbw6FXQzOQMaxMH74oIQ
+https://mp.weixin.qq.com/s/ghCwVKM3Tj2aEOLt153qVg
+https://mp.weixin.qq.com/s/OvTUlEYN0p62U1uzNVHiIA
+https://mp.weixin.qq.com/s/1clLx5aqknp8SNtFbSWeOw
+https://mp.weixin.qq.com/s/k4587r4M-xRVHXHv3Lr_Zg
+https://mp.weixin.qq.com/s/RcdcUJU3s1i9Z5ZDob3Jxg
 https://mp.weixin.qq.com/s/Sb-c0qgP5w9e3WkqZKJGvQ
+https://mp.weixin.qq.com/s/IpibFk_WzNR5sx6i9N7QjA
+https://mp.weixin.qq.com/s/fS28HaHiR1AWJ3MyL_A1_g
+https://mp.weixin.qq.com/s/7NKDsgdSeBk_XvZQi4qc-w
+https://mp.weixin.qq.com/s/V_nEc3_EIo8rnABljDwutQ
+https://mp.weixin.qq.com/s/iXCUZN1EcodKUtFtTYIvyA
+https://mp.weixin.qq.com/s/7rOwbUmnYnUY7j9Nhvr8UA
+https://mp.weixin.qq.com/s/_n9TbOoRR63Edo1_FrUBxQ
+https://mp.weixin.qq.com/s/nHu8MbBel7aIqpaikoU7EQ
+https://mp.weixin.qq.com/s/I03vSrhBvz0HCjJDauVOmA
+https://mp.weixin.qq.com/s/O-J_2tYRki5WTyj-blLrcQ
+https://mp.weixin.qq.com/s/DWTaItvoN96Y_0ZiTdmwmA
+https://mp.weixin.qq.com/s/YSRznnpoCnIgdPzKAhFiAQ
+https://mp.weixin.qq.com/s/TWsIdeC74Jmg81d6P7ty3w
+https://mp.weixin.qq.com/s/MuGk_tmmvF7RXSHkrGWYJg
+https://mp.weixin.qq.com/s/h5pFI4fIK1nl-dNISWQcsQ
+https://mp.weixin.qq.com/s/wLRq3ghx6ztaNqdkHEfgmg
+https://mp.weixin.qq.com/s/1QkZrUMg7rGf1gGaWFqEfw
+https://mp.weixin.qq.com/s/AyDOdN404MtSCp0sRN7XDQ
+https://mp.weixin.qq.com/s/dALoa7HPEWhtL1rGMO0IGQ
+https://mp.weixin.qq.com/s/sQFKsfYBTqcJ2uKvMo9luw
+https://mp.weixin.qq.com/s/BUGa48LauIbnlzvpX6T0vg
+https://mp.weixin.qq.com/s/fXezNQzQYsZqM1UQkNYsNA
+https://mp.weixin.qq.com/s/3-D71F9H0nwLcp8xDRxBkA
+https://mp.weixin.qq.com/s/IpvmrAlKomcQKOULm2pUxQ
+https://mp.weixin.qq.com/s/Q59vNFsDdTaiZgnK2eWe0A
+https://mp.weixin.qq.com/s/RI618jmsXtDzZnEi5ocwdg
+https://mp.weixin.qq.com/s/TIT42Kwn1PiazmySX1MQFw
+https://mp.weixin.qq.com/s/xiWOn5FqpExaXCvhJVVDnA
+https://mp.weixin.qq.com/s/7pfNXj8e-AbZCEEVisCEKw
+https://mp.weixin.qq.com/s/IaSDl0nCu9WuN-IOt2j-lg

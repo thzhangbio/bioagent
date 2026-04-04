@@ -42,6 +42,16 @@ export function yamlDoubleQuotedScalar(s: string): string {
   return `"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n")}"`;
 }
 
+/**
+ * 是否为**良医汇**线路公众号（`wechatStyleVariant: liangyi_hui`）。
+ * 标杆范文未确立时，流水线可跳过抓取/清洗，仅记入延期列表。
+ */
+export function isLiangyiHuiAccount(mpName: string | undefined): boolean {
+  const m = mpName?.trim() ?? "";
+  if (!m) return false;
+  return /良医汇/.test(m);
+}
+
 export function extractWechatArticleMeta(html: string): WechatArticleMeta {
   const out: WechatArticleMeta = {};
 

@@ -10,6 +10,8 @@
  *   pnpm run wechat-article-pipeline -- --clean-only --fetch-stats   # 尝试拉阅读/点赞等（需 WECHAT_MP_COOKIE）
  *
  * 抓取可能遇到验证页；可将浏览器中「另存」或复制的 HTML 放入 `inbox/` 后 `--clean-only`。
+ *
+ * **良医汇**：若解析到公众号名为良医汇，默认**不写入 inbox / 不生成 out**，URL 追加到 **`links-liangyi-deferred.txt`**。加 **`--no-liangyi-skip`** 可强制处理（调试）。
  */
 import {
   existsSync,
@@ -26,7 +28,11 @@ import { cleanWeChatArticleRaw } from "./clean-article.js";
 import { fetchWeChatArticleRaw } from "./fetch.js";
 import { parseLinksFile } from "./parse-links.js";
 import { slugFromMpArticleUrl } from "./slug.js";
-import { extractWechatArticleMeta } from "./wechat-meta.js";
+import { appendLiangyiDeferred } from "./liangyi-deferred.js";
+import {
+  extractWechatArticleMeta,
+  isLiangyiHuiAccount,
+} from "./wechat-meta.js";
 import {
   renameInboxRawToOutBasename,
   slugHintForKbWechat,
@@ -39,7 +45,7 @@ const LINKS_FILE = join(ROOT, "links.txt");
 const INBOX = join(ROOT, "inbox");
 const OUT = join(ROOT, "out");
 
-async function runFetch(): Promise<void> {
+async function runFetch(deferLiangyi: boolean): Promise<void> {
   if (!existsSync(LINKS_FILE)) {
     console.error(`缺少 ${LINKS_FILE}（可从 links.example.txt 复制）`);
     process.exit(1);
@@ -63,6 +69,13 @@ async function runFetch(): Promise<void> {
     try {
       const r = await fetchWeChatArticleRaw(url);
       const wx = extractWechatArticleMeta(r.body);
+      if (deferLiangyi && isLiangyiHuiAccount(wx.mp_name)) {
+        appendLiangyiDeferred(ROOT, url, wx.mp_name ?? "良医汇");
+        console.warn(
+          `搁置（良医汇，未入 inbox）: ${url} — mp_name=${wx.mp_name ?? ""}`,
+        );
+        continue;
+      }
       const base = wechatArticleBasename(wx.mp_name, wx.title, urlSlug);
       const path = join(INBOX, `${base}.raw.html`);
       const header = `<!-- source: ${url}\n     fetchedAt: ${new Date().toISOString()}\n     httpStatus: ${r.status}\n     contentType: ${r.contentType}\n-->\n`;
@@ -77,6 +90,7 @@ async function runFetch(): Promise<void> {
 async function runClean(
   stripFooter: boolean,
   fetchStats: boolean,
+  deferLiangyi: boolean,
 ): Promise<void> {
   mkdirSync(OUT, { recursive: true });
   const files = readdirSync(INBOX).filter(
@@ -96,6 +110,12 @@ async function runClean(
     const inboxBase = basename(f).replace(/\.raw\.html?$/i, "");
     const raw = readFileSync(join(INBOX, f), "utf-8");
     const wx = extractWechatArticleMeta(raw);
+    if (deferLiangyi && isLiangyiHuiAccount(wx.mp_name)) {
+      console.warn(
+        `跳过清洗（良医汇）: ${f} — mp_name=${wx.mp_name ?? ""}（可加 --no-liangyi-skip 强制）`,
+      );
+      continue;
+    }
     const urlMatch = raw.match(/<!--\s*source:\s*([^\n]+)/);
     const sourceUrl = urlMatch?.[1]?.trim();
     const urlSlug = sourceUrl ? slugFromMpArticleUrl(sourceUrl) : null;
@@ -135,17 +155,18 @@ async function main(): Promise<void> {
   const cleanOnly = args.includes("--clean-only");
   const stripFooter = args.includes("--strip-footer");
   const fetchStats = args.includes("--fetch-stats");
+  const deferLiangyi = !args.includes("--no-liangyi-skip");
 
   if (cleanOnly) {
-    await runClean(stripFooter, fetchStats);
+    await runClean(stripFooter, fetchStats, deferLiangyi);
     return;
   }
   if (fetchOnly) {
-    await runFetch();
+    await runFetch(deferLiangyi);
     return;
   }
-  await runFetch();
-  await runClean(stripFooter, fetchStats);
+  await runFetch(deferLiangyi);
+  await runClean(stripFooter, fetchStats, deferLiangyi);
 }
 
 main().catch((e) => {

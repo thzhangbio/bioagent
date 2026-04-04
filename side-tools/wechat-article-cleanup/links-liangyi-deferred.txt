@@ -1,0 +1,13 @@
+# 良医汇链接 — 自动搁置（尚未确立标杆范文时由抓取/清洗跳过）
+# 格式：每条记录两行 —— 注释行含时间与 mp_name，下一行为 URL。勿删手动备注。
+
+# 2026-04-04T10:21:27.308Z mp_name=良医汇肿瘤资讯
+https://mp.weixin.qq.com/s/Ak6eW4ZVZeXH57Q_I1CGlQ
+# 2026-04-04T10:21:30.108Z mp_name=良医汇肿瘤资讯
+https://mp.weixin.qq.com/s/nWEwS7hjG8OF9gjJzs81JA
+# 2026-04-04T10:21:32.342Z mp_name=良医汇肿瘤资讯
+https://mp.weixin.qq.com/s/BHisQroNsxlyCHMiFgDv5Q
+# 2026-04-04T10:21:35.115Z mp_name=良医汇肿瘤资讯
+https://mp.weixin.qq.com/s/tVoPLpQMamNBrm5DWF7Tfw
+# 2026-04-04T10:21:38.369Z mp_name=良医汇肿瘤资讯
+https://mp.weixin.qq.com/s/VcB9W_L0aluY5B39Qx57pA

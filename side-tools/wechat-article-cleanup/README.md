@@ -2,11 +2,18 @@
 
 与主项目解耦：**`links.txt`** → **`inbox/`** 原始 HTML → **`out/`** 清洗 Markdown → **`archive/`** 分两类归档。
 
+## 梅斯学术 vs 良医汇
+
+- **梅斯学术**（及非「良医汇」账号）：**正常**抓取 → `inbox` → 清洗 → `out`；YAML 中 `wechat_style_variant: medsci` 由启发式写入（见 `clean-article.ts`）。
+- **良医汇**：解析到的 **`mp_name` 含「良医汇」**时，默认**不写入 inbox**（抓取阶段），**不生成 out**（清洗阶段）；URL 追加到 **`links-liangyi-deferred.txt`**，待标杆范文确立后再跑 **`--no-liangyi-skip`** 或改策略。  
+  若某篇实际为梅斯但被误判，请检查 HTML 里 `nick_name` 是否异常；调试可 **`--no-liangyi-skip`**。
+
 ## 目录
 
 | 路径 | 作用 |
 |------|------|
-| `links.txt` | 每行一条 `https://mp.weixin.qq.com/s/...`，`#` 为注释 |
+| `links.txt` | 每行一条 `https://mp.weixin.qq.com/s/...`，`#` 为注释；**去重**由解析器完成 |
+| `links-liangyi-deferred.txt` | **良医汇**链接自动搁置列表（抓取识别到公众号名含「良医汇」时追加，**不入 inbox**；标杆范文确立后再处理） |
 | `inbox/` | 抓取或手动的 **`*.raw.html` 全文**；清洗成功后会 **重命名为** 与 **`out/*.md` 同基名**（短链占位名会被替换） |
 | `out/` | 清洗后的 **`*.md`**；文件名 **`{公众号名}+{文章标题}`**（非法字符已替换、过长已截断，见 `wechat-article-filename.ts`） |
 | `wechat-meta.ts` | 从页面 HTML 解析 **`title` / `is_original` / `editor` / `mp_name` / `published_at` / `published_at_cn`** |
@@ -90,6 +97,7 @@
 | `pnpm run wechat-article-pipeline -- --clean-only` | 仅根据 `inbox/*.raw.html` 生成 `out` |
 | `pnpm run wechat-article-pipeline -- --clean-only --strip-footer` | 同上，并裁掉微信页尾部少量「壳子」提示（保留版权声明等） |
 | `pnpm run wechat-article-pipeline -- --clean-only --fetch-stats` | 清洗并写入互动数据（需 `WECHAT_MP_COOKIE`） |
+| `pnpm run wechat-article-pipeline -- --fetch-only --no-liangyi-skip` | 抓取时**不过滤**良医汇（调试用；默认会搁置良医汇） |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html` | 单篇清洗到 `out/xxx.md` |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html --strip-footer` | 单篇清洗并裁壳子尾部（`--` 后为传给脚本的参数） |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html --fetch-stats` | 单篇清洗并写入互动数据（需 `WECHAT_MP_COOKIE`） |

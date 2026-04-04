@@ -44,6 +44,7 @@ function stripTagsToText(html: string): string {
   s = s.replace(/<style[\s\S]*?<\/style>/gi, "");
   s = s.replace(/<br\s*\/?>/gi, "\n");
   s = s.replace(/<\/p>/gi, "\n\n");
+  s = s.replace(/<\/section>/gi, "\n\n");
   s = s.replace(/<\/div>/gi, "\n");
   s = s.replace(/<[^>]+>/g, "");
   s = s
@@ -59,6 +60,62 @@ function stripTagsToText(html: string): string {
  * 默认不裁文末，以便保留运营话术、版权声明、转载说明等——写作时经常要对齐或改写自家声明。
  * （若需更强裁剪，在编辑器里手工删。）
  */
+/** 阶段性小标题通常较短；同一样式的「蓝粗要点段」往往是一整段摘要，需排除。 */
+const WECHAT_SUBHEADING_MAX_CHARS = 48;
+
+/**
+ * 微信图文里「阶段性小标题」常为 span 内联样式：蓝色 + 粗体（非标准 h2/h3）。
+ * 图注等多为灰色 rgb(136,136,136)，不会命中。
+ */
+function isWeChatSectionSubheading(pInnerHtml: string): boolean {
+  if (!/font-weight\s*:\s*(bold|700)/i.test(pInnerHtml)) return false;
+  const blue =
+    /rgb\s*\(\s*59\s*,\s*115\s*,\s*185\s*\)/i.test(pInnerHtml) ||
+    /rgb\s*\(\s*76\s*,\s*119\s*,\s*175\s*\)/i.test(pInnerHtml);
+  if (!blue) return false;
+  const t = stripTagsToText(pInnerHtml).replace(/\s+/g, " ").trim();
+  if (t.length === 0 || t.length > WECHAT_SUBHEADING_MAX_CHARS) return false;
+  return true;
+}
+
+/** 将 `#js_content` 内层 HTML 转为 Markdown：识别蓝粗小标题为 `##`，其余为段落。 */
+function jsContentInnerToMarkdown(innerHtml: string): string {
+  const cleaned = innerHtml
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "");
+  const pRe = /<p\b[^>]*>([\s\S]*?)<\/p>/gi;
+  const chunks: string[] = [];
+  let m: RegExpExecArray | null;
+  let last = 0;
+  while ((m = pRe.exec(cleaned)) !== null) {
+    const gap = cleaned.slice(last, m.index);
+    const gapText = stripTagsToText(gap).replace(/\s+/g, " ").trim();
+    if (gapText) chunks.push(gapText);
+    const inner = m[1];
+    const plain = stripTagsToText(inner)
+      .split("\n")
+      .map((l) => l.trimEnd())
+      .join("\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+    if (!plain) {
+      last = pRe.lastIndex;
+      continue;
+    }
+    if (isWeChatSectionSubheading(inner)) {
+      const line = plain.replace(/\n+/g, " ").trim();
+      chunks.push(`## ${line}`);
+    } else {
+      chunks.push(plain);
+    }
+    last = pRe.lastIndex;
+  }
+  const tail = cleaned.slice(last);
+  const tailText = stripTagsToText(tail).replace(/\s+/g, " ").trim();
+  if (tailText) chunks.push(tailText);
+  return chunks.join("\n\n");
+}
+
 const STRIP_FOOTER_UI_ONLY_PATTERNS: RegExp[] = [
   /预览时标签不可点[\s\S]*$/i,
   /Scan to Follow[\s\S]*$/i,
@@ -79,7 +136,7 @@ export function cleanWeChatArticleRaw(
 ): string {
   const inner = extractJsContentHtml(raw);
   const base = inner ?? raw;
-  let text = stripTagsToText(base);
+  let text = inner ? jsContentInnerToMarkdown(inner) : stripTagsToText(base);
 
   if (meta?.stripFooterPatterns) {
     for (const re of STRIP_FOOTER_UI_ONLY_PATTERNS) {

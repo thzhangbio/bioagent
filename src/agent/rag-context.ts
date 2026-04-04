@@ -1,17 +1,9 @@
 import { existsSync } from "node:fs";
 
 import { createEmbeddingClient } from "../knowledge/embeddings.js";
+import { CHAT_RAG_DEFAULT_COLLECTIONS } from "../knowledge/rag-default-collections.js";
 import { DEFAULT_RAG_STORE_PATH } from "../knowledge/paths.js";
 import { retrieve } from "../knowledge/retrieve.js";
-import type { KnowledgeCollection } from "../knowledge/types.js";
-
-/** 对话侧检索：预置调性/医学 + 个人上传；不含 `job_post`（避免岗位实验数据干扰日常对话） */
-const CHAT_RAG_COLLECTIONS: KnowledgeCollection[] = [
-  "platform_tone",
-  "medical",
-  "literature",
-  "personal",
-];
 
 /**
  * 用检索片段包裹用户当前问句，供 Claude 参考（失败时原样返回）。
@@ -26,7 +18,7 @@ export async function augmentUserTextWithRag(userText: string): Promise<string> 
   try {
     const client = createEmbeddingClient();
     const hits = await retrieve(client, trimmed, {
-      collections: CHAT_RAG_COLLECTIONS,
+      collections: [...CHAT_RAG_DEFAULT_COLLECTIONS],
       topK: 8,
     });
     if (hits.length === 0) return userText;

@@ -4,8 +4,8 @@ import { existsSync } from "node:fs";
 import { getAnthropicClient } from "../anthropic.js";
 import { createEmbeddingClient } from "../../knowledge/embeddings.js";
 import { DEFAULT_RAG_STORE_PATH } from "../../knowledge/paths.js";
+import { CONTENT_RAG_DEFAULT_COLLECTIONS } from "../../knowledge/rag-default-collections.js";
 import { retrieve } from "../../knowledge/retrieve.js";
-import type { KnowledgeCollection } from "../../knowledge/types.js";
 import {
   createDocumentWithPlainText,
 } from "../../lark/docx-document.js";
@@ -18,14 +18,6 @@ import {
   shouldForceReadyForEditorHandoff,
   shouldRelaxXhsOverride,
 } from "./write-brief.js";
-
-/** 内容创作检索：与对话 RAG 一致，不含 job_post */
-const CONTENT_RAG_COLLECTIONS: KnowledgeCollection[] = [
-  "platform_tone",
-  "medical",
-  "literature",
-  "personal",
-];
 
 /** 第一跳：判断是否可成稿；若用户已授权编辑把握边界，可放行避免重复追问 */
 const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动笔前核对」环节。判断：当前材料是否已足以**在合规前提下**撰写对外稿件（科普/营销类）。
@@ -171,7 +163,7 @@ async function fetchRagContext(userText: string): Promise<string> {
   try {
     const client = createEmbeddingClient();
     const hits = await retrieve(client, userText.trim(), {
-      collections: CONTENT_RAG_COLLECTIONS,
+      collections: [...CONTENT_RAG_DEFAULT_COLLECTIONS],
       topK: 10,
     });
     if (hits.length === 0) return "（检索无命中片段。）";

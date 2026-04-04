@@ -17,6 +17,7 @@
     "ingest:wechat": "tsx scripts/ingest-wechat.ts",
     "ingest:all": "pnpm run ingest:presets && pnpm run ingest:jobs",
     "search:rag": "tsx scripts/search-rag.ts",
+    "report:explicit-state": "tsx scripts/report-explicit-state.ts",
     "search:jobs": "tsx scripts/search-job-posts.ts",
     "pdf-cleanup": "tsx side-tools/pdf-text-cleanup/cli.ts",
     "pdf-kb-pipeline": "tsx side-tools/pdf-text-cleanup/pipeline.ts",

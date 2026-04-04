@@ -13,6 +13,7 @@ import {
 import { parseMedsciLiteratureWechatRequest } from "./agent/workflows/medsci-literature-wechat.js";
 import { sendContentCreateConsentCard } from "./lark/content-create-card-flow.js";
 import { acquireFeishuWsLock } from "./lark/ws-lock.js";
+import { formatForPrivacyLog } from "./lib/privacy-log.js";
 
 const bridge = new LarkEventBridge();
 
@@ -29,7 +30,9 @@ bridge.on("message", async (event: LarkMessageEvent) => {
     console.log(`\n[main] 处理文件消息 chatKey=${chatKey}`);
     try {
       const reply = await handleUserFileMessage(event);
-      console.log(`[main] 文件处理回复: ${reply.slice(0, 120)}...`);
+      console.log(
+        `[main] 文件处理回复: ${formatForPrivacyLog(reply, "reply")}`,
+      );
       if (event.messageId) {
         await replyMessage({ messageId: event.messageId, markdown: reply });
       } else if (event.chatId) {
@@ -51,7 +54,7 @@ bridge.on("message", async (event: LarkMessageEvent) => {
 
   const chatKey = event.chatId || event.senderId;
   console.log(`\n[main] 处理消息 chatKey=${chatKey}`);
-  console.log(`[main] 用户: ${event.content}`);
+  console.log(`[main] ${formatForPrivacyLog(event.content, "user")}`);
 
   try {
     const normalized = normalizeUserTextForIntent(event.content);
@@ -82,7 +85,7 @@ bridge.on("message", async (event: LarkMessageEvent) => {
     const reply = await handleUserMessage(chatKey, event.content, {
       senderOpenId: event.senderId || undefined,
     });
-    console.log(`[main] 回复: ${reply.slice(0, 100)}...`);
+    console.log(`[main] ${formatForPrivacyLog(reply, "reply")}`);
 
     if (event.messageId) {
       await replyMessage({ messageId: event.messageId, markdown: reply });
@@ -131,6 +134,9 @@ console.log(
   "[config] 提示：同一应用只允许一个长连接收事件；请关闭其它终端里的 lark-cli event / 重复 pnpm start"
 );
 console.log("[config] 排查时可执行: DEBUG_LARK=1 pnpm start");
+console.log(
+  "[config] 终端默认不打用户/助手全文；需全文时请: DEBUG_CONTENT=1 pnpm start",
+);
 console.log(
   "[config] RAG：需 OPENAI_API_KEY + 已执行 ingest:all；对话检索不含 job_post；文件上传见 data/uploads/",
 );

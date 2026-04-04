@@ -16,6 +16,7 @@ import {
   syncWriteMergeGateFromWorkflowReply,
 } from "./write-merge-gate.js";
 import { buildSystemPrompt } from "../prompts/medical-editor.js";
+import { formatForPrivacyLog, isDebugContentLogEnabled } from "../lib/privacy-log.js";
 import { loadMemory, saveMemory, type CompanyProfile } from "../memory/store.js";
 
 interface ConversationMessage {
@@ -70,7 +71,7 @@ export async function handleUserMessage(
   const createIntent =
     meta?.forceGeneralChat === true ? false : isWriteTaskIntent(normalized);
   console.log(
-    `[router] content-create intent=${createIntent} text=${JSON.stringify(normalized.slice(0, 72))}${normalized.length > 72 ? "…" : ""}`,
+    `[router] content-create intent=${createIntent} ${formatForPrivacyLog(normalized, "text")}`,
   );
 
   if (createIntent) {
@@ -250,6 +251,12 @@ function extractAndSaveInfo(
   if (changed) {
     memory.companyProfile = profile;
     saveMemory(memory);
-    console.log("[agent] 公司画像已更新:", JSON.stringify(profile));
+    const payload = JSON.stringify(profile);
+    console.log(
+      "[agent] 公司画像已更新:",
+      isDebugContentLogEnabled() ?
+        payload
+      : formatForPrivacyLog(payload, "companyProfile"),
+    );
   }
 }

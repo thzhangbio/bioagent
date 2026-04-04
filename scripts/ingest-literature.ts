@@ -9,6 +9,9 @@
  * 可选侧车元数据：与 `foo.md` 同目录的 `foo.meta.json`
  *   { "paperId": "...", "sourceUrl": "https://doi.org/...", "sourceLabel": "..." }
  *
+ * **DOI 主键**：`sourceUrl` 或 `paperId`（形如 `10.xxxx/...`）可解析为 DOI 时，所有块的 `paperId`
+ * 均为**规范化注册 DOI**。同一批次内多篇 `.md` 若 DOI 相同，视为**同一篇文献的补充**，块 id 按文件区分避免碰撞。
+ *
  * 会**替换**库内全部 `literature` 块，不影响 platform_tone / medical / personal / job_post。
  */
 import "dotenv/config";
@@ -18,6 +21,12 @@ import { fileURLToPath } from "node:url";
 
 import { chunkText } from "../src/knowledge/chunk.js";
 import { COLLECTION_LITERATURE } from "../src/knowledge/collections.js";
+import {
+  doiToSlug,
+  extractFirstDoiFromMarkdown,
+  looksLikeDoiString,
+  normalizeDoi,
+} from "../src/knowledge/doi.js";
 import { createEmbeddingClient } from "../src/knowledge/embeddings.js";
 import {
   buildMergedStore,
@@ -53,6 +62,69 @@ function loadMeta(inbox: string, baseName: string): LiteratureMeta | null {
   }
 }
 
+function sanitizeFileKey(fileBase: string): string {
+  const s = fileBase
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 96);
+  return s || "doc";
+}
+
+/**
+ * 解析文献主键：DOI 优先，其次 meta.paperId（人类可读 slug），再正文首条 DOI，最后文件名。
+ */
+function resolvePaperId(
+  meta: LiteratureMeta | null,
+  rawMd: string,
+  fileBase: string,
+): { paperId: string; canonicalDoi: string | null; sourceUrl?: string } {
+  const fromSourceUrl = meta?.sourceUrl?.trim()
+    ? normalizeDoi(meta.sourceUrl)
+    : null;
+  if (fromSourceUrl) {
+    return {
+      paperId: fromSourceUrl,
+      canonicalDoi: fromSourceUrl,
+      sourceUrl: meta?.sourceUrl?.trim().startsWith("http")
+        ? meta.sourceUrl.trim()
+        : `https://doi.org/${fromSourceUrl}`,
+    };
+  }
+
+  const pid = meta?.paperId?.trim();
+  if (pid && looksLikeDoiString(pid)) {
+    const n = normalizeDoi(pid);
+    if (n) {
+      return {
+        paperId: n,
+        canonicalDoi: n,
+        sourceUrl: `https://doi.org/${n}`,
+      };
+    }
+  }
+
+  const fromBody = extractFirstDoiFromMarkdown(rawMd);
+  if (fromBody) {
+    return {
+      paperId: fromBody,
+      canonicalDoi: fromBody,
+      sourceUrl: `https://doi.org/${fromBody}`,
+    };
+  }
+
+  if (pid) {
+    return { paperId: pid, canonicalDoi: null, sourceUrl: meta?.sourceUrl?.trim() };
+  }
+
+  const fallback =
+    fileBase.replace(/[^\w.-]+/g, "-").replace(/^-|-$/g, "") || fileBase;
+  return {
+    paperId: fallback,
+    canonicalDoi: null,
+    sourceUrl: meta?.sourceUrl?.trim(),
+  };
+}
+
 async function main(): Promise<void> {
   const inbox = defaultInbox();
   if (!existsSync(inbox)) {
@@ -73,6 +145,7 @@ async function main(): Promise<void> {
 
   const client = createEmbeddingClient();
   const textChunks: TextChunk[] = [];
+  const doiCounts = new Map<string, number>();
 
   for (const file of files.sort()) {
     const abs = join(inbox, file);
@@ -80,31 +153,46 @@ async function main(): Promise<void> {
     const base = basename(file, ".md");
     const meta = loadMeta(inbox, base);
     const sourcePath = abs.replace(PROJECT_ROOT + "/", "");
-    const slug =
-      meta?.paperId?.trim() ||
-      base.replace(/[^\w.-]+/g, "-").replace(/^-|-$/g, "") ||
-      base;
+
+    const { paperId, canonicalDoi, sourceUrl: resolvedUrl } = resolvePaperId(
+      meta,
+      raw,
+      base,
+    );
     const sourceLabel =
       meta?.sourceLabel ?? base.replace(/-/g, " ").slice(0, 120);
+
+    const idPrefix = doiToSlug(canonicalDoi ?? paperId);
+    const fileKey = sanitizeFileKey(base);
 
     const parts = chunkText(raw);
     parts.forEach((text, chunkIndex) => {
       textChunks.push({
-        id: `${slug}-c${chunkIndex}`,
+        id: `${idPrefix}__${fileKey}__c${chunkIndex}`,
         collection: COLLECTION_LITERATURE,
         sourcePath,
         sourceLabel,
         text,
         chunkIndex,
-        paperId: slug,
-        sourceUrl: meta?.sourceUrl,
+        paperId,
+        sourceUrl: resolvedUrl ?? meta?.sourceUrl,
       });
     });
+
+    const key = canonicalDoi ?? paperId;
+    doiCounts.set(key, (doiCounts.get(key) ?? 0) + 1);
   }
 
+  const doiSummary = [...doiCounts.entries()]
+    .filter(([, n]) => n > 1)
+    .map(([k, n]) => `${k} ← ${n} 个文件`)
+    .join("; ");
   console.log(
     `文献文件 ${files.length} 个，切块 ${textChunks.length} 条 → 合并入 ${DEFAULT_RAG_STORE_PATH}（仅替换 literature）`,
   );
+  if (doiSummary) {
+    console.log(`同一 DOI/主键多文件补充: ${doiSummary}`);
+  }
 
   const stored = await embedTextChunks(client, textChunks);
   const store = buildMergedStore([COLLECTION_LITERATURE], stored);

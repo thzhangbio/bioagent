@@ -18,9 +18,12 @@ export interface TextChunk {
   sourceLabel: string;
   text: string;
   chunkIndex: number;
-  /** 事实层文献：可选稳定 ID（文件名 slug 或 meta） */
+  /**
+   * 事实层文献：稳定主键。**优先**为注册 DOI（`10.xxxx/...`），与 `sourceUrl` 指向的 DOI 一致时
+   * 多篇 `.md` 视为同一篇论文的补充块；无 DOI 时为文件名/meta 短 slug。
+   */
   paperId?: string;
-  /** 事实层文献：可选 DOI / 出版社链接，供未来溯源展示 */
+  /** 事实层文献：原始条目 URL，通常为 `https://doi.org/10....` */
   sourceUrl?: string;
 }
 

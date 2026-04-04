@@ -11,7 +11,7 @@
 | 飞书 IM | 飞书开放平台 | 收文本/文件事件，按应用权限发消息、建云文档、加协作者等 |
 | 对话与创作 | Claude（通常经 `ANTHROPIC_BASE_URL` 中转） | 用户当前句、会话历史、写作任务拼装后的 payload、合规协审等 |
 | 日常对话 RAG | OpenAI 兼容 Embeddings 端 | 用户问句嵌入；仅检索片段进入提示，不单独「上传整库」 |
-| 向量库 / 记忆 | 本机 `data/` | `rag-store.json`、`memory.json`、`uploads/` 等；**已在 `.gitignore`，勿提交** |
+| 向量库 / 记忆 | 本机 `data/` | `rag-store.json`、**`memory.json`**（结构化记忆：画像、最近交付 doc、写作偏好）、**`chat-sessions/*.json`**（会话窗口 + 滚动摘要）、`uploads/` 等；**已在 `.gitignore`，勿提交** |
 | 环境变量 | 本机 `.env` | 密钥仅存本地；仓库仅保留 `.env.example` 模板 |
 
 ## 日志约定

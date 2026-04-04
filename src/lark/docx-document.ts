@@ -143,6 +143,129 @@ function splitPlainTextToParagraphs(body: string): string[] {
 /**
  * 在指定父块下追加多个 **文本段落**（`block_type: 文本`）。
  */
+/**
+ * 获取新版云文档全文纯文本（飞书 docx `document.raw_content`）。
+ * @see https://open.feishu.cn/document/ukTMukTMukTM/uUDN04SN0QjL1QDN/document-docx/docx-v1/document/raw_content
+ */
+export async function getDocumentPlainText(documentId: string): Promise<string> {
+  return withFeishuRetry("document.rawContent", async () => {
+    const client = getFeishuClient();
+    const res = await client.docx.v1.document.rawContent({
+      path: { document_id: documentId },
+    });
+    assertOk(res, "docx.document.rawContent");
+    return (res.data?.content ?? "").replace(/\r\n/g, "\n");
+  });
+}
+
+/**
+ * 清空页面根块下**直接子块**（分页删除，兼容子块较多时），返回最新 `document_revision_id`（若有）。
+ */
+async function clearPageDirectChildren(options: {
+  documentId: string;
+  pageBlockId: string;
+  initialRevisionId?: number;
+}): Promise<number | undefined> {
+  let revisionId = options.initialRevisionId;
+  for (let safety = 0; safety < 500; safety++) {
+    const page = await withFeishuRetry("documentBlockChildren.get", async () => {
+      const client = getFeishuClient();
+      const res = await client.docx.v1.documentBlockChildren.get({
+        path: {
+          document_id: options.documentId,
+          block_id: options.pageBlockId,
+        },
+        params: {
+          page_size: 50,
+          document_revision_id: revisionId,
+        },
+      });
+      assertOk(res, "docx.documentBlockChildren.get");
+      return res;
+    });
+    const items = page.data?.items ?? [];
+    if (items.length === 0) return revisionId;
+
+    const batchSize = items.length;
+    const del = await withFeishuRetry("documentBlockChildren.batchDelete", async () => {
+      const client = getFeishuClient();
+      const res = await client.docx.v1.documentBlockChildren.batchDelete({
+        path: {
+          document_id: options.documentId,
+          block_id: options.pageBlockId,
+        },
+        data: {
+          start_index: 0,
+          end_index: batchSize,
+        },
+        params: {
+          document_revision_id: revisionId,
+          client_token: randomUUID(),
+        },
+      });
+      assertOk(res, "docx.documentBlockChildren.batchDelete");
+      return res;
+    });
+    revisionId = del.data?.document_revision_id ?? revisionId;
+  }
+  throw new Error("docx: 清空页面子块重试次数过多");
+}
+
+/**
+ * 用纯文本**替换**文档页面内正文：先清空页面根下子块，再按空行分段写入（与 `createDocumentWithPlainText` 一致）。
+ */
+export async function replaceDocumentPagePlainText(
+  documentId: string,
+  body: string,
+): Promise<{ documentRevisionId?: number }> {
+  const pageId = await findDocumentPageRootBlockId(documentId);
+  let revisionId: number | undefined;
+  try {
+    const docMeta = await withFeishuRetry("document.get", async () => {
+      const client = getFeishuClient();
+      const res = await client.docx.v1.document.get({
+        path: { document_id: documentId },
+      });
+      assertOk(res, "docx.document.get");
+      return res;
+    });
+    revisionId = docMeta.data?.document?.revision_id;
+  } catch {
+    /* 无版本号时仍尝试清空/写入 */
+  }
+
+  revisionId = await clearPageDirectChildren({
+    documentId,
+    pageBlockId: pageId,
+    initialRevisionId: revisionId,
+  });
+
+  const paragraphs = splitPlainTextToParagraphs(body);
+  await appendTextParagraphsToBlock({
+    documentId,
+    parentBlockId: pageId,
+    paragraphs,
+    index: 0,
+    documentRevisionId: revisionId,
+  });
+
+  try {
+    const after = await withFeishuRetry("document.get", async () => {
+      const client = getFeishuClient();
+      const res = await client.docx.v1.document.get({
+        path: { document_id: documentId },
+      });
+      assertOk(res, "docx.document.get");
+      return res;
+    });
+    return {
+      documentRevisionId: after.data?.document?.revision_id,
+    };
+  } catch {
+    return {};
+  }
+}
+
 export async function appendTextParagraphsToBlock(options: {
   documentId: string;
   parentBlockId: string;

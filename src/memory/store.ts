@@ -20,6 +20,8 @@ export interface LastDeliveredDoc {
 
 export interface MemoryStore {
   companyProfile?: CompanyProfile;
+  /** 用户明确说过的写作/协作偏好（短句，最多 10 条） */
+  contentPreferences?: string[];
   interactionCount: number;
   lastActiveAt?: string;
   lastDeliveredDoc?: LastDeliveredDoc;

@@ -206,7 +206,7 @@ export function buildMergedWriteRequest(
   return slice.join("\n\n---\n\n");
 }
 
-function formatProfileBlock(memory: MemoryStore): string {
+export function formatProfileBlock(memory: MemoryStore): string {
   const p = memory.companyProfile;
   if (!p) return "（尚未记录公司画像；成稿前须以用户最新说明为准。）";
   const lines: string[] = [];
@@ -219,7 +219,8 @@ function formatProfileBlock(memory: MemoryStore): string {
   return lines.length > 0 ? lines.join("\n") : "（画像待补充。）";
 }
 
-async function fetchRagContext(userText: string): Promise<string> {
+/** 成稿/改稿工作流共用：按用户（或合并）语句做向量检索 */
+export async function fetchContentRagContext(userText: string): Promise<string> {
   if (!process.env.OPENAI_API_KEY || !existsSync(DEFAULT_RAG_STORE_PATH)) {
     return "（当前无向量库或未配置 OPENAI_API_KEY，跳过检索。）";
   }
@@ -327,7 +328,7 @@ function buildPlatformStyleBlock(userText: string): string {
   ].join("\n");
 }
 
-function stripAssistantNoise(text: string): string {
+export function stripAssistantNoise(text: string): string {
   return text
     .replace(/^[\s\n]*(?:以下是|下面是|正文如下)[:：]?\s*/i, "")
     .replace(/```[\s\S]*?```/g, (block) => block.replace(/```/g, "").trim())
@@ -337,7 +338,7 @@ function stripAssistantNoise(text: string): string {
 /**
  * 解析生成结果：第 1 行为发布标题，第 2 行为空行，第 3 行起为正文。若格式不符则回退为从任务句抽标题 + 全文作正文。
  */
-function splitGeneratedTitleAndBody(
+export function splitGeneratedTitleAndBody(
   cleaned: string,
   userText: string,
 ): { title: string; body: string } {
@@ -615,7 +616,7 @@ export async function runContentCreateWorkflow(
         medsciLitParsed.literatureTopic,
         medsciVerifiedHits,
       )
-    : await fetchRagContext(userText);
+    : await fetchContentRagContext(userText);
   const profileBlock = formatProfileBlock(memory);
 
   const briefSignals = extractWriteBriefSignals(userText);

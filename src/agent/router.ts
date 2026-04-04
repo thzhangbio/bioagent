@@ -3,8 +3,8 @@ import { getAnthropicClient } from "./anthropic.js";
 import { augmentUserTextWithRag } from "./rag-context.js";
 import {
   buildMergedWriteRequest,
-  isContentCreateIntent,
   isPlausibleWriteMergeFollowUp,
+  isWriteTaskIntent,
   normalizeUserTextForIntent,
   runContentCreateWorkflow,
   type ContentCreateWorkflowOptions,
@@ -66,7 +66,7 @@ export async function handleUserMessage(
   const memory = loadMemory();
   const normalized = normalizeUserTextForIntent(userText);
   const createIntent =
-    meta?.forceGeneralChat === true ? false : isContentCreateIntent(normalized);
+    meta?.forceGeneralChat === true ? false : isWriteTaskIntent(normalized);
   console.log(
     `[router] content-create intent=${createIntent} text=${JSON.stringify(normalized.slice(0, 72))}${normalized.length > 72 ? "…" : ""}`,
   );

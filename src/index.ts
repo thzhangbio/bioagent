@@ -6,7 +6,11 @@ import {
   appendConversationMessages,
   handleUserMessage,
 } from "./agent/router.js";
-import { isContentCreateIntent, normalizeUserTextForIntent } from "./agent/workflows/content-create.js";
+import {
+  isContentCreateIntent,
+  normalizeUserTextForIntent,
+} from "./agent/workflows/content-create.js";
+import { parseMedsciLiteratureWechatRequest } from "./agent/workflows/medsci-literature-wechat.js";
 import { sendContentCreateConsentCard } from "./lark/content-create-card-flow.js";
 import { acquireFeishuWsLock } from "./lark/ws-lock.js";
 
@@ -54,6 +58,7 @@ bridge.on("message", async (event: LarkMessageEvent) => {
     if (
       process.env.FEISHU_CONTENT_CARD_FORM === "1" &&
       isContentCreateIntent(normalized) &&
+      !parseMedsciLiteratureWechatRequest(normalized) &&
       (event.chatId || event.senderId)
     ) {
       console.log("[main] 内容创作：先下发「是否进入创作工作流」确认卡片（FEISHU_CONTENT_CARD_FORM=1）");

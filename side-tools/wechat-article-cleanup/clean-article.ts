@@ -3,6 +3,7 @@
  * 抽取优先：`#js_content` 正文区（嵌套 div 深度扫描）；失败则退化为去标签草稿。
  */
 
+import type { WechatEngagementMetrics } from "./appmsg-stats.js";
 import {
   extractWechatArticleMeta,
   yamlDoubleQuotedScalar,
@@ -213,6 +214,34 @@ function jsContentInnerToMarkdown(innerHtml: string): string {
   return chunks.join("\n\n");
 }
 
+function pushEngagementYaml(
+  headerLines: string[],
+  e: WechatEngagementMetrics,
+): void {
+  if (e.stats_read !== undefined) headerLines.push(`stats_read: ${e.stats_read}`);
+  if (e.stats_old_like !== undefined) {
+    headerLines.push(`stats_old_like: ${e.stats_old_like}`);
+  }
+  if (e.stats_like !== undefined) headerLines.push(`stats_like: ${e.stats_like}`);
+  if (e.stats_share !== undefined) {
+    headerLines.push(`stats_share: ${e.stats_share}`);
+  }
+  if (e.stats_comment !== undefined) {
+    headerLines.push(`stats_comment: ${e.stats_comment}`);
+  }
+  if (e.stats_collect !== undefined) {
+    headerLines.push(`stats_collect: ${e.stats_collect}`);
+  }
+  if (e.stats_fetched_at) {
+    headerLines.push(`stats_fetched_at: ${yamlDoubleQuotedScalar(e.stats_fetched_at)}`);
+  }
+  if (e.stats_fetch_error) {
+    headerLines.push(
+      `stats_fetch_error: ${yamlDoubleQuotedScalar(e.stats_fetch_error)}`,
+    );
+  }
+}
+
 const STRIP_FOOTER_UI_ONLY_PATTERNS: RegExp[] = [
   /预览时标签不可点[\s\S]*$/i,
   /Scan to Follow[\s\S]*$/i,
@@ -229,6 +258,8 @@ export function cleanWeChatArticleRaw(
     fetchedAt?: string;
     /** 为 true 时仅裁上述「壳子」尾部，仍保留版权声明/阅读原文/转载说明等 */
     stripFooterPatterns?: boolean;
+    /** 由 `fetchWechatEngagementStats` 填入（需 `--fetch-stats` + Cookie） */
+    engagement?: WechatEngagementMetrics;
   },
 ): string {
   const inner = extractJsContentHtml(raw);
@@ -263,6 +294,9 @@ export function cleanWeChatArticleRaw(
   }
   if (wx.published_at_cn) {
     headerLines.push(`published_at_cn: ${yamlDoubleQuotedScalar(wx.published_at_cn)}`);
+  }
+  if (meta?.engagement) {
+    pushEngagementYaml(headerLines, meta.engagement);
   }
   headerLines.push("---", "");
 

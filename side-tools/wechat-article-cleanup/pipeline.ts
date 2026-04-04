@@ -7,6 +7,7 @@
  *   pnpm run wechat-article-pipeline -- --fetch-only
  *   pnpm run wechat-article-pipeline -- --clean-only
  *   pnpm run wechat-article-pipeline -- --clean-only --strip-footer  # 可选：仅裁 App/预览类尾部，保留版权声明等
+ *   pnpm run wechat-article-pipeline -- --clean-only --fetch-stats   # 尝试拉阅读/点赞等（需 WECHAT_MP_COOKIE）
  *
  * 抓取可能遇到验证页；可将浏览器中「另存」或复制的 HTML 放入 `inbox/` 后 `--clean-only`。
  */
@@ -20,6 +21,7 @@ import {
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { fetchWechatEngagementStats } from "./appmsg-stats.js";
 import { cleanWeChatArticleRaw } from "./clean-article.js";
 import { fetchWeChatArticleRaw } from "./fetch.js";
 import { parseLinksFile } from "./parse-links.js";
@@ -64,7 +66,10 @@ async function runFetch(): Promise<void> {
   }
 }
 
-function runClean(stripFooter: boolean): void {
+async function runClean(
+  stripFooter: boolean,
+  fetchStats: boolean,
+): Promise<void> {
   mkdirSync(OUT, { recursive: true });
   const files = readdirSync(INBOX).filter(
     (f) => f.endsWith(".raw.html") || f.endsWith(".raw.htm"),
@@ -73,15 +78,34 @@ function runClean(stripFooter: boolean): void {
     console.warn(`inbox 内无 .raw.html；请将抓取结果或另存 HTML 放入 ${INBOX}`);
     return;
   }
+  const cookie = process.env.WECHAT_MP_COOKIE;
+  if (fetchStats && !cookie) {
+    console.warn(
+      "已指定 --fetch-stats 但未设置环境变量 WECHAT_MP_COOKIE；互动数据可能无法返回（请在已登录微信的浏览器中打开 mp 文章页，从开发者工具复制 Cookie）",
+    );
+  }
   for (const f of files) {
     const slug = basename(f).replace(/\.raw\.html?$/i, "");
     const raw = readFileSync(join(INBOX, f), "utf-8");
     const urlMatch = raw.match(/<!--\s*source:\s*([^\n]+)/);
     const sourceUrl = urlMatch?.[1]?.trim();
+    let engagement: Awaited<
+      ReturnType<typeof fetchWechatEngagementStats>
+    > | undefined;
+    if (fetchStats) {
+      engagement = await fetchWechatEngagementStats(raw, {
+        sourceUrl: sourceUrl || undefined,
+        cookie,
+      });
+      if (engagement.stats_fetch_error) {
+        console.warn(`${slug}: 互动数据 ${engagement.stats_fetch_error}`);
+      }
+    }
     const cleaned = cleanWeChatArticleRaw(raw, {
       sourceUrl: sourceUrl || undefined,
       fetchedAt: new Date().toISOString(),
       stripFooterPatterns: stripFooter,
+      engagement,
     });
     const outPath = join(OUT, `${slug}.md`);
     writeFileSync(outPath, cleaned, "utf-8");
@@ -94,9 +118,10 @@ async function main(): Promise<void> {
   const fetchOnly = args.includes("--fetch-only");
   const cleanOnly = args.includes("--clean-only");
   const stripFooter = args.includes("--strip-footer");
+  const fetchStats = args.includes("--fetch-stats");
 
   if (cleanOnly) {
-    runClean(stripFooter);
+    await runClean(stripFooter, fetchStats);
     return;
   }
   if (fetchOnly) {
@@ -104,7 +129,7 @@ async function main(): Promise<void> {
     return;
   }
   await runFetch();
-  runClean(stripFooter);
+  await runClean(stripFooter, fetchStats);
 }
 
 main().catch((e) => {

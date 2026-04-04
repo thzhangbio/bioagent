@@ -10,6 +10,7 @@
 | `inbox/` | 抓取或手动的 **`*.raw.html` 全文** |
 | `out/` | 清洗后的 **`*.md`**（待校对、灌库）；YAML 头含 **`wechat-meta.ts`** 抽取的运营字段，见下节 |
 | `wechat-meta.ts` | 从页面 HTML 解析 **`title` / `is_original` / `editor` / `mp_name` / `published_at` / `published_at_cn`** |
+| `appmsg-stats.ts` | 可选：通过 `getappmsgext` 拉取 **阅读 / 点赞 / 分享 / 评论 / 收藏** 等互动数（需 Cookie，见下节） |
 | `archive/` | 两类子目录，见下节 |
 
 ### `out/*.md` 的 YAML 头（运营参考）
@@ -24,6 +25,23 @@
 | `published_at_cn` | 东八区可读时间，与微信界面一致便于对照 |
 
 另含 `url`、`fetchedAt`（抓取侧）；正文内 **`[导流]`** 等非正文标记见 `clean-article.ts` / 合规与预期一节。
+
+### 互动数据（可选，`--fetch-stats`）
+
+静态 HTML **不含**真实阅读量等数字（多为占位）。流水线可额外请求 `mp/getappmsgext`，将结果写入 YAML（字段前缀 `stats_`）：
+
+| 字段 | 含义 |
+|------|------|
+| `stats_read` | 阅读量 |
+| `stats_old_like` | 旧版「赞」数（若接口返回） |
+| `stats_like` | 点赞 / 在看相关计数（接口字段因版本而异） |
+| `stats_share` | 转发量 |
+| `stats_comment` | 评论数（主文） |
+| `stats_collect` | 收藏数（若接口返回） |
+| `stats_fetched_at` | 拉取互动数据的时间（ISO 8601） |
+| `stats_fetch_error` | 失败原因（如无 Cookie 时常见 `no_appmsgstat`） |
+
+**用法**：在已登录微信的浏览器中打开 `mp.weixin.qq.com` 文章页，从开发者工具复制 **Cookie**，设置环境变量 **`WECHAT_MP_COOKIE`**，再执行带 **`--fetch-stats`** 的 pipeline 或单篇清洗。未设置 Cookie 时仍会尝试请求，但通常拿不到 `appmsgstat`，YAML 中可能仅有 `stats_fetch_error`。
 
 ## 两类归档（不要混用）
 
@@ -42,8 +60,10 @@
 | `pnpm run wechat-article-pipeline -- --fetch-only` | 仅抓取 |
 | `pnpm run wechat-article-pipeline -- --clean-only` | 仅根据 `inbox/*.raw.html` 生成 `out` |
 | `pnpm run wechat-article-pipeline -- --clean-only --strip-footer` | 同上，并裁掉微信页尾部少量「壳子」提示（保留版权声明等） |
+| `pnpm run wechat-article-pipeline -- --clean-only --fetch-stats` | 清洗并写入互动数据（需 `WECHAT_MP_COOKIE`） |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html` | 单篇清洗到 `out/xxx.md` |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html --strip-footer` | 单篇清洗并裁壳子尾部（`--` 后为传给脚本的参数） |
+| `pnpm run wechat-article-clean -- inbox/xxx.raw.html --fetch-stats` | 单篇清洗并写入互动数据（需 `WECHAT_MP_COOKIE`） |
 
 ## 合规与预期
 

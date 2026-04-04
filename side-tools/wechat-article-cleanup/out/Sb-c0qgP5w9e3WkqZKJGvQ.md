@@ -1,7 +1,7 @@
 ---
 source: wechat_mp_article
 url: https://mp.weixin.qq.com/s/Sb-c0qgP5w9e3WkqZKJGvQ
-fetchedAt: 2026-04-04T09:14:24.012Z
+fetchedAt: 2026-04-04T09:18:53.505Z
 title: "从小爱吃辣，竟容易长不高？Nature子刊：辛辣饮食诱发肠道炎症，改变血液中这种信号分子，掐断长高“信号”"
 is_original: true
 editor: "JY"

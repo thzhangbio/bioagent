@@ -254,12 +254,29 @@ function formatProfile(p: CompanyProfile): string {
   return lines.length > 0 ? lines.join("\n") : "已开始收集，信息暂不完整。";
 }
 
+/** 避免「我是小编，……」等抱怨句被「我是」+ 截断捕获进公司名称/对接称呼 */
+function isPlausibleProfileNameCapture(raw: string): boolean {
+  const t = raw.trim();
+  if (t.length < 2 || t.length > 22) return false;
+  if (/[？！…]/.test(t)) return false;
+  if ((t.match(/，/g) ?? []).length >= 1) return false;
+  if (
+    /原则|行不行|即可动|每次都说|一轮又一轮|元对话|吐槽|我说了|你按|自己选|不要选了/i.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+  if (/小编/.test(t) && t.length > 4) return false;
+  return true;
+}
+
 function extractAndSaveInfo(
   userText: string,
   memory: ReturnType<typeof loadMemory>,
 ): void {
   if (
-    /你是小编|我说了原则|补充.{0,8}一轮又一轮|不要选了|元对话|吐槽机器人/i.test(
+    /你是小编|我是小编|我说了原则|按原则自己选|补充完即可|补充.{0,8}一轮又一轮|不要选了|元对话|吐槽机器人/i.test(
       userText,
     )
   ) {
@@ -273,7 +290,11 @@ function extractAndSaveInfo(
     regex: RegExp;
     field: keyof CompanyProfile;
   }> = [
-    { regex: /(?:我们?(?:公司)?(?:叫|是|名[叫称为]?)|公司名?[叫是称为])[\s:：]*(.{2,30})/, field: "name" },
+    {
+      regex:
+        /(?:我们?(?:公司)?(?:叫|是|名[叫称为]?)|公司名?[叫是称为])[\s:：]*(.{2,22})/,
+      field: "name",
+    },
     { regex: /(?:(?:主要|主营|核心)?(?:做|卖|经营|产品|服务)[的是]?)[\s:：]*(.{2,50})/, field: "products" },
     { regex: /(?:目标|针对|面向|客户|用户|人群)[的是]?[\s:：]*(.{2,50})/, field: "targetCustomers" },
     { regex: /(?:调性|风格|品牌|定位)[的是]?[\s:：]*(.{2,50})/, field: "brandTone" },
@@ -283,8 +304,9 @@ function extractAndSaveInfo(
   for (const { regex, field } of patterns) {
     if (!profile[field]) {
       const match = userText.match(regex);
-      if (match?.[1]) {
-        (profile as Record<string, string>)[field] = match[1].trim();
+      const cap = match?.[1]?.trim();
+      if (cap && (field !== "name" || isPlausibleProfileNameCapture(cap))) {
+        (profile as Record<string, string>)[field] = cap;
         changed = true;
       }
     }

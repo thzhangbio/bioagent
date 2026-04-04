@@ -6,3 +6,5 @@
 #
 # 归档 ①（out 满意后）：pnpm run wechat-article-archive-inbox  →  archive/processed-inbox/
 # 归档 ②（向量化入库后）：pnpm run wechat-article-archive-out  →  archive/ingested-out/
+
+https://mp.weixin.qq.com/s/Sb-c0qgP5w9e3WkqZKJGvQ

@@ -32,6 +32,45 @@ export function dropMineruMarkdownNoise(text: string): string {
   return out.join("\n");
 }
 
+/**
+ * MinerU 导出中整段 `<table>…</table>`（试剂表等）对向量检索噪声大；转为 `[表格]` + `|` 分隔的纯文本行。
+ */
+function flattenOneTableBlock(tableHtml: string): string {
+  const rowMatches = tableHtml.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [];
+  const lines: string[] = [];
+  for (const row of rowMatches) {
+    const cellMatches =
+      row.match(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi) ?? [];
+    const parts: string[] = [];
+    for (const cell of cellMatches) {
+      const inner = cell
+        .replace(/^<t[hd]\b[^>]*>/i, "")
+        .replace(/<\/t[hd]>$/i, "");
+      const plain = inner
+        .replace(/<br\s*\/?>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (plain) parts.push(plain);
+    }
+    if (parts.length) lines.push(parts.join(" | "));
+  }
+  if (lines.length === 0) return "";
+  return `\n[表格]\n${lines.join("\n")}\n`;
+}
+
+export function flattenHtmlTablesToPlain(text: string): string {
+  let s = text;
+  let guard = 0;
+  while (/<table\b/i.test(s) && guard++ < 2000) {
+    s = s.replace(/<table\b[^>]*>[\s\S]*?<\/table>/i, (m) => {
+      const flat = flattenOneTableBlock(m);
+      return flat || "\n<!-- 空表格已省略 -->\n";
+    });
+  }
+  return s;
+}
+
 export function normalizeMineruInlineLatex(text: string): string {
   let s = text;
 
@@ -75,8 +114,9 @@ export function normalizeMineruInlineLatex(text: string): string {
     },
   );
 
+  /** `${ \mathsf { C X C L 1 3 } } ^ { + }$` 等：体须含数字（CXCL13），故用 [A-Za-z0-9] */
   s = s.replace(
-    /\$\s*\{\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\}\s*\^\s*\{\s*\+\s*\}\s*\$/g,
+    /\$\s*\{\s*\\mathsf\s*\{\s*((?:[A-Za-z0-9]\s*)+)\}\s*\}\s*\^\s*\{\s*\+\s*\}\s*\$/g,
     (full, body: string) => {
       const t = collapseSpacedChars(body);
       if (/^[A-Z]{2,8}\d{0,2}$/i.test(t) || /^CXCL\d+$/i.test(t))
@@ -86,6 +126,15 @@ export function normalizeMineruInlineLatex(text: string): string {
   );
 
   s = s.replace(/\$\s*\\mathsf\s*\{\s*T\s*\}\s*=\s*\$/gi, "T =");
+
+  /** `${ \mathsf { C D } } 1 9 ^ { + }$` → CD19+ */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*C\s*D\s*\}\s*\}\s*((?:\d\s*)+)\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    (full, digits: string) => {
+      const n = collapseSpacedChars(digits);
+      return /^\d{1,3}$/.test(n) ? `CD${n}+` : full;
+    },
+  );
 
   s = s.replace(
     /TGF\s*\$\s*\\mathrm\s*\{\s*\\Delta\s*\\ddot\s*\{\s*\\beta\s*\}\s*\}\s*\$/gi,
@@ -137,6 +186,119 @@ export function normalizeMineruInlineLatex(text: string): string {
     /\$\s*\{\s*\\mathsf\s*\{\s*T\s*L\s*S\s*\}\s*\}\s*\^\s*\{\s*([+\-−])\s*\}\s*\$/g,
     (_, sup: string) => `TLS${sup === "+" ? "+" : "−"}`,
   );
+
+  /** `${ \mathsf { T G F } } { \mathsf { \beta } }` → TGFβ */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*T\s*G\s*F\s*\}\s*\}\s*\{\s*\\mathsf\s*\{\s*\\beta\s*\}\s*\}\s*\$/gi,
+    "TGFβ",
+  );
+
+  /** 行内纯数字的 `$5 0$`、`$1 2$` → 数字（须在百分号等规则之后） */
+  s = s.replace(/\$\s*((?:\d\s*){1,14})\s*\$/g, (full, raw: string) => {
+    const n = collapseSpacedChars(raw);
+    return /^\d+$/.test(n) ? n : full;
+  });
+
+  /** OCR：连续 `\mu` 污染 */
+  s = s.replace(/(?:\\mu\s*){3,}/g, "μ");
+
+  /** 裸 `\mathsf { … } ^{+}`（非美元块）常见于图注 */
+  s = s.replace(
+    /\\mathsf\s*\{\s*((?:[A-Za-z0-9]\s*)+)\}\s*\^\s*\{\s*\+\s*\}/g,
+    (full, body: string) => {
+      const t = collapseSpacedChars(body);
+      if (/^CD\d+/i.test(t) || /^CXCL\d+/i.test(t) || /^PDPN$/i.test(t))
+        return `${t}+`;
+      return full;
+    },
+  );
+
+  /** `\mathtt { N } = 3 { - } 5` → `N = 3–5` */
+  s = s.replace(
+    /\\mathtt\s*\{\s*N\s*\}\s*=\s*(\d)\s*\{\s*-\s*\}\s*(\d)/gi,
+    "N = $1–$2",
+  );
+
+  /** `$5 \mathrm { n g / m L }$` 类浓度 */
+  s = s.replace(
+    /\$\s*(\d+)\s*\\mathrm\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*\$/gi,
+    "$1 ng/mL",
+  );
+
+  /** `$1 \mu g / \mathrm { m L }$`、`\mathsf { m L }`（OCR 空格） */
+  s = s.replace(
+    /\$\s*(\d+)\s*\\mu\s*\\?\s*g\s*\/\s*\\(?:mathrm|mathsf)\s*\{\s*m\s*L\s*\}\s*\$/gi,
+    "$1 μg/mL",
+  );
+
+  /** `$10 \mu \mathsf { M }$`、`$1 0 \mu \mathsf { M }$` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\?\s*\\mathsf\s*\{\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μM` : full;
+    },
+  );
+
+  /** `$T _ { \mathsf { H } }` → TH（辅助性 T 细胞下标） */
+  s = s.replace(/\$\s*T\s*_\s*\{\s*\\mathsf\s*\{\s*H\s*\}\s*\}/gi, "T_H");
+
+  /** `T_H \mathsf { 1 }$` 被拆成两段时的拼接 */
+  s = s.replace(/T_H\s*\\mathsf\s*\{\s*1\s*\}\s*\$/gi, "TH1");
+
+  /** `\mathsf { C D 9 0 . 2 ^ { + } }` 等小数字编号 */
+  s = s.replace(
+    /\\mathsf\s*\{\s*C\s*D\s*((?:\d\s*)+\s*\.\s*(?:\d\s*)+)\s*\^\s*\{\s*\+\s*\}\s*\}/gi,
+    (full, raw: string) => {
+      const t = collapseSpacedChars(raw);
+      return /^\d+\.\d+$/.test(t) ? `CD${t}+` : full;
+    },
+  );
+
+  /** `$\pm { \mathsf { C D } } 4 ^ { + } / { \mathsf { C D } } 8 ^ { + }$` */
+  s = s.replace(
+    /\$\s*\\pm\s*\{\s*\\mathsf\s*\{\s*C\s*D\s*\}\s*\}\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\/\s*\{\s*\\mathsf\s*\{\s*C\s*D\s*\}\s*\}\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "± CD$1+/CD$2+",
+  );
+
+  /** `${ \mathsf { C D } } 8 +$`（参考文献等） */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*C\s*D\s*\}\s*\}\s*(\d+)\s*\+\s*\$/gi,
+    (_, n: string) => `CD${n}+`,
+  );
+
+  /** `${ \mathsf { r C A F } } +` */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*r\s*C\s*A\s*F\s*\}\s*\}\s*\+/gi,
+    "rCAF+",
+  );
+
+  /** OCR 将 `g` 识成 `\rho` 的浓度 */
+  s = s.replace(
+    /\$\s*(\d+)\s*\\mu\s*\\rho\s*\/\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*\$/gi,
+    "$1 μg/mL",
+  );
+
+  /** `\mathsf { C D a ^ { + } / C D b ^ { + } }`（须先于单标记 `CDn+`） */
+  s = s.replace(
+    /\\mathsf\s*\{\s*C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\/\s*C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\}/gi,
+    "CD$1+/CD$2+",
+  );
+
+  /** `\mathsf { C D n ^ { + } }` 无外层 `$` 时 */
+  s = s.replace(
+    /\\mathsf\s*\{\s*C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\}/gi,
+    "CD$1+",
+  );
+
+  /** `\mathtt { C D n ^ { + } }` */
+  s = s.replace(
+    /\\mathtt\s*\{\s*C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}\s*\}/gi,
+    "CD$1+",
+  );
+
+  /** `\mathrm { ~ h ~ }` 时间占位 */
+  s = s.replace(/\^\s*\{\s*2\s*4\s*\\mathrm\s*\{\s*~\s*h\s*~\s*\}\s*\}/gi, "24 h");
 
   return s;
 }
@@ -199,6 +361,7 @@ export function cleanMarkdownForKnowledgeBase(
 
   let text = raw.replace(/\r\n/g, "\n");
   text = dropMineruMarkdownNoise(text);
+  text = flattenHtmlTablesToPlain(text);
   text = normalizeMineruInlineLatex(text);
   text = cleanPdfTextMd(text, cleanupOpts);
 

@@ -20,13 +20,10 @@ import {
 } from "../../lark/lark-cli-docs-update.js";
 import {
   extractDocxDocumentIdsFromText,
+  hasAnyDocxInChatIndex,
   pickMostRecentDocumentIdFromIndex,
   refreshChatDocxIndexFromHistory,
 } from "../../memory/chat-docx-index.js";
-import {
-  isComplianceReviewAfterWriteEnabled,
-  reviewDraftWithLlm,
-} from "../../medical/compliance.js";
 import {
   loadMemory,
   saveMemory,
@@ -155,6 +152,51 @@ export function shouldRunDocxReviseHeuristic(
     /润色|缩短|加长|扩写|精简|口语化|专业化|去AI味|更正式|更活泼|改稿|重写|修订|删改/u.test(t);
   const weakVerb = /修改|调整|优化|替换|删掉|加上|更新/u.test(t) && docCue;
   return strongRevise || weakVerb;
+}
+
+/**
+ * 会话里已有云文档上下文，但本条**不像改稿指令**（常见于用户分两条发：先贴标题、再发「修改一下」）。
+ * 此时若走通用对话，模型易输出与后续改稿工作流矛盾的说明，故在路由层短路为简短确认，**不调用**基座对话。
+ */
+export function isLikelyDocTitleOrSnippetWithoutReviseTask(
+  userText: string,
+  normalized: string,
+  chatId: string,
+  memory: MemoryStore,
+): boolean {
+  const hasDocContext =
+    hasAnyDocxInChatIndex(chatId) || !!memory.lastDeliveredDoc?.documentId;
+  if (!hasDocContext) return false;
+
+  const t = normalized.trim();
+  const nonEmptyLines = userText
+    .trim()
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (nonEmptyLines.length > 2) return false;
+  if (t.length < 8 || t.length > 400) return false;
+
+  if (isWriteTaskIntent(normalized)) return false;
+  if (isDocxReviseIntent(normalized)) return false;
+  if (
+    shouldRunDocxReviseHeuristic(
+      userText,
+      !!memory.lastDeliveredDoc?.documentId || hasAnyDocxInChatIndex(chatId),
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    /[？?]|吗\b|什么|怎么|如何|能否|可不可以|是否|请|帮我|麻烦|修改|改稿|润色|排版|格式|加粗|删除|补充|优化|调整|重写|缩短|加长|更新|替换|写回|同步/u.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 export interface DocxReviseWorkflowOptions {
@@ -304,33 +346,6 @@ export async function runDocxReviseWorkflow(
     saveMemory(fresh, { bumpInteraction: false });
   }
 
-  let complianceBlock = "";
-  if (isComplianceReviewAfterWriteEnabled()) {
-    try {
-      const review = await reviewDraftWithLlm(
-        title,
-        stripMarkdownToPlainFallback(body),
-      );
-      complianceBlock = [
-        "",
-        "---",
-        "",
-        "**合规与风险提示（自动协审，非法律意见）**",
-        "",
-        review,
-      ].join("\n");
-    } catch (err) {
-      const m = err instanceof Error ? err.message : String(err);
-      console.error("[docx-revise] 合规协审失败:", m);
-      complianceBlock = [
-        "",
-        "---",
-        "",
-        "（合规协审调用失败，请人工复核后再发布。）",
-      ].join("\n");
-    }
-  }
-
   const locateLine =
     resolved.sourceLabel && resolved.sourceLabel !== "当前消息中的云文档链接" ?
       [`定位：${resolved.sourceLabel}。`]
@@ -367,13 +382,6 @@ export async function runDocxReviseWorkflow(
     `链接：${url}`,
     "",
     "若需再改语气或局部段落，可继续说明具体句子。",
-    ...(complianceBlock ?
-      [
-        "",
-        "（以下为聊天内附的合规/评估摘要；**成稿正文已写入上方链接的云文档**，请勿仅把本段当作文档正文。）",
-      ]
-    : []),
-    complianceBlock,
     ...plainNote,
   ].join("\n");
 }

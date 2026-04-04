@@ -13,6 +13,7 @@ import {
 } from "./workflows/content-create.js";
 import {
   isDocxReviseIntent,
+  isLikelyDocTitleOrSnippetWithoutReviseTask,
   runDocxReviseWorkflow,
   shouldRunDocxReviseHeuristic,
 } from "./workflows/content-revise.js";
@@ -158,6 +159,30 @@ export async function handleUserMessage(
         console.error("[agent] content-create（合并）失败:", msg);
         return "抱歉，内容创作流程暂时失败，请稍后再试。";
       }
+    }
+
+    if (
+      !meta?.forceGeneralChat &&
+      isLikelyDocTitleOrSnippetWithoutReviseTask(
+        userText,
+        normalized,
+        chatId,
+        memory,
+      )
+    ) {
+      const reply = [
+        "已收到。这条看起来是**标题或摘录**，我暂不当作改稿指令处理。",
+        "",
+        "若需要改云文档里的排版或正文，请用一句话说明具体需求（例如标题层级、加粗、某段润色）。若你是分两条发送，**下一条**会直接走改稿写回。",
+      ].join("\n");
+      history.push({ role: "user", content: userText });
+      history.push({ role: "assistant", content: reply });
+      extractAndSaveInfo(userText, memory);
+      recordDocxLinksFromText(chatId, reply, "assistant");
+      console.log(
+        `[router] 云文档上下文中疑似仅标题/摘录，短路回复，避免与改稿工作流叙事冲突`,
+      );
+      return reply;
     }
 
     const wantsDocxRevise =

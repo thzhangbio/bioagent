@@ -3,17 +3,57 @@ import Anthropic from "@anthropic-ai/sdk";
 import { getAnthropicClient } from "../agent/anthropic.js";
 
 /**
- * Phase D：合规与改稿 — 暂无规则库时，用基座模型做协审提示（非法律意见）。
+ * Phase D：合规协审 — 暂无规则库时，用基座模型做协审提示（非法律意见）。
  * - 宽松闸门：`FEISHU_CONTENT_STRICT_GATE` 未设为 `1` 时，动笔前少追问，合规后置。
- * - 成稿后审读：`FEISHU_COMPLIANCE_AFTER_WRITE=0` 可关闭。
+ * - **仅「成稿」流程**（`content-create`）且用户**显式**要求合规审读时，在写回 docx 后调用；**聊天改稿**不跑。是否协审由 `isExplicitComplianceReviewIntent` 决定，**不**再依赖环境变量开关。
  */
 
 export function isContentStrictGate(): boolean {
   return process.env.FEISHU_CONTENT_STRICT_GATE === "1";
 }
 
-export function isComplianceReviewAfterWriteEnabled(): boolean {
-  return process.env.FEISHU_COMPLIANCE_AFTER_WRITE !== "0";
+/**
+ * 用户是否在**本条创作指令**中明确要求「合规/规范」方面的审读或处理。
+ * 成稿后是否跑 LLM 协审**仅**依赖本函数命中；普通成稿不自动协审。
+ */
+export function isExplicitComplianceReviewIntent(raw: string): boolean {
+  const t = raw.replace(/\u200b/g, "").replace(/\s+/g, " ").trim();
+  if (t.length < 4) return false;
+
+  if (
+    /合规(?:建议|校正|审查|审核|协审|评估|意见|风险提示|化处理)|合规化|是否合规|合不合规/u.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    /(?:是否|有没有|是不是).{0,6}(?:合规|规范)/u.test(t) &&
+    /(?:帮|请|麻烦|想|要|给我|给我点|想请|希望|需要|顺便|同时|另外|再)/u.test(t)
+  ) {
+    return true;
+  }
+
+  if (
+    /(?:帮我|请|麻烦|给我|想请|希望).{0,24}(?:看看|查查|查一下|查查看|审一下|看一下|瞧一眼|分析).{0,20}(?:是否|有没有|是不是).{0,10}(?:合规|规范)/u.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    /(?:看看|查查|查查看|审一下).{0,16}(?:是否|有没有).{0,10}(?:合规|规范)/u.test(t)
+  ) {
+    return true;
+  }
+
+  if (/规范(?:吗|性|与否)?|是否规范|合不规范/u.test(t) && /(?:帮|请|麻烦|给我|查查|看看|审)/u.test(t)) {
+    return true;
+  }
+
+  return false;
 }
 
 const REVIEW_SYSTEM = `你是医学新媒体与推广合规方向的**协审助手**（非律师、非最终合规裁决）。

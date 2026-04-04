@@ -16,8 +16,8 @@ import {
 } from "../../lark/docx-document.js";
 import type { SearchHit } from "../../knowledge/vector-file-store.js";
 import {
-  isComplianceReviewAfterWriteEnabled,
   isContentStrictGate,
+  isExplicitComplianceReviewIntent,
   reviewDraftWithLlm,
 } from "../../medical/compliance.js";
 import { loadMemory, saveMemory, type MemoryStore } from "../../memory/store.js";
@@ -836,9 +836,9 @@ export async function runContentCreateWorkflow(
       : "";
 
     let complianceBlock = "";
-    if (isComplianceReviewAfterWriteEnabled()) {
+    if (isExplicitComplianceReviewIntent(userText)) {
       try {
-        console.log("[content-create] 成稿后合规协审（LLM）…");
+        console.log("[content-create] 成稿后合规协审（LLM，用户显式要求）…");
         const review = await reviewDraftWithLlm(title, body);
         complianceBlock = [
           "",

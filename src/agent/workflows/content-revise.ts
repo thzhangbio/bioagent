@@ -15,6 +15,10 @@ import {
   replaceDocumentPagePlainText,
 } from "../../lark/docx-document.js";
 import {
+  replaceDocumentViaLarkCliOverwrite,
+  stripMarkdownToPlainFallback,
+} from "../../lark/lark-cli-docs-update.js";
+import {
   extractDocxDocumentIdsFromText,
   pickMostRecentDocumentIdFromIndex,
   refreshChatDocxIndexFromHistory,
@@ -29,15 +33,17 @@ import {
   type MemoryStore,
 } from "../../memory/store.js";
 
-const DOCX_REVISE_SYSTEM = `你是医学新媒体编辑。用户要求**修改**一篇已存在的稿件正文（已通过飞书新版云文档交付）。
+/** 改稿默认经 lark-cli `docs +update` 写回；模型须输出 Lark-flavored Markdown 正文 */
+const DOCX_REVISE_SYSTEM = `你是医学新媒体编辑。用户要求**修改**一篇已存在的稿件正文（将通过 **飞书 Lark Markdown** 写回云文档）。
 
 要求：
 - **输出结构（必须严格遵守）**：
-  - 第 1 行：**仅一行**——修改后的**发布标题**（若用户未要求改标题，保持原标题或只做必要微调）。
+  - 第 1 行：**仅一行**——修改后的**发布标题**（纯文本一行，不要加 #）。
   - 第 2 行：必须为空行。
-  - 第 3 行起：**正文**，段落之间空一行；正文内不要重复第一行的标题；不要使用 Markdown 标题符号（如 #）。
-- **以【当前文档正文】为事实基底**；用户指令与知识库片段用于语气、结构、合规与补充；**禁止编造**新数据、病例或文献结论；不确定处用审慎表述或删去。
-- 医学表述审慎，不夸大疗效；遵守广告法，避免绝对化用语。
+  - 第 3 行起：**正文**，使用 **飞书 Lark Markdown**：段落之间空一行；可用 \`##\` / \`###\` 表示小标题；可用 \`**粗体**\`；可用 \`>\` 引用；列表用 \`-\` 或 \`1.\`。
+  - 正文内**不要**重复抄写第一行的标题；需要文首展示标题时，程序会在文档顶部自动插入一级标题。
+- **以【当前文档正文】为事实基底**；**禁止编造**新数据、病例或文献结论；不确定处用审慎表述或删去。
+- 医学表述审慎，遵守广告法。
 - 不要开场白或后记说明；不要输出「已保存」等系统话术。`;
 
 /** 从消息中提取飞书 docx 的 document_id（URL 路径 `/docx/<token>`） */
@@ -111,21 +117,25 @@ export function isDocxReviseIntent(userText: string): boolean {
   }
 
   const hasReviseVerb =
-    /改稿|改一下|改改|改成|改为|润色|删改|修改|调整|缩短|加长|优化|重写|修订|更新|精简|扩写|口语化|专业化|去AI味|更正式|更活泼|替换|删掉|加上|写回|同步到/u.test(
+    /改稿|改一下|改改|改成|改为|润色|删改|修改|调整|缩短|加长|优化|重写|修订|更新|精简|扩写|口语化|专业化|去AI味|更正式|更活泼|替换|删掉|加上|写回|同步到|校正|修复|规整|修一下|给修/u.test(
       t,
     );
   if (!hasReviseVerb) return false;
 
   const mentionsContext =
-    /文档|云文档|飞书|docx|那篇|上一篇|刚写的|成稿|这篇|这段|那段|段落|交付稿|链接里|刚发|刚给你/u.test(
+    /文档|云文档|飞书|docx|那篇|上一篇|刚写的|成稿|这篇|这段|那段|段落|交付稿|链接里|刚发|刚给你|文献|正文里|页面里|标题|小标题|格式|加粗|排版|样式|显示|对齐/u.test(
       t,
     ) || /docx\/[a-zA-Z0-9_-]+/u.test(userText);
+
+  const formatRevise =
+    /格式|加粗|小标题|标题层级|排版|样式|显示出来|显示不对|Markdown|markdown/u.test(t) &&
+    /改|修|调|校正|弄|弄一下|优化|统一/u.test(t);
 
   const shortStandalone =
     t.length <= 48 &&
     /^(?:请|麻烦|帮我)?(?:润色|改一下|优化|修改|调整)(?:下|一下)?[。.!！？\s]*$/u.test(t);
 
-  return mentionsContext || shortStandalone;
+  return mentionsContext || formatRevise || shortStandalone;
 }
 
 /**
@@ -140,7 +150,7 @@ export function shouldRunDocxReviseHeuristic(
   if (isWriteTaskIntent(t)) return false;
   if (/^(?:什么|怎么|如何|为什么|是否|能否)/u.test(t)) return false;
   const docCue =
-    /稿|正文|文档|那段|这段|段落|标题|导语|开头|结尾|句子|语气|版本|云文档|飞书|笔记|文章|文案/u.test(t);
+    /稿|正文|文档|那段|这段|段落|标题|导语|开头|结尾|句子|语气|版本|云文档|飞书|笔记|文章|文案|文献|格式|加粗|小标题|排版|样式/u.test(t);
   const strongRevise =
     /润色|缩短|加长|扩写|精简|口语化|专业化|去AI味|更正式|更活泼|改稿|重写|修订|删改/u.test(t);
   const weakVerb = /修改|调整|优化|替换|删掉|加上|更新/u.test(t) && docCue;
@@ -252,18 +262,35 @@ export async function runDocxReviseWorkflow(
     return `抱歉，改稿生成失败：${msg.slice(0, 200)}`;
   }
 
+  let writeBackMode: "lark_cli_md" | "lark_cli_fallback_sdk";
+  const fullMarkdown = [`# ${title.trim()}`, "", body.trim()].join("\n");
   try {
-    await replaceDocumentPagePlainText(documentId, body);
+    await replaceDocumentViaLarkCliOverwrite(documentId, fullMarkdown, {
+      newTitle: title.trim(),
+    });
+    writeBackMode = "lark_cli_md";
+    console.log("[docx-revise] 已通过 lark-cli docs +update（overwrite）写回 Markdown");
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[docx-revise] 写回飞书失败:", msg);
-    return [
-      "改稿内容已生成，但**未能写入飞书云文档**（网络/权限/版本冲突等）。",
-      "",
-      `错误摘要：${msg.slice(0, 240)}`,
-      "",
-      "请稍后重试，或检查开放平台中文档权限与 docx 相关 scope。",
-    ].join("\n");
+    console.warn("[docx-revise] lark-cli 写回失败，回退为 Node SDK 纯文本:", msg);
+    try {
+      await replaceDocumentPagePlainText(
+        documentId,
+        stripMarkdownToPlainFallback(fullMarkdown),
+      );
+      writeBackMode = "lark_cli_fallback_sdk";
+    } catch (e2) {
+      const msg2 = e2 instanceof Error ? e2.message : String(e2);
+      console.error("[docx-revise] 回退写回仍失败:", msg2);
+      return [
+        "改稿内容已生成，但**未能写入飞书云文档**（lark-cli 与备用通道均失败）。",
+        "",
+        `lark-cli：${msg.slice(0, 200)}`,
+        `SDK：${msg2.slice(0, 200)}`,
+        "",
+        "请确认本机已安装 `lark-cli` 且已登录（如 `lark-cli auth login`）；或检查开放平台 docx 权限与网络。",
+      ].join("\n");
+    }
   }
 
   const url = buildDocxWebUrl(documentId);
@@ -280,7 +307,10 @@ export async function runDocxReviseWorkflow(
   let complianceBlock = "";
   if (isComplianceReviewAfterWriteEnabled()) {
     try {
-      const review = await reviewDraftWithLlm(title, body);
+      const review = await reviewDraftWithLlm(
+        title,
+        stripMarkdownToPlainFallback(body),
+      );
       complianceBlock = [
         "",
         "---",
@@ -306,13 +336,44 @@ export async function runDocxReviseWorkflow(
       [`定位：${resolved.sourceLabel}。`]
     : [];
 
+  const askedRich =
+    /加粗|小标题|标题层级|标题样式|格式|排版|样式|Markdown|markdown/u.test(
+      userText,
+    );
+  const plainNote =
+    writeBackMode === "lark_cli_md" ?
+      []
+    : askedRich ?
+      [
+        "",
+        "**说明**：`lark-cli` 写回未成功，已改用 **OpenAPI 纯文本**备用通道（标题/加粗等可能需在文档内再调）。请在本机安装并登录 `lark-cli`（如 `lark-cli auth login`）后重试改稿。",
+      ]
+    : writeBackMode === "lark_cli_fallback_sdk" ?
+      [
+        "",
+        "**说明**：本次以纯文本写回；完整 Markdown 样式需 `lark-cli` 可用时生效。",
+      ]
+    : [];
+
+  const writeHint =
+    writeBackMode === "lark_cli_md" ?
+      "（已通过 **lark-cli** 以 **Lark Markdown** 覆盖页面正文；含标题层级与粗体等，**overwrite** 会重建正文区，复杂嵌入块请见 lark-doc 最佳实践。）"
+    : "（页面内正文已用**纯文本**替换：`lark-cli` 未成功。）";
+
   return [
-    "已按你的指令改稿并**写回飞书云文档**（页面内正文已替换）。",
+    `已按你的指令改稿并**写回飞书云文档** ${writeHint}`,
     ...locateLine,
     `标题（供核对）：${title}`,
     `链接：${url}`,
     "",
     "若需再改语气或局部段落，可继续说明具体句子。",
+    ...(complianceBlock ?
+      [
+        "",
+        "（以下为聊天内附的合规/评估摘要；**成稿正文已写入上方链接的云文档**，请勿仅把本段当作文档正文。）",
+      ]
+    : []),
     complianceBlock,
+    ...plainNote,
   ].join("\n");
 }

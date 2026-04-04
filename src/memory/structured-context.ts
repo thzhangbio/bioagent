@@ -14,6 +14,7 @@ export function formatStructuredMemoryBlock(memory: MemoryStore): string {
       d.createdAt ?
         `  交付时间（UTC）：${d.createdAt}`
       : "",
+      `  （后台可通过 API 读写该文档正文；勿对用户声称「无法打开飞书链接」。复杂排版可能需在文档内本地调整。）`,
     );
   } else {
     lines.push("- 最近交付的云文档：（暂无记录；成稿成功后会自动登记）");

@@ -8,6 +8,13 @@ export interface CleanupOptions {
   keepFirstJournalTitle?: boolean;
   /** 合并行末 `-` 导致的英文断词（如 recruit-\nment） */
   mergeHyphenation?: boolean;
+  /**
+   * 合并 PDF 硬换行导致的「一句拆成多行」（下一行以小写字母开头且上一行未以句末标点结束）。
+   * 与 {@link joinParagraphsWithBlankLine} 配合：合并后再在段落间插入空行。
+   */
+  mergeSoftLineBreaks?: boolean;
+  /** 段落与段落之间插入一个空行（`\n\n`），便于阅读 */
+  joinParagraphsWithBlankLine?: boolean;
   /** 将 3 段以上空行压成 2 段 */
   collapseBlankLines?: boolean;
   /**
@@ -30,6 +37,8 @@ export interface CleanupOptions {
 const DEFAULT_OPTS: CleanupOptions = {
   keepFirstJournalTitle: true,
   mergeHyphenation: true,
+  mergeSoftLineBreaks: true,
+  joinParagraphsWithBlankLine: true,
   collapseBlankLines: true,
   normalizeTgfBetaMarkup: true,
   normalizeImmuneMarkerLatex: true,
@@ -97,6 +106,155 @@ function applyLineFilters(text: string, opts: CleanupOptions): string {
 /** 英文单词在行尾被 `-` 拆开时合并（允许断行后多余空格，如 recruit-\n ment） */
 function mergeHyphenation(text: string): string {
   return text.replace(/([a-zA-Z])-\s*\n\s*([a-z])/g, "$1$2");
+}
+
+/** 上一行是否已像「句末」结束（避免把 `...factor` 与 `receptor` 当成两句） */
+function endsWithSentenceBoundary(line: string): boolean {
+  const t = line.trimEnd();
+  if (t.length === 0) return true;
+  const last = t[t.length - 1];
+  if (last === "." || last === "?" || last === "!" || last === "…") return true;
+  /** 引号闭合 */
+  if (/[.!?]["'")\]]\s*$/.test(t)) return true;
+  return false;
+}
+
+function looksLikeEmailOrUrl(line: string): boolean {
+  return /@/.test(line) || /\bhttps?:\/\//i.test(line);
+}
+
+/** 独立成行的小标题 / 章节标记，不与下一行合并 */
+function isLikelyStandaloneHeading(line: string): boolean {
+  const t = line.trim();
+  if (t.length === 0 || t.length > 220) return false;
+  if (/^Figure\s+\d+/i.test(t)) return true;
+  if (/^(INTRODUCTION|RESULTS|DISCUSSION|SUMMARY|REFERENCES|STAR METHODS|ACKNOWLEDGMENTS|AUTHOR CONTRIBUTIONS|DECLARATION OF INTERESTS)\b/i.test(t))
+    return true;
+  /** 全大写短行（如 METHODS 小节名） */
+  if (/^[A-Z0-9][A-Z0-9\s\-–,:]{2,100}$/.test(t) && t.length < 120 && !/[.!?]$/.test(t)) {
+    const letters = t.replace(/[^A-Za-z]/g, "");
+    if (letters.length >= 3 && letters === letters.toUpperCase()) return true;
+  }
+  return false;
+}
+
+function shouldMergeSoftBreak(prev: string, next: string): boolean {
+  const a = prev.trimEnd();
+  const b = next.trim();
+  if (a.length === 0 || b.length === 0) return false;
+  if (looksLikeEmailOrUrl(a) || looksLikeEmailOrUrl(b)) return false;
+  if (isLikelyStandaloneHeading(a) || isLikelyStandaloneHeading(b)) return false;
+  /** 图注、列表、面板标记 */
+  if (/^[•\-–*]\s/.test(b) || /^\(?[A-Z]\)\s/.test(b) || /^Table\s+\d+/i.test(b)) return false;
+  /** 常见缩写结尾，避免与下一句合并 */
+  if (/\b(e\.g|i\.e|et al|Fig|Figs|vs|Dr|Mr|Mrs|St)\.\s*$/i.test(a)) return false;
+  const c0 = b[0];
+  if (c0 >= "a" && c0 <= "z") {
+    if (endsWithSentenceBoundary(a)) return false;
+    return true;
+  }
+  return false;
+}
+
+/** 新段常见开头（The/We 等同句折行见 isParagraphBoundary 中优先判断） */
+const LIKELY_NEW_PARAGRAPH_START =
+  /^(To |The |We |Here |In this |Using |Finally,|However,|Moreover,|Thus,|These |When |Although |Despite |One |Two |Three |Recently,|Importantly,|Interestingly,|Collectively,|Together,|Previous |Our |This |For |As |If |After |Before |Because |Given |Signaling |CAF |TGFβ|Mouse |Human |Blockade |Lymphocyte |Reprogramming |Neutralization |Correspondingly,|Furthermore,|Additionally,|Indeed,|Conversely,|Accordingly,)/;
+
+/** 句末标点后的折行续句，不断段 */
+const AMBIGUOUS_PARA_START_AFTER_SENTENCE =
+  /^(The |We |This |It |They |These )/;
+
+/**
+ * 在「硬换行但仍是同一段」时合并：上一行未以句末标点结束且下一行以大写开头（PDF 折行）。
+ */
+function isHardWrappedContinuation(prev: string, next: string): boolean {
+  const a = prev.trimEnd();
+  const b = next.trim();
+  if (a.length === 0 || b.length === 0) return false;
+  if (looksLikeEmailOrUrl(a) || looksLikeEmailOrUrl(b)) return false;
+  if (isLikelyStandaloneHeading(a) || isLikelyStandaloneHeading(b)) return false;
+  if (/^[•\-–*]\s/.test(b)) return false;
+  if (LIKELY_NEW_PARAGRAPH_START.test(b)) return false;
+  const n0 = b[0];
+  if (n0 < "A" || n0 > "Z") return false;
+  if (endsWithSentenceBoundary(a)) return false;
+  /** 数字/逗号结尾常为引文或从句未完，多与下行相接 */
+  if (/[\d,;:)\]]\s*$/.test(a)) return true;
+  /** 短行更可能是标题或图注，不当作折行续接 */
+  if (a.length < 40) return false;
+  return true;
+}
+
+/**
+ * 是否应在 `prev` 与 `next` 之间断开为**新段落**（其后可插入空行）。
+ */
+function isParagraphBoundary(prev: string, next: string): boolean {
+  const p = prev.trimEnd();
+  const n = next.trim();
+  if (p.length === 0 || n.length === 0) return true;
+  /** 「…end. The next…」「…study. We found…」为同段折行 */
+  if (
+    endsWithSentenceBoundary(p) &&
+    AMBIGUOUS_PARA_START_AFTER_SENTENCE.test(n)
+  ) {
+    return false;
+  }
+  if (LIKELY_NEW_PARAGRAPH_START.test(n)) return true;
+  if (isLikelyStandaloneHeading(p) || isLikelyStandaloneHeading(n)) return true;
+  if (/^Figure\s+\d+/i.test(n)) return true;
+  if (looksLikeEmailOrUrl(p) || looksLikeEmailOrUrl(n)) return true;
+  /** 句点后接以小写开头的免疫/CAF 缩写（OCR 小写） */
+  if (/[.!?]["')\]]?\s*$/.test(p) && /^(rCAF|myCAF|iCAF|apCAF)\b/.test(n))
+    return true;
+  return false;
+}
+
+/**
+ * 将误拆成多行的同一段合并；在真实段分界处可选插入空行（`\n\n`）。
+ */
+function mergeSoftLineBreaksAndSpaceParagraphs(
+  text: string,
+  joinWithBlankLine: boolean,
+): string {
+  const raw = text.split(/\r?\n/);
+  const paragraphs: string[] = [];
+  let buf = "";
+
+  const flush = (): void => {
+    if (buf) {
+      paragraphs.push(buf);
+      buf = "";
+    }
+  };
+
+  for (const line of raw) {
+    const t = line.trim();
+    if (t === "") {
+      flush();
+      continue;
+    }
+    if (buf === "") {
+      buf = t;
+      continue;
+    }
+    if (
+      shouldMergeSoftBreak(buf, t) ||
+      isHardWrappedContinuation(buf, t)
+    ) {
+      buf = `${buf} ${t}`;
+      continue;
+    }
+    if (isParagraphBoundary(buf, t)) {
+      flush();
+      buf = t;
+    } else {
+      buf = `${buf} ${t}`;
+    }
+  }
+  flush();
+
+  const sep = joinWithBlankLine ? "\n\n" : "\n";
+  return paragraphs.join(sep);
 }
 
 function collapseBlankLines(text: string): string {
@@ -377,6 +535,15 @@ function normalizeOcrLatexMisc(text: string): string {
   /** OCR：`doH(2)0` → dH₂O（去离子水类洗涤液） */
   s = s.replace(/\bdoH\s*\(\s*2\s*\)\s*0\b/gi, "dH₂O");
 
+  /** OCR：`37(∘)C`、`4(∘)C`（∘/○ 误作度数符号）→ `°C` */
+  s = s.replace(/\(\s*[∘○]\s*\)\s*C/g, "°C");
+
+  /** OCR：`|` 误为 `l` → `μl`（兼容 µ U+00B5 与 μ U+03BC） */
+  s = s.replace(/[\u00B5\u03BC]\s*\|/g, "μl");
+
+  /** OCR：`15m|` → `15ml`（毫升，竖线误为 l） */
+  s = s.replace(/(\d)\s*m\|/g, "$1ml");
+
   return s;
 }
 
@@ -403,6 +570,12 @@ export function cleanPdfTextMd(
   text = applyLineFilters(text, opts);
 
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
+  if (opts.mergeSoftLineBreaks !== false) {
+    text = mergeSoftLineBreaksAndSpaceParagraphs(
+      text,
+      opts.joinParagraphsWithBlankLine !== false,
+    );
+  }
   if (opts.normalizeTgfBetaMarkup !== false) text = normalizeTgfBetaMarkup(text);
   if (opts.normalizeImmuneMarkerLatex !== false) {
     text = normalizeImmuneMarkerLatex(text);

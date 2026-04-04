@@ -4,6 +4,7 @@ export {
   COLLECTION_MEDICAL,
   COLLECTION_PERSONAL,
   COLLECTION_PLATFORM_TONE,
+  COLLECTION_WECHAT_STYLE,
 } from "./collections.js";
 export { chunkText } from "./chunk.js";
 export {
@@ -40,4 +41,5 @@ export type {
   StoredVectorChunk,
   TextChunk,
   VectorStoreFile,
+  WechatStyleVariant,
 } from "./types.js";

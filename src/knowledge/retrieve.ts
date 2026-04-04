@@ -4,14 +4,30 @@ import { existsSync } from "node:fs";
 import { embedTexts } from "./embeddings.js";
 import { DEFAULT_RAG_STORE_PATH } from "./paths.js";
 import { loadVectorStore, searchVectorStore, type SearchHit } from "./vector-file-store.js";
-import type { KnowledgeCollection } from "./types.js";
+import type { KnowledgeCollection, WechatStyleVariant } from "./types.js";
 
 export interface RetrieveOptions {
   /** 限定检索的集合；不传则检索库内全部集合 */
   collections?: KnowledgeCollection[];
+  /**
+   * 仅作用于 `wechat_style` 块：限定良医汇 / 梅斯子风格。
+   * 不传或空数组：不额外过滤（与 `collections` 含 `wechat_style` 时即「混合参考全部微信风格」）。
+   */
+  wechatStyleVariants?: WechatStyleVariant[];
   topK: number;
   /** 默认 `data/knowledge/rag-store.json` */
   storePath?: string;
+}
+
+function passesWechatStyleFilter(
+  collection: KnowledgeCollection,
+  variant: WechatStyleVariant | undefined,
+  requested: WechatStyleVariant[] | undefined,
+): boolean {
+  if (collection !== "wechat_style") return true;
+  if (!requested?.length) return true;
+  if (variant == null) return false;
+  return requested.includes(variant);
 }
 
 /**
@@ -29,10 +45,25 @@ export async function retrieve(
     );
   }
   const store = loadVectorStore(path);
+  const requestedVariants = options.wechatStyleVariants;
   const chunks =
     options.collections?.length ?
-      store.chunks.filter((c) => options.collections!.includes(c.collection))
-    : store.chunks;
+      store.chunks.filter(
+        (c) =>
+          options.collections!.includes(c.collection) &&
+          passesWechatStyleFilter(
+            c.collection,
+            c.wechatStyleVariant,
+            requestedVariants,
+          ),
+      )
+    : store.chunks.filter((c) =>
+        passesWechatStyleFilter(
+          c.collection,
+          c.wechatStyleVariant,
+          requestedVariants,
+        ),
+      );
   const subStore = { ...store, chunks };
   const [qvec] = await embedTexts(client, [query]);
   return searchVectorStore(subStore, qvec, options.topK);

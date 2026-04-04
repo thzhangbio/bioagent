@@ -14,3 +14,6 @@ export const COLLECTION_PERSONAL: KnowledgeCollection = "personal";
 
 /** 文献与可核对事实（事实层）：论文/指南等清洗稿向量块 */
 export const COLLECTION_LITERATURE: KnowledgeCollection = "literature";
+
+/** 微信医学长文风格语料（表达层）：良医汇 / 梅斯等，块级字段 `wechatStyleVariant` 区分 */
+export const COLLECTION_WECHAT_STYLE: KnowledgeCollection = "wechat_style";

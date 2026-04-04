@@ -39,7 +39,11 @@ export async function augmentUserTextWithRag(userText: string): Promise<string> 
           : h.chunk.paperId ?
             `${h.chunk.sourceLabel} | id:${h.chunk.paperId}`
           : h.chunk.sourceLabel;
-        return `[#${i + 1} ${h.chunk.collection} | ${ref}]\n${h.chunk.text}`;
+        const styleTag =
+          h.chunk.collection === "wechat_style" && h.chunk.wechatStyleVariant ?
+            ` | style:${h.chunk.wechatStyleVariant}`
+          : "";
+        return `[#${i + 1} ${h.chunk.collection}${styleTag} | ${ref}]\n${h.chunk.text}`;
       })
       .join("\n\n---\n\n");
 

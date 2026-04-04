@@ -18,6 +18,7 @@ const VALID: KnowledgeCollection[] = [
   "medical",
   "literature",
   "personal",
+  "wechat_style",
 ];
 
 function parseArgs(): { query: string; collections?: KnowledgeCollection[] } {

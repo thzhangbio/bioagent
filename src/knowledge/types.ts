@@ -1,13 +1,20 @@
 /**
  * RAG 集合名：与《实现路线图》及《知识库分层与文献库规划》对齐。
  * - `literature`：事实层（论文/指南等可核对来源）
+ * - `wechat_style`：表达层——微信医学长文语料（语气/结构参考），**非事实依据**；块级见 {@link WechatStyleVariant}
  */
 export type KnowledgeCollection =
   | "job_post"
   | "platform_tone"
   | "medical"
   | "personal"
-  | "literature";
+  | "literature"
+  | "wechat_style";
+
+/**
+ * `wechat_style` 集合内：良医汇肿瘤资讯系 vs 梅斯学术系，可单独检索或混合检索（不传 `wechatStyleVariants` 即全量）。
+ */
+export type WechatStyleVariant = "liangyi_hui" | "medsci";
 
 export interface TextChunk {
   id: string;
@@ -25,6 +32,8 @@ export interface TextChunk {
   paperId?: string;
   /** 事实层文献：原始条目 URL，通常为 `https://doi.org/10....` */
   sourceUrl?: string;
+  /** 仅 `collection === "wechat_style"`：区分良医汇 / 梅斯，供检索侧过滤 */
+  wechatStyleVariant?: WechatStyleVariant;
 }
 
 export interface StoredVectorChunk extends TextChunk {

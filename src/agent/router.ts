@@ -28,6 +28,10 @@ import {
   persistChatSession,
   saveChatSessionFile,
 } from "../memory/chat-session.js";
+import {
+  hasAnyDocxInChatIndex,
+  recordDocxLinksFromText,
+} from "../memory/chat-docx-index.js";
 import { formatStructuredMemoryBlock } from "../memory/structured-context.js";
 import { loadMemory, saveMemory, type CompanyProfile } from "../memory/store.js";
 
@@ -46,6 +50,8 @@ export function appendConversationMessages(
   user: string,
   assistant: string,
 ): void {
+  recordDocxLinksFromText(chatId, user, "user");
+  recordDocxLinksFromText(chatId, assistant, "assistant");
   const s = getChatSession(chatId);
   s.messages.push({ role: "user", content: user });
   s.messages.push({ role: "assistant", content: assistant });
@@ -72,6 +78,7 @@ export async function handleUserMessage(
 ): Promise<string> {
   try {
     const history = getHistory(chatId);
+    recordDocxLinksFromText(chatId, userText, "user");
     const memory = loadMemory();
     const normalized = normalizeUserTextForIntent(userText);
     const createIntent =
@@ -89,6 +96,7 @@ export async function handleUserMessage(
         syncWriteMergeGateFromWorkflowReply(chatId, reply);
         history.push({ role: "assistant", content: reply });
         extractAndSaveInfo(userText, memory);
+        recordDocxLinksFromText(chatId, reply, "assistant");
         return reply;
       } catch (err) {
         history.pop();
@@ -115,6 +123,7 @@ export async function handleUserMessage(
         syncWriteMergeGateFromWorkflowReply(chatId, reply);
         history.push({ role: "assistant", content: reply });
         extractAndSaveInfo(userText, memory);
+        recordDocxLinksFromText(chatId, reply, "assistant");
         return reply;
       } catch (err) {
         history.pop();
@@ -141,6 +150,7 @@ export async function handleUserMessage(
         syncWriteMergeGateFromWorkflowReply(chatId, reply);
         history.push({ role: "assistant", content: reply });
         extractAndSaveInfo(userText, memory);
+        recordDocxLinksFromText(chatId, reply, "assistant");
         return reply;
       } catch (err) {
         history.pop();
@@ -152,7 +162,10 @@ export async function handleUserMessage(
 
     const wantsDocxRevise =
       isDocxReviseIntent(normalized) ||
-      shouldRunDocxReviseHeuristic(userText, !!memory.lastDeliveredDoc?.documentId);
+      shouldRunDocxReviseHeuristic(
+        userText,
+        !!memory.lastDeliveredDoc?.documentId || hasAnyDocxInChatIndex(chatId),
+      );
     if (!meta?.forceGeneralChat && wantsDocxRevise) {
       history.push({ role: "user", content: userText });
       try {
@@ -161,6 +174,7 @@ export async function handleUserMessage(
         });
         history.push({ role: "assistant", content: reply });
         extractAndSaveInfo(userText, memory);
+        recordDocxLinksFromText(chatId, reply, "assistant");
         return reply;
       } catch (err) {
         history.pop();
@@ -210,6 +224,7 @@ export async function handleUserMessage(
       history.push({ role: "assistant", content: assistantText });
 
       extractAndSaveInfo(userText, memory);
+      recordDocxLinksFromText(chatId, assistantText, "assistant");
 
       return assistantText;
     } catch (err) {

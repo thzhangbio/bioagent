@@ -15,10 +15,19 @@ import {
   replaceDocumentPagePlainText,
 } from "../../lark/docx-document.js";
 import {
+  extractDocxDocumentIdsFromText,
+  pickMostRecentDocumentIdFromIndex,
+  refreshChatDocxIndexFromHistory,
+} from "../../memory/chat-docx-index.js";
+import {
   isComplianceReviewAfterWriteEnabled,
   reviewDraftWithLlm,
 } from "../../medical/compliance.js";
-import { loadMemory, saveMemory, type MemoryStore } from "../../memory/store.js";
+import {
+  loadMemory,
+  saveMemory,
+  type MemoryStore,
+} from "../../memory/store.js";
 
 const DOCX_REVISE_SYSTEM = `你是医学新媒体编辑。用户要求**修改**一篇已存在的稿件正文（已通过飞书新版云文档交付）。
 
@@ -33,10 +42,61 @@ const DOCX_REVISE_SYSTEM = `你是医学新媒体编辑。用户要求**修改**
 
 /** 从消息中提取飞书 docx 的 document_id（URL 路径 `/docx/<token>`） */
 export function extractDocxDocumentIdFromText(raw: string): string | null {
-  const m =
-    raw.match(/\/docx\/([a-zA-Z0-9_-]+)/) ??
-    raw.match(/larkoffice\.com\/docx\/([a-zA-Z0-9_-]+)/);
-  return m?.[1] ?? null;
+  const ids = extractDocxDocumentIdsFromText(raw);
+  return ids[0] ?? null;
+}
+
+/**
+ * 解析改稿目标文档：**当前消息链接** → **本会话索引** → **memory 最近交付** → **拉会话历史并更新索引**。
+ */
+async function resolveDocumentIdForRevise(
+  chatId: string,
+  userText: string,
+  memory: MemoryStore,
+): Promise<{ documentId: string | null; sourceLabel: string }> {
+  const fromUrl = extractDocxDocumentIdFromText(userText);
+  if (fromUrl) {
+    return { documentId: fromUrl, sourceLabel: "当前消息中的云文档链接" };
+  }
+
+  const fromIndex = pickMostRecentDocumentIdFromIndex(chatId);
+  if (fromIndex) {
+    return {
+      documentId: fromIndex,
+      sourceLabel: "本会话云文档链接索引（最近一条）",
+    };
+  }
+
+  if (memory.lastDeliveredDoc?.documentId) {
+    return {
+      documentId: memory.lastDeliveredDoc.documentId,
+      sourceLabel: "结构化记忆「最近交付」文档",
+    };
+  }
+
+  if (process.env.FEISHU_CHAT_DOCX_REFRESH_HISTORY !== "0") {
+    try {
+      const pages = Number(process.env.FEISHU_CHAT_DOCX_HISTORY_PAGES ?? 8);
+      const r = await refreshChatDocxIndexFromHistory(chatId, {
+        maxPages: pages,
+      });
+      console.log(
+        `[docx-revise] 会话历史已拉取：扫描消息 ${r.scannedMessages} 条，新增文档条目 ${r.newDocumentIds}`,
+      );
+      const after = pickMostRecentDocumentIdFromIndex(chatId);
+      if (after) {
+        return {
+          documentId: after,
+          sourceLabel: "会话历史消息（im.v1.message.list）解析后的索引",
+        };
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn("[docx-revise] 拉取会话历史失败:", msg);
+    }
+  }
+
+  return { documentId: null, sourceLabel: "" };
 }
 
 /**
@@ -95,22 +155,25 @@ export interface DocxReviseWorkflowOptions {
  * 读取最近一次交付或链接中的 docx → 检索 → Claude 改稿 → 写回页面正文。
  */
 export async function runDocxReviseWorkflow(
-  _chatId: string,
+  chatId: string,
   userText: string,
   workflowOpts: DocxReviseWorkflowOptions = {},
 ): Promise<string> {
-  void _chatId;
   void workflowOpts;
 
   const memory = loadMemory();
-  const fromUrl = extractDocxDocumentIdFromText(userText);
-  const documentId = fromUrl ?? memory.lastDeliveredDoc?.documentId;
+  const resolved = await resolveDocumentIdForRevise(chatId, userText, memory);
+  const documentId = resolved.documentId;
 
   if (!documentId) {
     return [
-      "未找到可改稿的云文档：请先发一条包含 **飞书 docx 链接**（路径里带 `/docx/文档ID`）的消息，或先让我完成一篇并交付到飞书后再说「改一下」类指令。",
+      "未找到可改稿的云文档。你可以：",
       "",
-      "（若你刚在本对话中成稿，我会默认改**最近一篇**已交付的文档。）",
+      "1. 本条消息附上 **飞书 docx 链接**（路径含 `/docx/文档ID`）；或",
+      "2. 先在对话里发过带云文档链接的消息（我会写入**本会话索引**）；或",
+      "3. 先完成一篇并交付到飞书（会登记「最近交付」）。",
+      "",
+      "若对话里曾有过链接但仍提示本条：可能是索引未写入或历史拉取失败（需机器人在会话内且具备拉取会话消息等权限）。",
     ].join("\n");
   }
 
@@ -238,8 +301,14 @@ export async function runDocxReviseWorkflow(
     }
   }
 
+  const locateLine =
+    resolved.sourceLabel && resolved.sourceLabel !== "当前消息中的云文档链接" ?
+      [`定位：${resolved.sourceLabel}。`]
+    : [];
+
   return [
     "已按你的指令改稿并**写回飞书云文档**（页面内正文已替换）。",
+    ...locateLine,
     `标题（供核对）：${title}`,
     `链接：${url}`,
     "",

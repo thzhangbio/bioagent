@@ -138,10 +138,20 @@ function isLikelyStandaloneHeading(line: string): boolean {
   return false;
 }
 
+/** Markdown 仅标题行（`# …`），避免与下一行正文误合并 */
+function isMarkdownHeadingOnlyLine(line: string): boolean {
+  const t = line.trim();
+  return /^#{1,6}\s+\S/.test(t) && t.length < 220;
+}
+
 function shouldMergeSoftBreak(prev: string, next: string): boolean {
   const a = prev.trimEnd();
   const b = next.trim();
   if (a.length === 0 || b.length === 0) return false;
+  /** Elsevier 刊信息行 / 版权句 */
+  if (/\bet al\.,\s*\d{4}/i.test(a) || /^text and data mining/i.test(b))
+    return false;
+  if (isMarkdownHeadingOnlyLine(a) || isMarkdownHeadingOnlyLine(b)) return false;
   if (looksLikeEmailOrUrl(a) || looksLikeEmailOrUrl(b)) return false;
   if (isLikelyStandaloneHeading(a) || isLikelyStandaloneHeading(b)) return false;
   /** 图注、列表、面板标记 */
@@ -171,10 +181,23 @@ function isHardWrappedContinuation(prev: string, next: string): boolean {
   const a = prev.trimEnd();
   const b = next.trim();
   if (a.length === 0 || b.length === 0) return false;
+  if (isMarkdownHeadingOnlyLine(a)) return false;
+  if (isMarkdownHeadingOnlyLine(b)) return false;
+  if (/\bet al\.,\s*\d{4}/i.test(a)) return false;
+  /** 长标题行后与「作者,上标」行 */
+  if (
+    a.length > 80 &&
+    a.length < 320 &&
+    !endsWithSentenceBoundary(a) &&
+    /^[A-Z][a-z]+ [A-Z][a-z]+,\d/.test(b)
+  )
+    return false;
   if (looksLikeEmailOrUrl(a) || looksLikeEmailOrUrl(b)) return false;
   if (isLikelyStandaloneHeading(a) || isLikelyStandaloneHeading(b)) return false;
   if (/^[•\-–*]\s/.test(b)) return false;
   if (LIKELY_NEW_PARAGRAPH_START.test(b)) return false;
+  if (/^[A-Z][a-zA-Z]+ et al\.,\s*\d{4}/.test(b) || /^text and data mining/i.test(b))
+    return false;
   const n0 = b[0];
   if (n0 < "A" || n0 > "Z") return false;
   if (endsWithSentenceBoundary(a)) return false;
@@ -192,6 +215,13 @@ function isParagraphBoundary(prev: string, next: string): boolean {
   const p = prev.trimEnd();
   const n = next.trim();
   if (p.length === 0 || n.length === 0) return true;
+  if (isMarkdownHeadingOnlyLine(p) || isMarkdownHeadingOnlyLine(n)) return true;
+  /** Markdown 列表行（含 JSON 结构摘要 `- [p1] …`） */
+  if (/^-\s/.test(n)) return true;
+  if (/^[A-Z][a-zA-Z]+ et al\.,\s*\d{4}/.test(n) || /^text and data mining/i.test(n))
+    return true;
+  /** Elsevier 版权段末「…similar technologies.」后与正文/重复标题分开 */
+  if (/similar technologies\.?\s*$/i.test(p)) return true;
   /** 「…end. The next…」「…study. We found…」为同段折行 */
   if (
     endsWithSentenceBoundary(p) &&
@@ -202,6 +232,15 @@ function isParagraphBoundary(prev: string, next: string): boolean {
   if (LIKELY_NEW_PARAGRAPH_START.test(n)) return true;
   if (isLikelyStandaloneHeading(p) || isLikelyStandaloneHeading(n)) return true;
   if (/^Figure\s+\d+/i.test(n)) return true;
+  if (/^\d{1,2}Department of\b/i.test(n)) return true;
+  if (/^\d{1,2}(?!Department\b)[A-Z]/.test(n)) return true;
+  if (
+    p.length > 80 &&
+    p.length < 320 &&
+    !/[.!?]\s*$/.test(p) &&
+    /^[A-Z][a-z]+ [A-Z][a-z]+,\d/.test(n)
+  )
+    return true;
   if (looksLikeEmailOrUrl(p) || looksLikeEmailOrUrl(n)) return true;
   /** 句点后接以小写开头的免疫/CAF 缩写（OCR 小写） */
   if (/[.!?]["')\]]?\s*$/.test(p) && /^(rCAF|myCAF|iCAF|apCAF)\b/.test(n))

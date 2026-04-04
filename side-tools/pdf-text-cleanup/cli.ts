@@ -1,4 +1,7 @@
 /**
+ * 仅「初步稿 → 终版」：`cleanPdfTextMd`。
+ * 完整链路（MinerU 原始 MD + 可选 JSON）见 `pipeline.ts` / `pnpm run pdf-kb-pipeline`。
+ *
  * 用法（在仓库根目录）:
  *   pnpm exec tsx side-tools/pdf-text-cleanup/cli.ts side-tools/pdf-text-cleanup/inbox/某文件.md
  * 输出: side-tools/pdf-text-cleanup/out/<同名>.cleaned.md

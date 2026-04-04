@@ -53,7 +53,7 @@ const DEFAULT_OPTS: CleanupOptions = {
   softenLatexArtifacts: false,
 };
 
-/** 整行删除：页脚、版权、重复 DOI 等 */
+/** 整行删除：页脚、版权等（**保留**单独成行的 `https://doi.org/...` 作为文献唯一标识） */
 function shouldDropLine(
   trimmed: string,
   ctx: { keptCancerCell: boolean; keptArticle: boolean },
@@ -66,8 +66,6 @@ function shouldDropLine(
   if (/^Cancer Cell 44,/i.test(trimmed)) return "drop";
   if (/^All rights are reserved/i.test(trimmed)) return "drop";
   if (/Elsevier Inc\./i.test(trimmed) && /2026/i.test(trimmed)) return "drop";
-  if (/^https:\/\/doi\.org\/10\.1016\/j\.ccell\.2026\.03\.004\s*$/i.test(trimmed))
-    return "drop";
   if (/^Continued\s*$/i.test(trimmed)) return "drop";
   if (/^Graphical abstract\s*$/i.test(trimmed)) return "drop";
 

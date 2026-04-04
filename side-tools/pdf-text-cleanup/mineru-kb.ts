@@ -25,8 +25,6 @@ export function dropMineruMarkdownNoise(text: string): string {
     if (/^#\s*Cancer Cell\s*$/i.test(t)) continue;
     if (/^#\s*Article\s*$/i.test(t)) continue;
     if (/^May 11, 2026\s+\$?\\?circledcirc/i.test(t)) continue;
-    if (/^https:\/\/doi\.org\/10\.1016\/j\.ccell\.2026\.03\.004\s*$/i.test(t))
-      continue;
     out.push(line);
   }
   return out.join("\n");
@@ -1301,6 +1299,8 @@ export function normalizeKbOcrTypos(text: string): string {
   let s = text;
   s = s.replace(/\bPreybus\b/g, "Prebys");
   s = s.replace(/(https?:\/\/zenodo)\.\s+(org[^\s)\]]*)/gi, "$1.$2");
+  /** Elsevier 路径常见断行：`j. ccell` → `j.ccell` */
+  s = s.replace(/(10\.1016\/j\.)\s+(ccell)/gi, "$1$2");
   s = s.replace(/\(\s*(\d+%[–-]\d+%)\s*\)\s*\)/g, "($1)");
   s = s.replace(
     /\bwith a (\d{2})C annealing temperature\b/gi,

@@ -15,6 +15,14 @@ export interface CleanupOptions {
    * 仅匹配 T、G、F + beta 组合，不误伤 `CD31` 等其它 `\\tt` 公式。
    */
   normalizeTgfBetaMarkup?: boolean;
+  /**
+   * `$$ { \\tt C D 3 1 } ^ { + } $$`、`${ \\sf B } 2 2 0 ^ { + } $` 等免疫标记 OCR/LaTeX 碎片 → **CD31+**、**B220+** 等。
+   */
+  normalizeImmuneMarkerLatex?: boolean;
+  /**
+   * 样本量 `$$_ { \\it { n } } = 5$$`、µm²、浓度 `$1 5 \\mu { \\sf g } / \\sf m \\mu$`、误识 **CD20+**（`\\textcircled{1220}`）等杂项 OCR/LaTeX。
+   */
+  normalizeOcrLatexMisc?: boolean;
   /** 弱化常见 LaTeX/OCR 数学碎片（不保证可逆） */
   softenLatexArtifacts?: boolean;
 }
@@ -24,6 +32,8 @@ const DEFAULT_OPTS: CleanupOptions = {
   mergeHyphenation: true,
   collapseBlankLines: true,
   normalizeTgfBetaMarkup: true,
+  normalizeImmuneMarkerLatex: true,
+  normalizeOcrLatexMisc: true,
   /** 默认关闭：公式块形态各异，自动替换易误伤正文（如 CD31 等） */
   softenLatexArtifacts: false,
 };
@@ -162,6 +172,211 @@ function normalizeTgfBetaMarkup(text: string): string {
     "TGFβ",
   );
 
+  /** `$${ \tt T G F \beta }$$` / `$$ { \tt T G F \beta } $$`（无 `\{`，β 在 `\tt` 块内） */
+  s = s.replace(
+    /\$\$\s*\{\s*\\tt\s*T\s*G\s*F\s*\\beta\s*\}\s*\$\$/gi,
+    "TGFβ",
+  );
+
+  /** `TG $$\mathrm { \ddot { \beta } }$$`（β 被排成 umlaut+β）→ **TGFβ** */
+  s = s.replace(
+    /TG\s*\$\$\s*\\mathrm\s*\{\s*\\ddot\s*\{\s*\\beta\s*\}\s*\}\s*\$\$/gi,
+    "TGFβ",
+  );
+
+  /** `${ \sf T G F } \mathrm { \beta } \mathrm { . }$` */
+  s = s.replace(
+    /\$\s*\{\s*\\sf\s*T\s*G\s*F\s*\}\s*\\mathrm\s*\{\s*\\beta\s*\}\s*\\mathrm\s*\{\s*\.\s*\}\s*\$/gi,
+    "TGFβ",
+  );
+
+  /** `$\tt T G F \{ \mathrm { \beta } \}$`（如参考文献 TGFβR1 inhibitor） */
+  s = s.replace(
+    /\$\s*\\tt\s*T\s*G\s*F\s*\\\{\s*\\mathrm\s*\{\s*\\beta\s*\}\s*\}\s*\$/gi,
+    "TGFβ",
+  );
+
+  /** `$\tt T G F \{ \beta \uparrow` 等未闭合块 */
+  s = s.replace(
+    /\$\s*\\tt\s*T\s*G\s*F\s*\\\{\s*\\beta\s*\\uparrow/gi,
+    "TGFβ",
+  );
+
+  return s;
+}
+
+/** 去掉 OCR 在字母/数字间插入的空格 */
+function collapseSpacedChars(fragment: string): string {
+  return fragment.replace(/\s+/g, "");
+}
+
+/**
+ * 判断折叠后是否为常见 **CD** 系标记（CD8、CD31、CD45 等），避免误替换非 CD 的 `\\tt` 内容。
+ */
+function isCdLikeToken(collapsed: string): boolean {
+  /** CD8、CD31、CD11b 等 */
+  return (
+    /^CD[0-9]+[a-z]?$/i.test(collapsed) &&
+    collapsed.length >= 3 &&
+    collapsed.length <= 10
+  );
+}
+
+/**
+ * `$$ { \\tt C D 3 1 } ^ { + } $$`、`${ \\sf B } 2 2 0 ^ { + } $`、`${ \\sf T } _ { \\sf H } { \\sf 1 } $` 等 → **CD31+**、**B220+**、**TH1**。
+ */
+function normalizeImmuneMarkerLatex(text: string): string {
+  let s = text;
+
+  const supToSuffix = (sup: string): string => {
+    if (sup === "+" || sup === "＋") return "+";
+    if (sup === "-" || sup === "−" || sup === "–") return "−";
+    return "+" + sup;
+  };
+
+  /**
+   * `${ \tt C D 8 ^ { + } }$`：上标在 `\tt` 花括号**内部**（与 `} ^ { + }` 在括号外不同）。
+   */
+  s = s.replace(
+    /\$\s*\{\s*\\tt\s*((?:[A-Za-z0-9]\s*)+)\s*\^\s*\{\s*([+\-−–])\s*\}\s*\}\s*\$/g,
+    (full, body: string, sup: string) => {
+      const token = collapseSpacedChars(body);
+      if (!isCdLikeToken(token)) return full;
+      return token + supToSuffix(sup);
+    },
+  );
+
+  s = s.replace(
+    /\$\$\s*\{\s*\\tt\s*((?:[A-Za-z0-9]\s*)+)\s*\^\s*\{\s*([+\-−–])\s*\}\s*\}\s*\$\$/g,
+    (full, body: string, sup: string) => {
+      const token = collapseSpacedChars(body);
+      if (!isCdLikeToken(token)) return full;
+      return token + supToSuffix(sup);
+    },
+  );
+
+  /** `${ \tt C D 8 + }$`（加号无 `^`，与数字间可有空格） */
+  s = s.replace(
+    /\$\s*\{\s*\\tt\s*((?:[A-Za-z0-9]\s*)+)\s*\+\s*\}\s*\$/g,
+    (full, body: string) => {
+      const token = collapseSpacedChars(body);
+      if (!isCdLikeToken(token)) return full;
+      return token + "+";
+    },
+  );
+
+  /** `$$ { \tt C D … } ^ { +/- } $$` */
+  s = s.replace(
+    /\$\$\s*\{\s*\\tt\s*((?:[A-Za-z0-9]\s*)+)\}\s*\^\s*\{\s*([+\-−–])\s*\}\s*\$\$/g,
+    (full, body: string, sup: string) => {
+      const token = collapseSpacedChars(body);
+      if (!isCdLikeToken(token)) return full;
+      return token + supToSuffix(sup);
+    },
+  );
+
+  /** `$\{ \tt C D … \} ^ { +/- } $`（单美元块） */
+  s = s.replace(
+    /\$\s*\{\s*\\tt\s*((?:[A-Za-z0-9]\s*)+)\}\s*\^\s*\{\s*([+\-−–])\s*\}\s*\$/g,
+    (full, body: string, sup: string) => {
+      const token = collapseSpacedChars(body);
+      if (!isCdLikeToken(token)) return full;
+      return token + supToSuffix(sup);
+    },
+  );
+
+  /** `${ \sf B } 2 2 0 ^ { + }$` → B220+（B 细胞标记；数字在 `\\sf` 外） */
+  s = s.replace(
+    /\$\s*\{\s*\\sf\s*([A-Za-z])\s*\}\s*((?:\d\s*)+)\s*\^\s*\{\s*\+\s*\}\s*\$/g,
+    (_, letter: string, digits: string) =>
+      letter + collapseSpacedChars(digits) + "+",
+  );
+
+  /** `${ \sf T } _ { \sf H } { \sf 1 }$` → TH1 */
+  s = s.replace(
+    /\$\s*\{\s*\\sf\s*T\s*\}\s*_\s*\{\s*\\sf\s*[Hh]\s*\}\s*\{\s*\\sf\s*1\s*\}\s*\$/g,
+    "TH1",
+  );
+
+  return s;
+}
+
+/**
+ * 样本量、单位、误识标记等零散 LaTeX/OCR 碎片（与免疫/TGF 分函数互补）。
+ */
+function normalizeOcrLatexMisc(text: string): string {
+  let s = text;
+
+  /** `$$_ { \it { n } } } = 5$$`（多一个 `}`）或 `$$_ { \it { n } } = 5$$` */
+  s = s.replace(
+    /\$\$\s*_\s*\{\s*\\it\s*\{\s*n\s*\}\s*\}\s*\}\s*=\s*(\d+)\s*\$\$/gi,
+    " (n = $1) ",
+  );
+  s = s.replace(
+    /\$\$\s*_\s*\{\s*\\it\s*\{\s*n\s*\}\s*\}\s*=\s*(\d+)\s*\$\$/gi,
+    " (n = $1) ",
+  );
+
+  /** OCR 将 CD20 误为 circled「1220」 */
+  s = s.replace(
+    /\$\s*\\textcircled\s*\{\s*1\s*2\s*2\s*0\s*\}\s*\^\s*\{\s*\+\s*\}\s*\$/g,
+    "CD20+",
+  );
+
+  /** `μm(2)` / `μm(2))` → µm² */
+  s = s.replace(/μm\s*\(\s*2\s*\)\s*\)/g, "µm²)");
+  s = s.replace(/μm\s*\(\s*2\s*\)/g, "µm²");
+  s = s.replace(/\\mu\s*m\s*\(\s*2\s*\)/gi, "µm²");
+
+  /** 千位逗号内多余空格 `10, 000` → `10,000` */
+  s = s.replace(/(\d{1,3}),\s+(\d{3})\b/g, "$1,$2");
+
+  /** `$1 5 \mu { \sf g } / \sf m \mu$` → `15 μg/ml` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\{\s*\\sf\s*g\s*\}\s*\/\s*\\sf\s*m\s*\\mu\s*\$/gi,
+    (_, rawNum: string) => {
+      const n = collapseSpacedChars(rawNum).replace(/\D/g, "");
+      return n ? `${n} μg/ml` : _;
+    },
+  );
+
+  /** `250μ g/mμ` 类浓度 */
+  s = s.replace(
+    /(\d+)\s*μ\s*g\s*\/\s*mμ/g,
+    (_, n: string) => `${n} μg/ml`,
+  );
+
+  /** `15 μ g/mL` → `15 μg/mL` */
+  s = s.replace(/(\d+)\s*μ\s+g\//gi, "$1 μg/");
+
+  /** `$$ { \sf H } _ { 2 } 0 _ { 2 } $$`（O 常为数字 0） */
+  s = s.replace(
+    /\$\$\s*\{\s*\\sf\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*[0O]\s*_\s*\{\s*2\s*\}\s*\$\$/gi,
+    "H₂O₂",
+  );
+
+  /** KPC 基因型常见 OCR：`$\underline{{K}} Ras^{G12D}/\underline{{p}}53^{...}$` */
+  s = s.replace(
+    /\$\s*\\underline\s*\{\s*\{\s*K\s*\}\s*\}\s*R\s*a\s*s\s*\^\s*\{\s*G\s*1\s*2\s*D\s*\}\s*\/\s*\\underline\s*\{\s*\{\s*p\s*\}\s*\}\s*5\s*3\s*\^\s*\{\s*R\s*1\s*7\s*2\s*H\s*\/\s*w\s*t\s*\}\s*\)\s*\$/gi,
+    "KRas^G12D/p53^R172H/wt)",
+  );
+
+  /** 前几步后仍残留的孤立 `$` */
+  s = s.replace(/TGFβ\$/g, "TGFβ");
+
+  /** `$${ \tt 6 0 ^ { \circ } C }$$` 等 → `60°C`（`^ { \circ }` 与 `C` 之间无额外 `}`） */
+  s = s.replace(
+    /\$\$\s*\{\s*\\tt\s*((?:\d\s*)+)\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\}\s*\$\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      if (!/^\d{1,3}$/.test(n)) return full;
+      return `${n}°C`;
+    },
+  );
+
+  /** OCR：`doH(2)0` → dH₂O（去离子水类洗涤液） */
+  s = s.replace(/\bdoH\s*\(\s*2\s*\)\s*0\b/gi, "dH₂O");
+
   return s;
 }
 
@@ -189,6 +404,10 @@ export function cleanPdfTextMd(
 
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
   if (opts.normalizeTgfBetaMarkup !== false) text = normalizeTgfBetaMarkup(text);
+  if (opts.normalizeImmuneMarkerLatex !== false) {
+    text = normalizeImmuneMarkerLatex(text);
+  }
+  if (opts.normalizeOcrLatexMisc !== false) text = normalizeOcrLatexMisc(text);
   if (opts.softenLatexArtifacts) text = softenLatexArtifacts(text);
   if (opts.collapseBlankLines) text = collapseBlankLines(text);
 

@@ -1270,12 +1270,44 @@ export function normalizeKbResidualDollarMath(text: string): string {
 export interface KbCleanupOptions extends CleanupOptions {
   collapseImageBlocks?: boolean;
   maxImagesPerRun?: number;
+  /**
+   * 去掉文首 `## 文档结构（MinerU JSON…）` 与 `- [pN] …` 清单（及紧随的 `---`），减少 RAG token、避免干扰主题检索。
+   * 版面顺序仍可从同篇 MinerU JSON 恢复。
+   */
+  stripMineruStructureManifest?: boolean;
+  /** 机构名、URL、括号等确定性 OCR 纠错（默认开启） */
+  applyKbOcrTypoFixes?: boolean;
 }
 
 const DEFAULT_KB: KbCleanupOptions = {
   collapseImageBlocks: true,
   maxImagesPerRun: 1,
+  stripMineruStructureManifest: true,
+  applyKbOcrTypoFixes: true,
 };
+
+/**
+ * 移除 {@link formatStructureSectionForKb} 写入的文首结构摘要块。
+ */
+export function stripMineruStructureManifest(text: string): string {
+  return text.replace(
+    /^##\s*文档结构（MinerU JSON，版面顺序）[\s\S]*?\n---\s*\n+/,
+    "",
+  );
+}
+
+/** 评审常见硬错误：机构名、URL 空格、重复右括号、PCR 退火温度缺少 °C */
+export function normalizeKbOcrTypos(text: string): string {
+  let s = text;
+  s = s.replace(/\bPreybus\b/g, "Prebys");
+  s = s.replace(/(https?:\/\/zenodo)\.\s+(org[^\s)\]]*)/gi, "$1.$2");
+  s = s.replace(/\(\s*(\d+%[–-]\d+%)\s*\)\s*\)/g, "($1)");
+  s = s.replace(
+    /\bwith a (\d{2})C annealing temperature\b/gi,
+    "with a $1°C annealing temperature",
+  );
+  return s;
+}
 
 export function collapseImageBlocksForKb(text: string, maxKeep = 1): string {
   const lines = text.split(/\r?\n/);
@@ -1321,15 +1353,27 @@ export function cleanMarkdownForKnowledgeBase(
   options: KbCleanupOptions = {},
 ): string {
   const kb = { ...DEFAULT_KB, ...options };
-  const { collapseImageBlocks, maxImagesPerRun, ...cleanupOpts } = kb;
+  const {
+    collapseImageBlocks,
+    maxImagesPerRun,
+    stripMineruStructureManifest: stripManifest,
+    applyKbOcrTypoFixes,
+    ...cleanupOpts
+  } = kb;
 
   let text = raw.replace(/\r\n/g, "\n");
+  if (stripManifest !== false) {
+    text = stripMineruStructureManifest(text);
+  }
   text = dropMineruMarkdownNoise(text);
   text = flattenHtmlTablesToPlain(text);
   text = neutralizeCatalogHashesAndHexColors(text);
   text = normalizeMineruInlineLatex(text);
   text = cleanPdfTextMd(text, cleanupOpts);
   text = normalizeKbResidualDollarMath(text);
+  if (applyKbOcrTypoFixes !== false) {
+    text = normalizeKbOcrTypos(text);
+  }
 
   if (collapseImageBlocks !== false) {
     text = collapseImageBlocksForKb(text, maxImagesPerRun ?? 1);

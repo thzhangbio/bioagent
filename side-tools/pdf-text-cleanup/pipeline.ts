@@ -18,25 +18,33 @@ import { mineruRawMarkdownToPreliminary } from "./raw-to-preliminary.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-function parseArgs(): { rawMd: string; jsonPath?: string; out?: string } {
+function parseArgs(): {
+  rawMd: string;
+  jsonPath?: string;
+  out?: string;
+  keepStructureManifest?: boolean;
+} {
   const argv = process.argv.slice(2);
   let rawMd = "";
   let jsonPath: string | undefined;
   let out: string | undefined;
+  let keepStructureManifest = false;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--raw-md" && argv[i + 1]) rawMd = argv[++i];
     else if (a === "--json" && argv[i + 1]) jsonPath = argv[++i];
     else if (a === "--out" && argv[i + 1]) out = argv[++i];
+    else if (a === "--keep-structure-manifest") keepStructureManifest = true;
   }
-  return { rawMd, jsonPath, out };
+  return { rawMd, jsonPath, out, keepStructureManifest };
 }
 
 function main(): void {
-  const { rawMd: rawArg, jsonPath, out: outArg } = parseArgs();
+  const { rawMd: rawArg, jsonPath, out: outArg, keepStructureManifest } =
+    parseArgs();
   if (!rawArg) {
     console.error(
-      "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始MinerU.md> [--json <同篇.json>] [--out <输出.md>]",
+      "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始MinerU.md> [--json <同篇.json>] [--out <输出.md>] [--keep-structure-manifest]",
     );
     process.exit(1);
   }
@@ -52,7 +60,9 @@ function main(): void {
     body = formatStructureSectionForKb(entries) + body;
   }
 
-  const finalMd = cleanMarkdownForKnowledgeBase(body);
+  const finalMd = cleanMarkdownForKnowledgeBase(body, {
+    stripMineruStructureManifest: !keepStructureManifest,
+  });
 
   const outDir = join(__dirname, "out");
   mkdirSync(outDir, { recursive: true });

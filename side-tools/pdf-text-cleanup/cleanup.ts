@@ -9,6 +9,11 @@ export interface CleanupOptions {
   /** 合并行末 `-` 导致的英文断词（如 recruit-\nment） */
   mergeHyphenation?: boolean;
   /**
+   * 合并同一行内「连字符 + 空格」类 PDF 断词（如 evi- dence、charac- terized）；
+   * 保守排除 well- being、long- term 等复合词（见实现内 blocklist）。
+   */
+  mergeInlinePdfHyphenation?: boolean;
+  /**
    * 合并 PDF 硬换行导致的「一句拆成多行」（下一行以小写字母开头且上一行未以句末标点结束）。
    * 与 {@link joinParagraphsWithBlankLine} 配合：合并后再在段落间插入空行。
    */
@@ -37,6 +42,7 @@ export interface CleanupOptions {
 const DEFAULT_OPTS: CleanupOptions = {
   keepFirstJournalTitle: true,
   mergeHyphenation: true,
+  mergeInlinePdfHyphenation: true,
   mergeSoftLineBreaks: true,
   joinParagraphsWithBlankLine: true,
   collapseBlankLines: true,
@@ -106,6 +112,47 @@ function applyLineFilters(text: string, opts: CleanupOptions): string {
 /** 英文单词在行尾被 `-` 拆开时合并（允许断行后多余空格，如 recruit-\n ment） */
 function mergeHyphenation(text: string): string {
   return text.replace(/([a-zA-Z])-\s*\n\s*([a-z])/g, "$1$2");
+}
+
+/**
+ * 列宽导致的词内 `-\s`（与行末 `-\n` 不同）。排除常见「保留连字符」复合词。
+ */
+function mergeInlinePdfHyphenation(text: string): string {
+  const blockSecond = new Set([
+    "being",
+    "term",
+    "standing",
+    "oriented",
+    "defined",
+    "specific",
+    "associated",
+    "induced",
+    "related",
+    "regulated",
+    "sensitive",
+    "established",
+  ]);
+  const blockFirst = new Set([
+    "well",
+    "long",
+    "short",
+    "free",
+    "near",
+    "mid",
+    "high",
+    "low",
+    "cross",
+    "non",
+    "co",
+  ]);
+  return text.replace(
+    /\b([a-zA-Z]{2,15})-\s+([a-z][a-z]{1,15})\b/g,
+    (full, a: string, b: string) => {
+      if (blockSecond.has(b.toLowerCase()) && blockFirst.has(a.toLowerCase()))
+        return full;
+      return a + b;
+    },
+  );
 }
 
 /** 上一行是否已像「句末」结束（避免把 `...factor` 与 `receptor` 当成两句） */
@@ -609,6 +656,9 @@ export function cleanPdfTextMd(
   text = applyLineFilters(text, opts);
 
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
+  if (opts.mergeInlinePdfHyphenation !== false) {
+    text = mergeInlinePdfHyphenation(text);
+  }
   if (opts.mergeSoftLineBreaks !== false) {
     text = mergeSoftLineBreaksAndSpaceParagraphs(
       text,

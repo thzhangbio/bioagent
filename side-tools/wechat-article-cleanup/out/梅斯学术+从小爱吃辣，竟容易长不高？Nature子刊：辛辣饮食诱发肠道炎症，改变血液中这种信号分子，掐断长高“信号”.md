@@ -2,11 +2,12 @@
 source: wechat_mp_article
 kb_wechat_id: "mp1|Mzg5NzczMjMxOA==|2247510894|1|c3652dec949014382a4f920eb3b923ea"
 url: https://mp.weixin.qq.com/s/Sb-c0qgP5w9e3WkqZKJGvQ
-fetchedAt: 2026-04-04T09:50:00.457Z
+fetchedAt: 2026-04-04T10:11:03.136Z
 title: "从小爱吃辣，竟容易长不高？Nature子刊：辛辣饮食诱发肠道炎症，改变血液中这种信号分子，掐断长高“信号”"
 is_original: true
 editor: "JY"
 mp_name: "梅斯学术"
+wechat_style_variant: medsci
 published_at: "2026-03-11T12:10:32.000Z"
 published_at_cn: "2026年3月11日 20:10"
 ---

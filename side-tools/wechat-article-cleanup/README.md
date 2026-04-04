@@ -105,4 +105,15 @@
 
 ## 与知识库
 
-清洗后的 `out/*.md` 经校对、标注 `wechatStyleVariant` 等后，再执行 **ingest**（规划中的 `wechat_style` 灌库）；**入库成功后**再执行归档 **②**。
+处理结果与入库约定以 **`docs/知识库分层与文献库规划.md`** **§6.2** 为准，摘要如下：
+
+| 项目 | 约定 |
+|------|------|
+| **输入灌库的成品** | 本目录 **`out/*.md`**（含 YAML 与正文；**保留** `> [导流]`、`> [文献]`、`署名·*` 等块，供 `wechat_style` 学结构与槽位形态）。 |
+| **主键** | 文首 **`kb_wechat_id`**，向量化时建议写入块元数据，便于去重与审计。 |
+| **子风格** | 文内 YAML **`wechat_style_variant`**（清洗器按公众号名启发式写入）或 **`.meta.json`**；灌库时写入块级 **`wechatStyleVariant`**。 |
+| **槽位** | **`pnpm run ingest:wechat`** 按段落打 **`wechatContentSlot`**（`body` / `caption` / `diversion` / `references` / `byline` / `footer`），检索时 **`retrieve(..., { wechatContentSlots: [...] })`**。 |
+| **事实** | 医学事实与可核对引用以 **`literature`** 为准；微信库仅表达层。 |
+| **可选第二步** | 若需「仅窄句」第二条管道，可从同批 md 再导出片段——见《知识库分层》§6.2.2。 |
+
+校对无误后在仓库根执行 **`pnpm run ingest:wechat`**（**仅替换** `wechat_style`）；**入库成功后**再执行归档 **②**。

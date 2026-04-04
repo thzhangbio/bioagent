@@ -10,6 +10,14 @@ import {
 } from "./wechat-meta.js";
 import { computeKbWechatId } from "./wechat-kb-id.js";
 
+/** 与 `ingest-wechat` 子风格一致；无法从公众号名推断时不写该 YAML 行 */
+function inferWechatStyleVariant(mpName: string | undefined): string | undefined {
+  const m = mpName?.trim() ?? "";
+  if (/梅斯/.test(m)) return "medsci";
+  if (/良医/.test(m)) return "liangyi_hui";
+  return undefined;
+}
+
 /** 自 HTML 中取出 `id="js_content"` 外层 div 的内层 HTML */
 function extractJsContentHtml(html: string): string | null {
   let openEnd = -1;
@@ -283,6 +291,7 @@ export function cleanWeChatArticleRaw(
     .trim();
 
   const wx = extractWechatArticleMeta(raw);
+  const wechatStyleVariant = inferWechatStyleVariant(wx.mp_name);
   const kbWechatId = computeKbWechatId(raw, {
     sourceUrl: meta?.sourceUrl,
     slugHint: meta?.slugHint,
@@ -297,6 +306,9 @@ export function cleanWeChatArticleRaw(
   }
   if (wx.editor) headerLines.push(`editor: ${yamlDoubleQuotedScalar(wx.editor)}`);
   if (wx.mp_name) headerLines.push(`mp_name: ${yamlDoubleQuotedScalar(wx.mp_name)}`);
+  if (wechatStyleVariant) {
+    headerLines.push(`wechat_style_variant: ${wechatStyleVariant}`);
+  }
   if (wx.published_at) {
     headerLines.push(`published_at: ${yamlDoubleQuotedScalar(wx.published_at)}`);
   }

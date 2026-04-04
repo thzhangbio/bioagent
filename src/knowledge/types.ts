@@ -16,6 +16,18 @@ export type KnowledgeCollection =
  */
 export type WechatStyleVariant = "liangyi_hui" | "medsci";
 
+/**
+ * 微信成稿内向量槽位：正文 / 图注 / 导流 / 参考文献区 / 署名 / 文末运营与转载等。
+ * 见 `wechat-segments.ts` 与 `scripts/ingest-wechat.ts`。
+ */
+export type WechatContentSlot =
+  | "body"
+  | "caption"
+  | "diversion"
+  | "references"
+  | "byline"
+  | "footer";
+
 export interface TextChunk {
   id: string;
   collection: KnowledgeCollection;
@@ -34,6 +46,10 @@ export interface TextChunk {
   sourceUrl?: string;
   /** 仅 `collection === "wechat_style"`：区分良医汇 / 梅斯，供检索侧过滤 */
   wechatStyleVariant?: WechatStyleVariant;
+  /** 仅 `wechat_style`：槽位（导流 / 文献块 / 署名等），供定向检索 */
+  wechatContentSlot?: WechatContentSlot;
+  /** 仅 `wechat_style`：与清洗稿 YAML `kb_wechat_id` 一致 */
+  kbWechatId?: string;
 }
 
 export interface StoredVectorChunk extends TextChunk {

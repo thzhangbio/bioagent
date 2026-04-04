@@ -11,3 +11,6 @@ export const COLLECTION_MEDICAL: KnowledgeCollection = "medical";
 
 /** 用户上传资料（飞书私聊附件等） */
 export const COLLECTION_PERSONAL: KnowledgeCollection = "personal";
+
+/** 文献与可核对事实（事实层）：论文/指南等清洗稿向量块 */
+export const COLLECTION_LITERATURE: KnowledgeCollection = "literature";

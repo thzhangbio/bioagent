@@ -9,6 +9,7 @@ import type { KnowledgeCollection } from "../knowledge/types.js";
 const CHAT_RAG_COLLECTIONS: KnowledgeCollection[] = [
   "platform_tone",
   "medical",
+  "literature",
   "personal",
 ];
 
@@ -31,10 +32,15 @@ export async function augmentUserTextWithRag(userText: string): Promise<string> 
     if (hits.length === 0) return userText;
 
     const block = hits
-      .map(
-        (h, i) =>
-          `[#${i + 1} ${h.chunk.collection} | ${h.chunk.sourceLabel}]\n${h.chunk.text}`,
-      )
+      .map((h, i) => {
+        const ref =
+          h.chunk.sourceUrl ?
+            `${h.chunk.sourceLabel} | ${h.chunk.sourceUrl}`
+          : h.chunk.paperId ?
+            `${h.chunk.sourceLabel} | id:${h.chunk.paperId}`
+          : h.chunk.sourceLabel;
+        return `[#${i + 1} ${h.chunk.collection} | ${ref}]\n${h.chunk.text}`;
+      })
       .join("\n\n---\n\n");
 
     return [

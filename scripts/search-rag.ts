@@ -16,6 +16,7 @@ const VALID: KnowledgeCollection[] = [
   "job_post",
   "platform_tone",
   "medical",
+  "literature",
   "personal",
 ];
 

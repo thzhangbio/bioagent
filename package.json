@@ -13,6 +13,7 @@
     "probe:docx": "tsx scripts/probe-docx.ts",
     "ingest:presets": "tsx scripts/ingest-presets.ts",
     "ingest:jobs": "tsx scripts/ingest-job-posts.ts",
+    "ingest:literature": "tsx scripts/ingest-literature.ts",
     "ingest:all": "pnpm run ingest:presets && pnpm run ingest:jobs",
     "search:rag": "tsx scripts/search-rag.ts",
     "search:jobs": "tsx scripts/search-job-posts.ts",

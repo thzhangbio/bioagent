@@ -23,6 +23,7 @@ import {
 const CONTENT_RAG_COLLECTIONS: KnowledgeCollection[] = [
   "platform_tone",
   "medical",
+  "literature",
   "personal",
 ];
 

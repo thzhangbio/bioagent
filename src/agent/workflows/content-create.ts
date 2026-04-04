@@ -15,6 +15,11 @@ import {
   createDocumentWithPlainText,
 } from "../../lark/docx-document.js";
 import type { SearchHit } from "../../knowledge/vector-file-store.js";
+import {
+  isComplianceReviewAfterWriteEnabled,
+  isContentStrictGate,
+  reviewDraftWithLlm,
+} from "../../medical/compliance.js";
 import { loadMemory, saveMemory, type MemoryStore } from "../../memory/store.js";
 import {
   buildBriefAcknowledgmentPreamble,
@@ -630,6 +635,15 @@ export async function runContentCreateWorkflow(
       ]
     : [];
 
+  const strictGate = isContentStrictGate();
+  const relaxedCollaborationNote =
+    !strictGate ?
+      [
+        "",
+        "【协作模式】默认先出可讨论稿：合规与投放确认后置；若材料不足请用审慎表述或省略，禁止杜撰未提供的事实与数据。",
+      ]
+    : [];
+
   const userPayload = [
     "【用户任务（含多轮合并时的完整原文）】",
     userText.trim(),
@@ -639,6 +653,7 @@ export async function runContentCreateWorkflow(
     buildPlatformStyleBlock(userText),
     ...draftOrientation,
     ...medsciTaskNote,
+    ...relaxedCollaborationNote,
     "",
     "【公司画像】",
     profileBlock,
@@ -654,6 +669,7 @@ export async function runContentCreateWorkflow(
   let gateReady =
     skipGates ||
     medsciLiteratureWechatMode ||
+    !strictGate ||
     shouldSkipClarificationGate(userText);
   if (
     !gateReady &&
@@ -676,6 +692,11 @@ export async function runContentCreateWorkflow(
   if (medsciLiteratureWechatMode) {
     console.log(
       "[content-create] 仿梅斯学术·文献微信公众号模式：文献已命中 + 双库检索，跳过动笔前闸门",
+    );
+  }
+  if (!strictGate && !skipGates) {
+    console.log(
+      "[content-create] 宽松模式：跳过动笔前闸门（合规后置；设 FEISHU_CONTENT_STRICT_GATE=1 可恢复严格追问）",
     );
   }
 
@@ -733,7 +754,12 @@ export async function runContentCreateWorkflow(
     }
   }
 
-  if (!skipGates && !medsciLiteratureWechatMode && shouldOverrideReadyToAsk(userText)) {
+  if (
+    strictGate &&
+    !skipGates &&
+    !medsciLiteratureWechatMode &&
+    shouldOverrideReadyToAsk(userText)
+  ) {
     const preamble = buildBriefAcknowledgmentPreamble(userText);
     const questionsBlock = await generateAlignmentFollowUpQuestions(
       userPayload,
@@ -808,6 +834,31 @@ export async function runContentCreateWorkflow(
         "（未能自动添加你为协作者：请管理员检查开放平台云文档/云空间权限；你仍可通过分享链接申请编辑。）"
       : "";
 
+    let complianceBlock = "";
+    if (isComplianceReviewAfterWriteEnabled()) {
+      try {
+        console.log("[content-create] 成稿后合规协审（LLM）…");
+        const review = await reviewDraftWithLlm(title, body);
+        complianceBlock = [
+          "",
+          "---",
+          "",
+          "**合规与风险提示（自动协审，非法律意见；正式投放前请人工终审）**",
+          "",
+          review,
+        ].join("\n");
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error("[content-create] 合规协审失败:", msg);
+        complianceBlock = [
+          "",
+          "---",
+          "",
+          "（合规协审调用失败，请人工复核后再发布。）",
+        ].join("\n");
+      }
+    }
+
     return [
       "已写好并保存到飞书云文档（新版 docx）。",
       `标题：${title}`,
@@ -815,6 +866,7 @@ export async function runContentCreateWorkflow(
       ...(grantLine ? ["", grantLine] : []),
       "",
       "如需修改语气或补充要点，直接说具体段落即可。",
+      complianceBlock,
     ].join("\n");
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

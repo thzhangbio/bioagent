@@ -8,6 +8,16 @@ function collapseSpacedChars(fragment: string): string {
   return fragment.replace(/\s+/g, "");
 }
 
+/** `3, 13` → `³,¹³`（作者单位上标） */
+function affiliationSuperscriptFromSpacedDigits(raw: string): string | null {
+  const compact = raw.replace(/\s+/g, "");
+  const m = compact.match(/^(\d+),(\d+)$/);
+  if (!m) return null;
+  const sup = (d: string) =>
+    [...d].map((c) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(c)] ?? c).join("");
+  return `${sup(m[1])},${sup(m[2])}`;
+}
+
 function isCdLikeToken(collapsed: string): boolean {
   return (
     /^CD[0-9]+[a-z]?$/i.test(collapsed) &&
@@ -25,7 +35,47 @@ export function dropMineruMarkdownNoise(text: string): string {
     if (/^#\s*Cancer Cell\s*$/i.test(t)) continue;
     if (/^#\s*Article\s*$/i.test(t)) continue;
     if (/^May 11, 2026\s+\$?\\?circledcirc/i.test(t)) continue;
+    /** Elsevier 等期刊页眉，MinerU 常插在段中造成「…was [换页] completed…」式断句 */
+    if (/^OPEN ACCESS\s*$/i.test(t)) continue;
     out.push(line);
+  }
+  return out.join("\n");
+}
+
+function shouldJoinLineAfterPageNoise(prev: string, next: string): boolean {
+  const p = prev.trimEnd();
+  const n = next.trimStart();
+  if (!p || !n) return false;
+  if (/[.!?;:]["')\]\s]*$/.test(p)) return false;
+  if (!/^[a-z(\u201c\u2018]/.test(n)) return false;
+  return true;
+}
+
+/**
+ * 去掉 `OPEN ACCESS` 等独立行后，把被页眉打断的同一句接回一行（上一行无句末标点、下一行以小写或左引号开头）。
+ */
+export function joinLinesBrokenByRemovedPageNoise(text: string): string {
+  const lines = text.split(/\r?\n/);
+  const out: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.trim() === "") {
+      let k = i + 1;
+      while (k < lines.length && lines[k].trim() === "") k++;
+      if (
+        out.length > 0 &&
+        k < lines.length &&
+        shouldJoinLineAfterPageNoise(out[out.length - 1], lines[k])
+      ) {
+        out[out.length - 1] =
+          out[out.length - 1].trimEnd() + " " + lines[k].trimStart();
+        i = k + 1;
+        continue;
+      }
+    }
+    out.push(line);
+    i++;
   }
   return out.join("\n");
 }
@@ -830,10 +880,260 @@ export function normalizeKbResidualDollarMath(text: string): string {
     },
   );
 
+  /** `$15 ^ { \circ } \mathrm { C } )$`（磷酸化等：右括号在 `$` 内）→ `15°C)` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\^\s*\{\s*\\circ\s*\}\s*\\(?:mathrm|mathsf)\s*\{\s*C\s*\}\s*\)\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n}°C)` : full;
+    },
+  );
+
   /** `$\mathsf { C O } _ { 2 }$` → CO₂ */
   s = s.replace(
     /\$\s*\\mathsf\s*\{\s*C\s*O\s*\}\s*_\s*\{\s*2\s*\}\s*\$/gi,
     "CO₂",
+  );
+
+  /** `${ \mathsf { C O } } _ { 2 }$`（多一层花括号）→ CO₂ */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*C\s*O\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\$/gi,
+    "CO₂",
+  );
+
+  /** STAR 方法目录：`$\circ$` 与 `○` 统一 */
+  s = s.replace(/\$\s*\\circ\s*\$/g, "○");
+
+  /** 品牌名误识：`$1 0 \times$ Genomics` → `10x Genomics` */
+  s = s.replace(/\$\s*1\s*0\s*\\times\s*\$\s*Genomics/gi, "10x Genomics");
+
+  /** DNA 甲基化 EpiJET：`$\%$ of 5 $\scriptstyle \mathsf { m C } = … ^ { Cq2 - Cq1 }$` */
+  s = s.replace(
+    /\$\s*\\%\s*\$\s+of\s+5\s+\$\s*\\scriptstyle\s*\\mathsf\s*\{\s*m\s*C\s*\}\s*=\s*1\s*0\s*0\s*\/\s*\(\s*1\s*\+\s*\\mathsf\s*\{\s*E\s*\}\s*\)\s*\^\s*\{\s*\\mathsf\s*\{\s*C\s*q\s*2\s*\}\s*-\s*\\mathsf\s*\{\s*C\s*q\s*1\s*\}\s*\}\s*\$/gi,
+    "% of 5mC = 100/(1+E)^(Cq2−Cq1)",
+  );
+
+  /** `$\mathsf { S n C l } _ { 2 }$` → SnCl₂ */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*S\s*n\s*C\s*l\s*\}\s*_\s*\{\s*2\s*\}\s*\$/gi,
+    "SnCl₂",
+  );
+
+  /** `$1, 5 \mathsf { m g } / \mathsf { m L } \mathsf { S n C l } _ { 2 }$` → `1.5 mg/mL SnCl₂` */
+  s = s.replace(
+    /\$\s*1\s*,\s*5\s*\\mathsf\s*\{\s*m\s*g\s*\}\s*\/\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*\\mathsf\s*\{\s*S\s*n\s*C\s*l\s*\}\s*_\s*\{\s*2\s*\}\s*\$/gi,
+    "1.5 mg/mL SnCl₂",
+  );
+
+  /** `$\mathsf { N } _ { 2 }$` → N₂ */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*N\s*\}\s*_\s*\{\s*2\s*\}\s*\$/gi,
+    "N₂",
+  );
+
+  /** `$1 0 ^ { n }$` / `$10^{n}$`（无系数，MOI、PBMC 等）→ `10^n` */
+  s = s.replace(
+    /\$\s*(?:1\s*0|10)\s*\^\s*\{\s*(\d+)\s*\}\s*\$/g,
+    (_, exp: string) => `10^${exp}`,
+  );
+
+  /** ChIP：`$\Delta \mathsf { C t } = \mathsf { C t }$` → `ΔCt = Ct` */
+  s = s.replace(
+    /\$\s*\\Delta\s*\\mathsf\s*\{\s*C\s*t\s*\}\s*=\s*\\mathsf\s*\{\s*C\s*t\s*\}\s*\$/gi,
+    "ΔCt = Ct",
+  );
+
+  /** `$n ^ { \circ } \mathsf { C } .$`（离心温度句号在 `$` 内）→ `n°C.` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\^\s*\{\s*\\circ\s*\}\s*\\mathsf\s*\{\s*C\s*\}\s*\.\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n}°C.` : full;
+    },
+  );
+
+  /** 原稿 `…C .$ .` 在 `$` 外多一个句点 → `…C. ` */
+  s = s.replace(/(\d+°C)\.\s+\./g, "$1. ");
+
+  /** RNA-seq：`${ \sf 3 ^ { \prime } }$`（3′ 端）→ `3′` */
+  s = s.replace(
+    /\$\s*\{\s*\\sf\s*3\s*\^\s*\{\s*\\prime\s*\}\s*\}\s*\$/gi,
+    "3′",
+  );
+
+  /** radio-TLC：`$( { \mathsf { R } } { \mathsf { f } } { = } 0)$ ),` → `(Rf = 0),` */
+  s = s.replace(
+    /\$\s*\(\s*\{\s*\\mathsf\s*\{\s*R\s*\}\s*\}\s*\{\s*\\mathsf\s*\{\s*f\s*\}\s*\}\s*\{\s*=\s*\}\s*0\s*\)\s*\$\s*\)\s*,/gi,
+    "(Rf = 0),",
+  );
+
+  /** `$( \mathsf { R f } = 1)$` → `(Rf = 1)` */
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*R\s*f\s*\}\s*=\s*1\s*\)\s*\$/gi,
+    "(Rf = 1)",
+  );
+
+  /** `$20 \mu \ g$` 等 μg（μ 与 g 间误空格） */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\?\s*g\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μg` : full;
+    },
+  );
+
+  /** `$50 \mathsf { m } \mathsf { M }$` Tris 等 → mM */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*m\s*\}\s*\\mathsf\s*\{\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mM` : full;
+    },
+  );
+
+  /** `$\textstyle - 8 0 ^ { \circ } \mathsf { C }$` → -80°C */
+  s = s.replace(
+    /\$\s*\\textstyle\s*-\s*8\s*0\s*\^\s*\{\s*\\circ\s*\}\s*\\mathsf\s*\{\s*C\s*\}\s*\$/gi,
+    "-80°C",
+  );
+
+  /** 引物 `$5 '$` → 5′ */
+  s = s.replace(/\$\s*5\s*'\s*\$/g, "5′");
+
+  /** `$1 . 2 \times 1 0 ^ { 5 }$` 等科学计数（指数为 5） */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*\\times\s*1\s*0\s*\^\s*\{\s*5\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n}×10⁵` : full;
+    },
+  );
+
+  /** `$5 \times 1 0 ^ { 5 } – 1 \times 1 0 ^ { 6 }$` 细胞数区间 */
+  s = s.replace(
+    /\$\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*5\s*\}\s*[–-−]\s*1\s*\\times\s*1\s*0\s*\^\s*\{\s*6\s*\}\s*\$/gi,
+    "5×10⁵–1×10⁶",
+  );
+
+  /** PCR 温度 OCR：`$\mathfrak { s } 5 ^ { \circ } \mathfrak { C }$` → 95°C（s5 → 95） */
+  s = s.replace(
+    /\$\s*\\mathfrak\s*\{\s*s\s*\}\s*5\s*\^\s*\{\s*\\circ\s*\}\s*\\mathfrak\s*\{\s*C\s*\}\s*\$/gi,
+    "95°C",
+  );
+
+  /** scRNA：`${ \mathfrak { z } } ^ { \prime }$`（z→3）→ 3′ */
+  s = s.replace(
+    /\$\s*\{\s*\\mathfrak\s*\{\s*z\s*\}\s*\}\s*\^\s*\{\s*(?:\\prime|')\s*\}\s*\$/gi,
+    "3′",
+  );
+
+  /** Scanpy 细胞数：`$\scriptstyle ( 1 7 = 4 5, 9 5 8)$ )` → `(n = 45,958)` */
+  s = s.replace(
+    /\$\s*\\scriptstyle\s*\(\s*1\s*7\s*=\s*4\s*5\s*,\s*9\s*5\s*8\s*\)\s*\$\s*\)/gi,
+    "(n = 45,958)",
+  );
+
+  /** `$( \mathsf { n } { = } 7, 6 3 5)$` → `(n = 7,635)` */
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*n\s*\}\s*\{\s*=\s*\}\s*7\s*,\s*6\s*3\s*5\s*\)\s*\$/gi,
+    "(n = 7,635)",
+  );
+
+  /** `$( \mathsf { n { = } } 2, 6 3 5 /$ group)` → `(n = 2,635/group)` */
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*n\s*\{\s*=\s*\}\s*\}\s*2\s*,\s*6\s*3\s*5\s*\/\s*\$\s*group\)/gi,
+    "(n = 2,635/group)",
+  );
+
+  /** 异氟烷气体：`$( 2 \%$ in $1 0 0 \% 0 _ { 2 }$ gas)` → `(2% in 100% O₂ gas)`（MinerU 常用 `\%`） */
+  s = s.replace(
+    /\$\s*\(\s*2\s*\\%\s*\$\s*in\s*\$\s*1\s*0\s*0\s*\\%\s*0\s*_\s*\{\s*2\s*\}\s*\$\s*gas\)/gi,
+    "(2% in 100% O₂ gas)",
+  );
+
+  /** SPECT 尾静脉剂量行（乱码 N→省略） */
+  s = s.replace(
+    /\$\s*1\s*1\s*0\s*~\s*\\mu\s*\\mathsf\s*\{\s*L\s*\}\s*\/\s*1\s*1\s*,\s*8\s*\{\s*\\pm\s*\}\s*0\s*,\s*8\s*~\s*\\mathsf\s*\{\s*N\s*\}\s*\$\s*MBq\)/gi,
+    "(110 μL; 11.8 ± 0.8 MBq)",
+  );
+
+  /** SPECT 瘤内：`$( 40\mu \mathrm { L } / 3, 5 { \pm } 0, 3$ MBq)` */
+  s = s.replace(
+    /\$\s*\(\s*4\s*0\s*\\mu\s*\\mathrm\s*\{\s*L\s*\}\s*\/\s*3\s*,\s*5\s*\{\s*\\pm\s*\}\s*0\s*,\s*3\s*\$\s*MBq\)/gi,
+    "(40 μL; 3.5 ± 0.3 MBq)",
+  );
+
+  /** `${ \mathsf { s o m } } _ { \mathsf { T c } }` → 99mTc（衰变校正） */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*s\s*o\s*m\s*\}\s*\}\s*_\s*\{\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*\}\s*\$/gi,
+    "99mTc",
+  );
+  s = s.replace(
+    /the\s+\$\s*\{\s*\\mathsf\s*\{\s*s\s*o\s*m\s*\}\s*\}\s*_\s*\{\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*\}\s*\$\s+signal/gi,
+    "the 99mTc signal",
+  );
+
+  /** 多重免疫：`$CD31+ lCAM+$` → CD31+ ICAM+ */
+  s = s.replace(
+    /\$\s*C\s*D\s*3\s*1\s*\+\s*l\s*C\s*A\s*M\s*\+\s*\$/gi,
+    "CD31+ ICAM+",
+  );
+
+  /** `$3 \mu \up$`（up→μL） */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\up\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μL` : full;
+    },
+  );
+
+  /** `$100 \mu \rho \mathsf { B } \mathsf { S }$` → 100 μL PBS */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\rho\s*\\mathsf\s*\{\s*B\s*\}\s*\\mathsf\s*\{\s*S\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μL PBS` : full;
+    },
+  );
+
+  /** `$100 \mathrm { m m } ^ { 3 }$` 肿瘤体积 */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathrm\s*\{\s*m\s*m\s*\}\s*\^\s*\{\s*3\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mm³` : full;
+    },
+  );
+
+  /** 样品储存：`$\mathfrak { - 8 0 \% }$` → -80°C */
+  s = s.replace(
+    /\$\s*\\mathfrak\s*\{\s*-\s*8\s*0\s*\\%\s*\}\s*\$/gi,
+    "-80°C",
+  );
+
+  /** PCR 延伸：`${ 7 2 ^ { \circ } } \mathsf { C }$` → 72°C */
+  s = s.replace(
+    /\$\s*\{\s*7\s*2\s*\^\s*\{\s*\\circ\s*\}\s*\}\s*\\mathsf\s*\{\s*C\s*\}\s*\$/gi,
+    "72°C",
+  );
+
+  /** `$10 \mu \ L$` / `$5 \mu \ L$` → μL */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\?\s*L\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μL` : full;
+    },
+  );
+
+  /** PMA/ionomycin：`$0 . 5 \mu \ g / \ m \mu$` → 0.5 μg/ml */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*\\mu\s*\\?\s*g\s*\/\s*\\?\s*m\s*\\mu\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n} μg/ml` : full;
+    },
   );
 
   /** `$50 ~ \mu \mathsf { M }$` → 50 μM */
@@ -900,6 +1200,223 @@ export function normalizeKbResidualDollarMath(text: string): string {
     /\$\s*\\mathsf\s*\{\s*I\s*F\s*N\s*\\beta\s*\}\s*\$/gi,
     "IFNβ",
   );
+
+  /** `$\mathsf { I F N } \gamma$` / `$\mathsf { I F N } \eta$`（η 多为 γ 误识）→ IFNγ */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*I\s*F\s*N\s*\}\s*\\gamma\s*\$/gi,
+    "IFNγ",
+  );
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*I\s*F\s*N\s*\}\s*\\eta\s*\$/gi,
+    "IFNγ",
+  );
+
+  /** `$| \mathsf { F N } \gamma$`：`|` 为 I 的误识 */
+  s = s.replace(
+    /\$\s*\|\s*\\mathsf\s*\{\s*F\s*N\s*\}\s*\\gamma\s*\$/gi,
+    "IFNγ",
+  );
+
+  /** `depletion with $\mathtt { C D 8 \beta }$`（不限于 anti- 前缀） */
+  s = s.replace(
+    /\$\s*\\mathtt\s*\{\s*C\s*D\s*8\s*\\beta\s*\}\s*\$/gi,
+    "CD8β",
+  );
+
+  /** 参考文献：`${ \mathsf { C D 4 + } }$` → CD4+ */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*C\s*D\s*4\s*\+\s*\}\s*\}\s*\$/gi,
+    "CD4+",
+  );
+
+  /** Prf1 敲除鼠常被拆成 `$P H ^ { - 1 - }$` */
+  s = s.replace(/\$\s*P\s*H\s*\^\s*\{\s*-\s*1\s*-\s*\}\s*\$/gi, "Prf1−/−");
+
+  /** 效应 CD8+ T：`$P H ^ { + }$`（穿孔素 Prf1） */
+  s = s.replace(/\$\s*P\s*H\s*\^\s*\{\s*\+\s*\}\s*\$/gi, "Prf1+");
+
+  /** 作者行上标 `$^ { 3, 1 3 }$`（逗号两侧数字均可含空格） */
+  s = s.replace(
+    /\$\s*\^\s*\{\s*([\d\s,]+)\s*\}\s*\$/g,
+    (full, raw: string) => {
+      const compact = raw.replace(/\s+/g, "");
+      return affiliationSuperscriptFromSpacedDigits(compact) ?? full;
+    },
+  );
+
+  /** Cxcl10、Arg1/Spp1（字母被空格拆开） */
+  s = s.replace(
+    /\$\s*C\s*x\s*c\s*I\s*1\s*0\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "Cxcl10+",
+  );
+  s = s.replace(/\$\s*C\s*x\s*c\s*I\s*1\s*0\s*\$/gi, "Cxcl10");
+  s = s.replace(
+    /\$\s*A\s*r\s*g\s*1\s*\^\s*\{\s*\+\s*\}\s*S\s*p\s*p\s*1\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "Arg1+ Spp1+",
+  );
+
+  /** scRNA-seq：`$( I f n g ^ { + }$,` → `(IFNγ+,` */
+  s = s.replace(
+    /\$\(\s*I\s*f\s*n\s*g\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "(IFNγ+",
+  );
+
+  /** `$( S e I I ^ …` → `(Tcf1+`（OCR 将 Tcf1 误为 SeII） */
+  s = s.replace(
+    /\$\(\s*S\s*e\s*I\s*I\s*\^\s*\{\s*\\mathrm\s*\{\s*~\s*\+\s*~\s*\}\s*\}\s*\$/gi,
+    "(Tcf1+",
+  );
+
+  /** `$( T o x ~ ^ { + }$,` */
+  s = s.replace(
+    /\$\(\s*T\s*o\s*x\s*~\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "(Tox+",
+  );
+
+  /** `$FASL+ CD \mathsf { 8 } ^ { + }$` */
+  s = s.replace(
+    /\$FASL\+\s*CD\s*\\mathsf\s*\{\s*8\s*\}\s*\^\s*\{\s*\+\s*\}\s*\$/gi,
+    "FASL+ CD8+",
+  );
+
+  /** 括号内整段基因型：`$( Rag2 ; Il2rg )$` */
+  s = s.replace(
+    /\$\s*\(\s*R\s*a\s*g\s*2\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*;\s*I\s*I\s*2\s*r\s*g\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\)\s*\$/gi,
+    "(Rag2−/−; Il2rg−/−)",
+  );
+
+  /** `(B a t f 3 ^ { - / - })` */
+  s = s.replace(
+    /\(\s*B\s*a\s*t\s*f\s*3\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\)/gi,
+    "(Batf3−/−)",
+  );
+
+  /** Sting^gt/J + Tmem173（Tmem 常在 `$` 外被拆字） */
+  s = s.replace(
+    /C57BL\/6J-Sting\s+\$\s*\^\s*\{\s*\\mathfrak\s*\{\s*g\s*t\s*\}\s*\}\s*\/\s*\\mathsf\s*\{\s*J\s*\}\s*\$\s*\(\s*T\s*m\s*e\s*m\s*1\s*7\s*3\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\)/gi,
+    "C57BL/6J-Sting^gt/J (Tmem173−/−)",
+  );
+
+  /** 游离 `(T m e m 1 7 3 ^ { - / - })` */
+  s = s.replace(
+    /\(\s*T\s*m\s*e\s*m\s*1\s*7\s*3\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\)/gi,
+    "(Tmem173−/−)",
+  );
+
+  /** Perforin 品系：`$( \mathsf { C 5 7 B L } / 6 \mathrm { - } \mathsf { P r f 1 } ^ … )$` */
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*C\s*5\s*7\s*B\s*L\s*\}\s*\/\s*6\s*\\mathrm\s*\{\s*-\s*\}\s*\\mathsf\s*\{\s*P\s*r\s*f\s*1\s*\}\s*\^\s*\{\s*\\mathrm\s*\{\s*t\s*m\s*1\s*5\s*d\s*z\s*\}\s*\}\s*\/\s*\\mathsf\s*\{\s*J\s*\}\s*\)\s*\$/gi,
+    "(C57BL/6-Prf1^tm1Sdz/J)",
+  );
+
+  /** 抗生素浓度 OCR：`$100 {\mathfrak{g}}/{\mathfrak{m}}\llcorner$` → μg/mL */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\{\s*\\mathfrak\s*\{\s*g\s*\}\s*\}\s*\/\s*\{\s*\\mathfrak\s*\{\s*m\s*\}\s*\}\s*\\llcorner\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} μg/mL` : full;
+    },
+  );
+
+  /** `(MO $10^5 )$ )` → `(MOI 10^5)` */
+  s = s.replace(
+    /\(MO\s+\$\s*((?:\d\s*)+)\s*\^\s*\{\s*5\s*\}\s*\)\s*\$\s*\)/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `(MOI 10^5)` : full;
+    },
+  );
+
+  /** `GloMa $\circled{8}$` → GloMax®（Promega 读板机） */
+  s = s.replace(/GloMa\s*\$\s*\\circled\s*\{\s*8\s*\}\s*\$/gi, "GloMax®");
+
+  /** `$(+/-$ RT but no AAV)` 破损括号 */
+  s = s.replace(
+    /\$\(\s*\+\s*\/\s*-\s*\$\s*RT but no AAV\)/gi,
+    "(+/- RT but no AAV)",
+  );
+
+  /** 箱线图：`$\pm 1 0 { - } 9 0 $ percentile` */
+  s = s.replace(
+    /\$\s*\\pm\s*((?:\d\s*)+)\s*\{\s*-\s*\}\s*((?:\d\s*)+)\s*\$\s*percentile/gi,
+    (full, a: string, b: string) => {
+      const x = collapseSpacedChars(a);
+      const y = collapseSpacedChars(b);
+      return /^\d+$/.test(x) && /^\d+$/.test(y)
+        ? `±${x}–${y}th percentile`
+        : full;
+    },
+  );
+
+  /** `RT $^ +$ AAV` → `RT+ AAV`（MinerU 常见 `$^ +$` 无花括号，或 `$^{+}$`） */
+  s = s.replace(
+    /\bRT\s+\$\s*\^\s*(?:\{\s*\+\s*\}|\s*\+)\s*\$\s*AAV/gi,
+    "RT+ AAV",
+  );
+
+  /** `$\mathsf { R T } { + } \mathsf { A A V } { - }$ - iIL12` → RT+AAV-iIL12 */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*R\s*T\s*\}\s*\{\s*\+\s*\}\s*\\mathsf\s*\{\s*A\s*A\s*V\s*\}\s*\{\s*-\s*\}\s*\$\s*-\s*iIL12/gi,
+    "RT+AAV-iIL12",
+  );
+
+  /** 肿瘤体积：`$1 0 0 ~ \mathsf { m m } ^ { 3 }$`、`$4 0 0 \mathsf { m m } ^ { 3 }$` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*\\mathsf\s*\{\s*m\s*m\s*\}\s*\^\s*\{\s*3\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mm³` : full;
+    },
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*m\s*m\s*\}\s*\^\s*\{\s*3\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mm³` : full;
+    },
+  );
+
+  /** `(8 Gy)`：`$( 8 \mathsf { G y } )$ )` 多余 `)` */
+  s = s.replace(
+    /\$\(\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*G\s*y\s*\}\s*\)\s*\$\s*\)/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `(${n} Gy)` : full;
+    },
+  );
+
+  /** A-485 抑制剂：`${ \mathsf { A } } – 4 8 5 ^ { 4 4 }$` */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*A\s*\}\s*\}\s*[–-]\s*4\s*8\s*5\s*\^\s*\{\s*4\s*4\s*\}\s*\$/gi,
+    "A-485",
+  );
+
+  /** `$( \mathsf { C D } 4 5 ^ { + } )$` → `(CD45+)` */
+  s = s.replace(
+    /\$\(\s*\\mathsf\s*\{\s*C\s*D\s*\}\s*4\s*5\s*\^\s*\{\s*\+\s*\}\s*\)\s*\$/gi,
+    "(CD45+)",
+  );
+
+  /** `$R a g 2 ^ { - / - }$ ; $I … Il2rg` 极端 LaTeX 垃圾（MC38 人源化段） */
+  s = s.replace(
+    /\$\s*R\s*a\s*g\s*2\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\$\s*;\s*\$I\s*\{\s*\\cal\s*\{\s*I\s*\}\s*\}[^$]{0,120}\^\s*\{\s*\/\s*-\s*\}\s*\$/gi,
+    "Rag2−/−; Il2rg−/−",
+  );
+
+  /** `$R a g 2 ^ { - / - } ; I I 2 ^ { - / - }$` → Rag2−/−; Il2rg−/− */
+  s = s.replace(
+    /\$\s*R\s*a\s*g\s*2\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*;\s*I\s*I\s*2\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\$/gi,
+    "Rag2−/−; Il2rg−/−",
+  );
+
+  /** 单段基因型：`$R a g 2 ^ { - / - }$` */
+  s = s.replace(
+    /\$\s*R\s*a\s*g\s*2\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\$/gi,
+    "Rag2−/−",
+  );
+
+  /** 流式：`$GFP+$` */
+  s = s.replace(/\$\s*GFP\+\s*\$/gi, "GFP+");
 
   /** `$( \mathsf { p g } / \mathsf { m l } )$` */
   s = s.replace(
@@ -1262,6 +1779,249 @@ export function normalizeKbResidualDollarMath(text: string): string {
   /** `rCAF+$`（残留 `$`）→ `rCAF+` */
   s = s.replace(/rCAF\+\$/g, "rCAF+");
 
+  /** 肿瘤体积公式 `$\mathsf{V}=(4/3)\times\pi\times…$` */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*V\s*\}\s*=\s*\(\s*4\s*\/\s*3\s*\)\s*\\times\s*\\pi\s*\\times\s*\(\s*\\mathsf\s*\{\s*W\s*\}\s*\/\s*2\s*\)\s*\^\s*\{\s*2\s*\}\s*\\times\s*\(\s*\\mathsf\s*\{\s*L\s*\}\s*\/\s*2\s*\)\s*\$/gi,
+    "V = (4/3)×π×(W/2)²×(L/2)",
+  );
+
+  /** `$100 ~ \mu \mathrm{L}$`（百微升） */
+  s = s.replace(
+    /\$\s*1\s*0\s*0\s*~\s*\\mu\s*\\mathrm\s*\{\s*L\s*\}\s*\$/gi,
+    "100 μL",
+  );
+
+  /** `NaCl $0{,}9\%$` → NaCl 0.9% */
+  s = s.replace(
+    /\bNaCl\s+\$\s*0\s*\{\s*,\s*\}\s*9\s*\\?\s*%\s*\$/gi,
+    "NaCl 0.9%",
+  );
+
+  /** 高锝酸盐 `$[ { 99 } \mathrm{m}_{TC}]…$` → 可读化学式 */
+  s = s.replace(
+    /\$\s*\[\s*\{\s*9\s*9\s*\}\s*\\mathrm\s*\{\s*m\s*\}\s*_\s*\{\s*\\mathsf\s*\{\s*T\s*C\s*\}\s*\}\s*\]\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+
+  /** radio-TLC 游离峰乱码 `$\mathsf{P}^{99m}…NaTcO4$` */
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*P\s*\}\s*\^\s*\{\s*\\mathsf\s*\{\s*9\s*9\s*m\s*\}\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*\\mathsf\s*\{\s*J\s*\}\s*\\mathsf\s*\{\s*N\s*a\s*T\s*c\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+
+  /** 人源化：`$(5×10^6$ cells/mouse)` 破损括号 */
+  s = s.replace(
+    /\$\s*\(\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*6\s*\}\s*\$\s*cells\/mouse\)/gi,
+    "(5×10^6 cells/mouse)",
+  );
+
+  /** 胶质瘤：`$(5×10^4$ cells per mouse` */
+  s = s.replace(
+    /\$\s*\(\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*4\s*\}\s*\$\s*cells per mouse/gi,
+    "(5×10^4 cells per mouse",
+  );
+
+  /** `${\sim}1$ cm` */
+  s = s.replace(/\$\s*\{\s*\\sim\s*\}\s*1\s*\$\s*cm/gi, "~1 cm");
+
+  /** 坐标 `$(+2.5 \mathsf{mm}$ lateral, $+1 \mathsf{mm}$ anterior` */
+  s = s.replace(
+    /\$\s*\(\s*\+\s*2\s*\.\s*5\s*\\mathsf\s*\{\s*m\s*m\s*\}\s*\$\s*lateral\s*,\s*\$\s*\+\s*1\s*\\mathsf\s*\{\s*m\s*m\s*\}\s*\$\s*anterior/gi,
+    "(+2.5 mm lateral, +1 mm anterior",
+  );
+
+  /** `$5×10^10$` 病毒基因组 / `$\mathsf{vg}$` */
+  s = s.replace(
+    /\$\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*1\s*0\s*\}\s*\$/gi,
+    "5×10^10",
+  );
+  s = s.replace(
+    /\$\s*\(\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*1\s*0\s*\}\s*\\mathsf\s*\{\s*v\s*g\s*\}\s*\)\s*\$\s*\)\s*\)/gi,
+    "(5×10^10 vg).",
+  );
+  s = s.replace(
+    /\$\s*\(\s*5\s*\\times\s*1\s*0\s*\^\s*\{\s*1\s*0\s*\}\s*\\mathsf\s*\{\s*v\s*g\s*\}\s*\)\s*\$/gi,
+    "(5×10^10 vg)",
+  );
+
+  /** `$(5×10^10 vg) ).` MinerU 多余右括号 */
+  s = s.replace(/\(\s*5×10\^10\s+vg\)\s*\)\s*\./g, "(5×10^10 vg).");
+
+  /** 尾静脉剂量 `$(1×10^11$ vg/mouse)` */
+  s = s.replace(
+    /\$\s*\(\s*1\s*\\times\s*1\s*0\s*\^\s*\{\s*1\s*1\s*\}\s*\$\s*vg\/mouse\)/gi,
+    "(1×10^11 vg/mouse)",
+  );
+
+  /** D-luciferin `$(20 \mathrm{mg/mL})$` */
+  s = s.replace(
+    /\$\s*\(\s*2\s*0\s*\\mathrm\s*\{\s*m\s*g\s*\/\s*m\s*L\s*\}\s*\)\s*\$/gi,
+    "(20 mg/mL)",
+  );
+
+  /** IVIS：`$( \mathsf{ph}/…$ )`（`$` 在右括号前闭合） */
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*p\s*h\s*\}\s*\/\s*\\mathsf\s*\{\s*s\s*\}\s*\/\s*\\mathsf\s*\{\s*c\s*m\s*\}\s*\^\s*\{\s*2\s*\}\s*\/\s*\\mathsf\s*\{\s*s\s*r\s*\}\s*\$\s*\)/gi,
+    "(ph/s/cm²/sr)",
+  );
+
+  /** qPCR 引物方向 `${}^{5^{\prime}}$` / `${\mathfrak{3}}^{\prime}$` */
+  s = s.replace(
+    /\$\s*\{\s*\}\s*\^\s*\{\s*5\s*\^\s*\{\s*\\prime\s*\}\s*\}\s*\$/g,
+    "5′",
+  );
+  s = s.replace(
+    /\$\s*\{\s*\\mathfrak\s*\{\s*3\s*\}\s*\}\s*\^\s*\{\s*\\prime\s*\}\s*\$/gi,
+    "3′",
+  );
+
+  /** `$2^{-\Delta \mathsf{Ct}}$` */
+  s = s.replace(
+    /\$\s*2\s*\^\s*\{\s*-\s*\\Delta\s*\\mathsf\s*\{\s*C\s*\}\s*\\mathsf\s*\{\s*t\s*\}\s*\}\s*\$/gi,
+    "2^(-ΔCt)",
+  );
+
+  /** SPECT：`$55 \mathsf{kV}$`、`$140 \mathsf{keV}$`、`$48 \mathrm{~h~}$` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*k\s*V\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} kV` : full;
+    },
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*k\s*e\s*V\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} keV` : full;
+    },
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathrm\s*\{\s*~\s*h\s*~\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} h` : full;
+    },
+  );
+
+  /** 流式：离心 `$300 ~ {\mathfrak{g}}$` */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*\{\s*\\mathfrak\s*\{\s*g\s*\}\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} g` : full;
+    },
+  );
+
+  /** `$0.5 \ \mathsf{mM}$`（EDTA；`\ ` 为 LaTeX 空格） */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*(?:\\\s+)?\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n} mM` : full;
+    },
+  );
+
+  /** `${\mathsf{Ca}}^{2+}$` / `$\mathsf{Mg}^{2+}$` */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*C\s*a\s*\}\s*\}\s*\^\s*\{\s*2\s*\+\s*\}\s*\$/gi,
+    "Ca²⁺",
+  );
+  s = s.replace(
+    /\$\s*\\mathsf\s*\{\s*M\s*g\s*\}\s*\^\s*\{\s*2\s*\+\s*\}\s*\$/gi,
+    "Mg²⁺",
+  );
+
+  /** FACS：`Ca²⁺ and Mg²⁺ -free PBS).` 多余右括号 */
+  s = s.replace(
+    /Ca²⁺ and Mg²⁺ -free PBS\)\./g,
+    "Ca²⁺- and Mg²⁺-free PBS.",
+  );
+
+  /** 磷酸化：`$20 \mathsf{mM}$`（无 `~`） */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mM` : full;
+    },
+  );
+
+  /** `$0.9 {\sf M}$` */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*\{\s*\\sf\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n} M` : full;
+    },
+  );
+
+  /** `$\left( { \mathsf { p H } } < 6 \right.$ $,` → `(pH < 6,`（`\right.` 后另有闭合 `$`） */
+  s = s.replace(
+    /\$\s*\\left\s*\(\s*\{\s*\\mathsf\s*\{\s*p\s*H\s*\}\s*\}\s*<\s*6\s*\\right\s*\.\s*\$\s*,/gi,
+    "(pH < 6,",
+  );
+
+  /** `2% ACN- $.0.1\%$ FA` */
+  s = s.replace(
+    /2%\s*ACN-\s*\$\s*\.\s*0\s*\.\s*1\s*\\?\s*%\s*\$\s*FA/gi,
+    "2% ACN- 0.1% FA",
+  );
+
+  /** `$1.9 \ \mu \mathrm{m}$` 粒径（DIA 柱径） */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*(?:\\\s+)?\s*\\mu\s*\\mathrm\s*\{\s*m\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n} μm` : full;
+    },
+  );
+  /** `$1.6 \mathsf{kV}$`（与 SPECT 的 kV 规则相同，允许 `1 . 6`） */
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*\\mathsf\s*\{\s*k\s*V\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d*\.?\d+$/.test(n) ? `${n} kV` : full;
+    },
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*\\mathrm\s*\{\s*m\s*\}\s*\/\s*z\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} m/z` : full;
+    },
+  );
+
+  /** 修饰列表：`Gln- $\cdot >$ pyro-Glu` */
+  s = s.replace(/Gln-\s*\$\s*\\cdot\s*>\s*\$\s*pyro-Glu/gi, "Gln→pyro-Glu");
+
+  /** Perseus：`(version $1 . 6 . 15 . 0) ^ { 85 }$` */
+  s = s.replace(
+    /\(version\s+\$\s*1\s*\.\s*6\s*\.\s*1\s*5\s*\.\s*0\s*\)\s*\^\s*\{\s*8\s*5\s*\}\s*\$/gi,
+    "(version 1.6.15.0)^85",
+  );
+
+  /** Metascape：`|1.5|, $_ {\mathsf{P} < 0.05)}$ ),` */
+  s = s.replace(
+    /\|\s*1\s*\.\s*5\s*\|\s*,\s*\$\s*_\s*\{\s*\\mathsf\s*\{\s*P\s*\}\s*<\s*0\s*\.\s*0\s*5\s*\)\s*\}\s*\$\s*\)\s*,/gi,
+    "|1.5|, P < 0.05),",
+  );
+
+  /** FDR：`${\mathsf{p}}{<}0.05$` */
+  s = s.replace(
+    /\$\s*\{\s*\\mathsf\s*\{\s*p\s*\}\s*\}\s*\{\s*<\s*\}\s*0\s*\.\s*0\s*5\s*\$/gi,
+    "p < 0.05",
+  );
+
+  /** `$50 ~ \mathsf { m M }$`（DTT 等；与 μM 的 `~\mu\mathsf{M}` 区分） */
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*\$/gi,
+    (full, raw: string) => {
+      const n = collapseSpacedChars(raw);
+      return /^\d+$/.test(n) ? `${n} mM` : full;
+    },
+  );
+
   return s;
 }
 
@@ -1298,6 +2058,8 @@ export function stripMineruStructureManifest(text: string): string {
 export function normalizeKbOcrTypos(text: string): string {
   let s = text;
   s = s.replace(/\bPreybus\b/g, "Prebys");
+  /** MinerU：DOI 链接中 `doi.org/ 10.` 误插入空格 */
+  s = s.replace(/https:\/\/doi\.org\/\s+/gi, "https://doi.org/");
   s = s.replace(/(https?:\/\/zenodo)\.\s+(org[^\s)\]]*)/gi, "$1.$2");
   /** Elsevier 路径常见断行：`j. ccell` → `j.ccell` */
   s = s.replace(/(10\.1016\/j\.)\s+(ccell)/gi, "$1$2");
@@ -1306,6 +2068,9 @@ export function normalizeKbOcrTypos(text: string): string {
     /\bwith a (\d{2})C annealing temperature\b/gi,
     "with a $1°C annealing temperature",
   );
+  /** `+` 非 \\w，勿在词尾用 \\b */
+  s = s.replace(/\btota CD8\+/gi, "total CD8+");
+  s = s.replace(/\bpathogenfree\b/gi, "pathogen-free");
   return s;
 }
 
@@ -1366,6 +2131,7 @@ export function cleanMarkdownForKnowledgeBase(
     text = stripMineruStructureManifest(text);
   }
   text = dropMineruMarkdownNoise(text);
+  text = joinLinesBrokenByRemovedPageNoise(text);
   text = flattenHtmlTablesToPlain(text);
   text = neutralizeCatalogHashesAndHexColors(text);
   text = normalizeMineruInlineLatex(text);

@@ -123,11 +123,47 @@ export function isWriteTaskIntent(userText: string): boolean {
 }
 
 /**
+ * 短句「再写一篇」类：无新主题，复用会话中**最近一条**完整创作指令。
+ * 若整句还包含新的体裁/主题要求，应走普通创作意图，不归此类。
+ */
+export function isRepeatWriteShortcut(userText: string): boolean {
+  const t = normalizeUserTextForIntent(userText);
+  if (t.length < 3 || t.length > 48) return false;
+  if (isWriteTaskIntent(t)) return false;
+  /** 注意：「再写一篇」是 再写+一篇，不能写成 再写+(?:一|篇)?，否则只匹配到「再写一」剩个「篇」导致整句不匹配 */
+  const shortRepeat =
+    /^(?:请|麻烦|帮我)?(?:再写(?:一篇|一则|一个|一遍)?|再来(?:一篇|一则|一个)?|重新写(?:一篇|一则|一个)?|再生成(?:一篇)?)[。.!！？\s]*$/u;
+  const okLine =
+    /^(?:好的|好|行|可以|OK|ok)[，,]?\s*(?:请|麻烦|帮我)?(?:再写(?:一篇|一则|一个|一遍)?|再来(?:一篇|一则)?)[。.!！？\s]*$/iu;
+  return shortRepeat.test(t) || okLine.test(t);
+}
+
+/**
+ * 从会话中取**最近一条**用户侧创作指令（`isWriteTaskIntent` 为真），供「再写一篇」复用。
+ */
+export function extractLastWriteTaskInstruction(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+): string | null {
+  const userMsgs: string[] = [];
+  for (const m of history) {
+    if (m.role === "user") userMsgs.push(m.content);
+  }
+  for (let j = userMsgs.length - 1; j >= 0; j--) {
+    const n = normalizeUserTextForIntent(userMsgs[j]!);
+    if (isWriteTaskIntent(n)) {
+      return userMsgs[j]!.trim();
+    }
+  }
+  return null;
+}
+
+/**
  * 当前用户句是否像「写作任务补充说明」，而非元对话/闲聊（避免与历史写作任务误合并）。
  */
 export function isPlausibleWriteMergeFollowUp(userText: string): boolean {
   const t = normalizeUserTextForIntent(userText);
   if (t.length < 6) return false;
+  if (isRepeatWriteShortcut(t)) return false;
   if (isContentCreateIntent(t)) return false;
   if (
     /(?:你)?现在.{0,8}(?:对|跟).{0,10}(?:我|咱).{0,10}(?:的)?(?:了解|认识|知道)|了解多少|知道我多少|你还记得|刚才|你为什么|什么模型|谁开发|测试|你好|谢谢|再见|离谱|怎么回事/.test(

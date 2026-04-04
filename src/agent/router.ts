@@ -3,7 +3,9 @@ import { getAnthropicClient } from "./anthropic.js";
 import { augmentUserTextWithRag } from "./rag-context.js";
 import {
   buildMergedWriteRequest,
+  extractLastWriteTaskInstruction,
   isPlausibleWriteMergeFollowUp,
+  isRepeatWriteShortcut,
   isWriteTaskIntent,
   normalizeUserTextForIntent,
   runContentCreateWorkflow,
@@ -88,6 +90,35 @@ export async function handleUserMessage(
       history.pop();
       const msg = err instanceof Error ? err.message : String(err);
       console.error("[agent] content-create 工作流失败:", msg);
+      return "抱歉，内容创作流程暂时失败，请稍后再试。";
+    }
+  }
+
+  if (!meta?.forceGeneralChat && isRepeatWriteShortcut(normalized)) {
+    const priorInstruction = extractLastWriteTaskInstruction(history);
+    if (!priorInstruction) {
+      return "没有找到上一篇创作指令。请先发送一条完整的写作需求（例如仿梅斯文献→微信公众号的完整句式），再说「再写一篇」。";
+    }
+    const repeatedPayload = normalizeUserTextForIntent(priorInstruction);
+    history.push({ role: "user", content: userText });
+    if (history.length > MAX_HISTORY * 2) {
+      history.splice(0, history.length - MAX_HISTORY * 2);
+    }
+    try {
+      console.log(
+        `[router] 再写一篇：复用上一指令 length=${repeatedPayload.length}`,
+      );
+      const reply = await runContentCreateWorkflow(chatId, repeatedPayload, {
+        senderOpenId: meta?.senderOpenId,
+      });
+      syncWriteMergeGateFromWorkflowReply(chatId, reply);
+      history.push({ role: "assistant", content: reply });
+      extractAndSaveInfo(userText, memory);
+      return reply;
+    } catch (err) {
+      history.pop();
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[agent] 再写一篇 工作流失败:", msg);
       return "抱歉，内容创作流程暂时失败，请稍后再试。";
     }
   }

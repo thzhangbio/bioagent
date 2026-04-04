@@ -18,7 +18,14 @@
     "search:rag": "tsx scripts/search-rag.ts",
     "search:jobs": "tsx scripts/search-job-posts.ts",
     "pdf-cleanup": "tsx side-tools/pdf-text-cleanup/cli.ts",
-    "pdf-kb-pipeline": "tsx side-tools/pdf-text-cleanup/pipeline.ts"
+    "pdf-kb-pipeline": "tsx side-tools/pdf-text-cleanup/pipeline.ts",
+    "pdf-archive-inbox": "tsx side-tools/pdf-text-cleanup/archive-inbox.ts",
+    "pdf-archive-out": "tsx side-tools/pdf-text-cleanup/archive-out.ts",
+    "pdf-archive-legacy-flat": "tsx side-tools/pdf-text-cleanup/archive-legacy-flat.ts",
+    "wechat-article-pipeline": "tsx side-tools/wechat-article-cleanup/pipeline.ts",
+    "wechat-article-clean": "tsx side-tools/wechat-article-cleanup/cli.ts",
+    "wechat-article-archive-inbox": "tsx side-tools/wechat-article-cleanup/archive-inbox.ts",
+    "wechat-article-archive-out": "tsx side-tools/wechat-article-cleanup/archive-out.ts"
   },
   "keywords": [
     "feishu",

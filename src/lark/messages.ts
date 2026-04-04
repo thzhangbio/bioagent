@@ -1,4 +1,5 @@
 import { getFeishuClient } from "./feishu-client.js";
+import { buildImPostContentString } from "./im-post-content.js";
 
 interface SendOptions {
   chatId?: string;
@@ -29,12 +30,25 @@ function textContent(body: string): string {
 export async function sendMessage(opts: SendOptions): Promise<string> {
   const body = pickBody(opts);
   const client = getFeishuClient();
+  const postContent = buildImPostContentString(body);
 
-  if (opts.chatId) {
+  async function sendPost(receiveId: string, receiveIdType: "chat_id" | "open_id") {
     const res = await client.im.v1.message.create({
-      params: { receive_id_type: "chat_id" },
+      params: { receive_id_type: receiveIdType },
       data: {
-        receive_id: opts.chatId,
+        receive_id: receiveId,
+        msg_type: "post",
+        content: postContent,
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
+
+  async function sendPlain(receiveId: string, receiveIdType: "chat_id" | "open_id") {
+    const res = await client.im.v1.message.create({
+      params: { receive_id_type: receiveIdType },
+      data: {
+        receive_id: receiveId,
         msg_type: "text",
         content: textContent(body),
       },
@@ -42,16 +56,24 @@ export async function sendMessage(opts: SendOptions): Promise<string> {
     return JSON.stringify(res?.data ?? res);
   }
 
+  if (opts.chatId) {
+    try {
+      return await sendPost(opts.chatId, "chat_id");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn("[im] post 发送失败，回退 text:", msg.slice(0, 200));
+      return await sendPlain(opts.chatId, "chat_id");
+    }
+  }
+
   if (opts.userId) {
-    const res = await client.im.v1.message.create({
-      params: { receive_id_type: "open_id" },
-      data: {
-        receive_id: opts.userId,
-        msg_type: "text",
-        content: textContent(body),
-      },
-    });
-    return JSON.stringify(res?.data ?? res);
+    try {
+      return await sendPost(opts.userId, "open_id");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn("[im] post 发送失败，回退 text:", msg.slice(0, 200));
+      return await sendPlain(opts.userId, "open_id");
+    }
   }
 
   throw new Error("sendMessage 需要 chatId 或 userId");
@@ -60,16 +82,29 @@ export async function sendMessage(opts: SendOptions): Promise<string> {
 export async function replyMessage(opts: ReplyOptions): Promise<string> {
   const body = pickBody(opts);
   const client = getFeishuClient();
+  const postContent = buildImPostContentString(body);
 
-  const res = await client.im.v1.message.reply({
-    path: { message_id: opts.messageId },
-    data: {
-      msg_type: "text",
-      content: textContent(body),
-    },
-  });
-
-  return JSON.stringify(res?.data ?? res);
+  try {
+    const res = await client.im.v1.message.reply({
+      path: { message_id: opts.messageId },
+      data: {
+        msg_type: "post",
+        content: postContent,
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn("[im] reply post 失败，回退 text:", msg.slice(0, 200));
+    const res = await client.im.v1.message.reply({
+      path: { message_id: opts.messageId },
+      data: {
+        msg_type: "text",
+        content: textContent(body),
+      },
+    });
+    return JSON.stringify(res?.data ?? res);
+  }
 }
 
 /** 飞书交互卡片（消息卡片 JSON，与开放平台「自定义发送消息」结构一致） */

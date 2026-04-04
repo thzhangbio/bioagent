@@ -10,6 +10,13 @@ import { fileURLToPath } from "node:url";
 
 import { fetchWechatEngagementStats } from "./appmsg-stats.js";
 import { cleanWeChatArticleRaw } from "./clean-article.js";
+import { slugFromMpArticleUrl } from "./slug.js";
+import { extractWechatArticleMeta } from "./wechat-meta.js";
+import {
+  renameInboxRawToOutBasename,
+  slugHintForKbWechat,
+  wechatArticleBasename,
+} from "./wechat-article-filename.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -30,9 +37,14 @@ async function main(): Promise<void> {
 
   const inputPath = resolve(process.cwd(), arg);
   const raw = readFileSync(inputPath, "utf-8");
-  const base = basename(arg).replace(/\.raw\.html?$/i, "");
+  const inboxBase = basename(arg).replace(/\.raw\.html?$/i, "");
+  const wx = extractWechatArticleMeta(raw);
   const urlMatch = raw.match(/<!--\s*source:\s*([^\n]+)/);
   const sourceUrl = urlMatch?.[1]?.trim();
+  const urlSlug = sourceUrl ? slugFromMpArticleUrl(sourceUrl) : null;
+  const fallbackSlug = urlSlug ?? inboxBase;
+  const outBase = wechatArticleBasename(wx.mp_name, wx.title, fallbackSlug);
+  const slugHint = slugHintForKbWechat(raw, inboxBase);
   let engagement: Awaited<
     ReturnType<typeof fetchWechatEngagementStats>
   > | undefined;
@@ -44,7 +56,7 @@ async function main(): Promise<void> {
   }
   const cleaned = cleanWeChatArticleRaw(raw, {
     sourceUrl,
-    slugHint: base,
+    slugHint,
     fetchedAt: new Date().toISOString(),
     stripFooterPatterns: stripFooter,
     engagement,
@@ -52,9 +64,10 @@ async function main(): Promise<void> {
 
   const outDir = join(__dirname, "out");
   mkdirSync(outDir, { recursive: true });
-  const outPath = join(outDir, `${base}.md`);
+  const outPath = join(outDir, `${outBase}.md`);
   writeFileSync(outPath, cleaned, "utf-8");
   console.log(`已写入: ${outPath}`);
+  renameInboxRawToOutBasename(inputPath, inboxBase, outBase);
 }
 
 main().catch((e) => {

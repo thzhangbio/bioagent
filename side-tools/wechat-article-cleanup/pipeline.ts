@@ -26,6 +26,12 @@ import { cleanWeChatArticleRaw } from "./clean-article.js";
 import { fetchWeChatArticleRaw } from "./fetch.js";
 import { parseLinksFile } from "./parse-links.js";
 import { slugFromMpArticleUrl } from "./slug.js";
+import { extractWechatArticleMeta } from "./wechat-meta.js";
+import {
+  renameInboxRawToOutBasename,
+  slugHintForKbWechat,
+  wechatArticleBasename,
+} from "./wechat-article-filename.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
@@ -49,14 +55,16 @@ async function runFetch(): Promise<void> {
   }
   mkdirSync(INBOX, { recursive: true });
   for (const url of links) {
-    const slug = slugFromMpArticleUrl(url);
-    if (!slug) {
+    const urlSlug = slugFromMpArticleUrl(url);
+    if (!urlSlug) {
       console.warn(`跳过（非微信公众号文章 URL）: ${url}`);
       continue;
     }
-    const path = join(INBOX, `${slug}.raw.html`);
     try {
       const r = await fetchWeChatArticleRaw(url);
+      const wx = extractWechatArticleMeta(r.body);
+      const base = wechatArticleBasename(wx.mp_name, wx.title, urlSlug);
+      const path = join(INBOX, `${base}.raw.html`);
       const header = `<!-- source: ${url}\n     fetchedAt: ${new Date().toISOString()}\n     httpStatus: ${r.status}\n     contentType: ${r.contentType}\n-->\n`;
       writeFileSync(path, header + r.body, "utf-8");
       console.log(`已写入 raw: ${path} (${r.body.length} 字符)`);
@@ -85,10 +93,15 @@ async function runClean(
     );
   }
   for (const f of files) {
-    const slug = basename(f).replace(/\.raw\.html?$/i, "");
+    const inboxBase = basename(f).replace(/\.raw\.html?$/i, "");
     const raw = readFileSync(join(INBOX, f), "utf-8");
+    const wx = extractWechatArticleMeta(raw);
     const urlMatch = raw.match(/<!--\s*source:\s*([^\n]+)/);
     const sourceUrl = urlMatch?.[1]?.trim();
+    const urlSlug = sourceUrl ? slugFromMpArticleUrl(sourceUrl) : null;
+    const fallbackSlug = urlSlug ?? inboxBase;
+    const outBase = wechatArticleBasename(wx.mp_name, wx.title, fallbackSlug);
+    const slugHint = slugHintForKbWechat(raw, inboxBase);
     let engagement: Awaited<
       ReturnType<typeof fetchWechatEngagementStats>
     > | undefined;
@@ -98,19 +111,21 @@ async function runClean(
         cookie,
       });
       if (engagement.stats_fetch_error) {
-        console.warn(`${slug}: 互动数据 ${engagement.stats_fetch_error}`);
+        console.warn(`${outBase}: 互动数据 ${engagement.stats_fetch_error}`);
       }
     }
     const cleaned = cleanWeChatArticleRaw(raw, {
       sourceUrl: sourceUrl || undefined,
-      slugHint: slug,
+      slugHint,
       fetchedAt: new Date().toISOString(),
       stripFooterPatterns: stripFooter,
       engagement,
     });
-    const outPath = join(OUT, `${slug}.md`);
+    const outPath = join(OUT, `${outBase}.md`);
     writeFileSync(outPath, cleaned, "utf-8");
     console.log(`已写入: ${outPath}`);
+    const inboxPath = join(INBOX, f);
+    renameInboxRawToOutBasename(inboxPath, inboxBase, outBase);
   }
 }
 

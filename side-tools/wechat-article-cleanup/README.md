@@ -7,9 +7,10 @@
 | 路径 | 作用 |
 |------|------|
 | `links.txt` | 每行一条 `https://mp.weixin.qq.com/s/...`，`#` 为注释 |
-| `inbox/` | 抓取或手动的 **`*.raw.html` 全文** |
-| `out/` | 清洗后的 **`*.md`**（待校对、灌库）；YAML 头含 **`wechat-meta.ts`** 抽取的运营字段，见下节 |
+| `inbox/` | 抓取或手动的 **`*.raw.html` 全文**；清洗成功后会 **重命名为** 与 **`out/*.md` 同基名**（短链占位名会被替换） |
+| `out/` | 清洗后的 **`*.md`**；文件名 **`{公众号名}+{文章标题}`**（非法字符已替换、过长已截断，见 `wechat-article-filename.ts`） |
 | `wechat-meta.ts` | 从页面 HTML 解析 **`title` / `is_original` / `editor` / `mp_name` / `published_at` / `published_at_cn`** |
+| `wechat-article-filename.ts` | 生成 **`公众号名+标题`** 安全文件名片段；抓取 raw 与输出 md 同名（仅扩展名不同） |
 | `wechat-kb-id.ts` | 计算 **`kb_wechat_id`**：灌库与后续补数据时的稳定唯一键（见下节） |
 | `appmsg-stats.ts` | 可选：通过 `getappmsgext` 拉取 **阅读 / 点赞 / 分享 / 评论 / 收藏** 等互动数（需 Cookie，见下节） |
 | `archive/` | 两类子目录，见下节 |

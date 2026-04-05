@@ -3094,6 +3094,42 @@ export function collapseImageBlocksForKb(text: string, maxKeep = 1): string {
   return out.join("\n");
 }
 
+export function applyKbSpecificPreCleanup(
+  raw: string,
+  options: Pick<KbCleanupOptions, "stripMineruStructureManifest"> = {},
+): string {
+  let text = raw.replace(/\r\n/g, "\n");
+  if (options.stripMineruStructureManifest !== false) {
+    text = stripMineruStructureManifest(text);
+  }
+  text = dropMineruMarkdownNoise(text);
+  text = dedupeConsecutiveLongLines(text);
+  text = joinLinesBrokenByRemovedPageNoise(text);
+  text = flattenHtmlTablesToPlain(text);
+  text = neutralizeCatalogHashesAndHexColors(text);
+  return text;
+}
+
+export function applyKbSpecificPostCleanup(
+  raw: string,
+  options: Pick<
+    KbCleanupOptions,
+    "applyKbOcrTypoFixes" | "collapseImageBlocks" | "maxImagesPerRun"
+  > = {},
+): string {
+  let text = raw.replace(/\r\n/g, "\n");
+  text = normalizeKbResidualDollarMath(text);
+  if (options.applyKbOcrTypoFixes !== false) {
+    text = normalizeKbOcrTypos(text);
+    text = reorderAaToAkAffiliationsAfterAd(text);
+  }
+
+  if (options.collapseImageBlocks !== false) {
+    text = collapseImageBlocksForKb(text, options.maxImagesPerRun ?? 1);
+  }
+  return text.trim() + "\n";
+}
+
 export function cleanMarkdownForKnowledgeBase(
   raw: string,
   options: KbCleanupOptions = {},
@@ -3108,25 +3144,14 @@ export function cleanMarkdownForKnowledgeBase(
   } = kb;
 
   let text = raw.replace(/\r\n/g, "\n");
-  if (stripManifest !== false) {
-    text = stripMineruStructureManifest(text);
-  }
-  text = dropMineruMarkdownNoise(text);
-  text = dedupeConsecutiveLongLines(text);
-  text = joinLinesBrokenByRemovedPageNoise(text);
-  text = flattenHtmlTablesToPlain(text);
-  text = neutralizeCatalogHashesAndHexColors(text);
+  text = applyKbSpecificPreCleanup(text, {
+    stripMineruStructureManifest: stripManifest,
+  });
   text = normalizeMineruInlineLatex(text);
   text = cleanPdfTextMd(text, cleanupOpts);
-  text = normalizeKbResidualDollarMath(text);
-  if (applyKbOcrTypoFixes !== false) {
-    text = normalizeKbOcrTypos(text);
-    text = reorderAaToAkAffiliationsAfterAd(text);
-  }
-
-  if (collapseImageBlocks !== false) {
-    text = collapseImageBlocksForKb(text, maxImagesPerRun ?? 1);
-  }
-
-  return text.trim() + "\n";
+  return applyKbSpecificPostCleanup(text, {
+    applyKbOcrTypoFixes,
+    collapseImageBlocks,
+    maxImagesPerRun,
+  });
 }

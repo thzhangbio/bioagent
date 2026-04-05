@@ -1,3 +1,4 @@
+import { applyPdfGenericCleanup } from "../../../cleanup.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,
@@ -7,9 +8,11 @@ export const segmentInboxToOut07CleanupGenericStage: SegmentInboxToOutStage = {
   name: "07-cleanup-generic",
   run(context) {
     return appendSegmentInboxToOutNote(
-      context,
-      "07-cleanup-generic: root stage placeholder created.",
+      {
+        ...context,
+        workingBody: applyPdfGenericCleanup(context.workingBody ?? ""),
+      },
+      "07-cleanup-generic: applied generic OCR and latex cleanup.",
     );
   },
 };
-

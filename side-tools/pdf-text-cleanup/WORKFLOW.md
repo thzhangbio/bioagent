@@ -5,7 +5,7 @@
 
 | 步骤 | 内容 | 谁执行 |
 |------|------|--------|
-| 1 | **执行清洗代码**：对 MinerU 源跑 `pnpm run pdf-kb-pipeline -- --raw-md <…> [--json <…>]`，产出 `out/*.kb.md` | 本地命令 |
+| 1 | **执行清洗代码**：对 MinerU 源跑 `pnpm run pdf-kb-pipeline -- --raw-md <…> [--json <…>]` 或 `pnpm run pdf-kb-inbox-to-out -- --raw-md <…> [--json <…>]`，产出 `out/*.kb.md` | 本地命令 |
 | 2 | **清洗完成后搜索短 `$…$` 碎片**：`pnpm run pdf-kb-fragment-audit`（默认扫 `out/`，生成 `out/kb-fragment-audit.md`） | 本地命令 |
 | 3 | **分析未解析碎片**，把版式抽象成**通用、非硬编码**的修改思路（不绑死具体数字/基因名） | **助手 / 人工** |
 | 4 | **形成规则并写入代码**：在 `mineru-kb.ts`（及必要时其他清洗模块）中实现 | **助手 / 人工** |
@@ -19,5 +19,17 @@
 - 若只跑了步骤 1、从未做 2–5，则仍属于「只跑了清洗」，不叫本文件意义上的完整「流水线闭环」。
 
 相关文件：`pipeline.ts`、`fragment-audit.ts`、`fragment-list.ts`、`fragment-apply-inplace.ts`、`fragment-fixtures.ts`、`fragment-fixtures-check.ts`、`mineru-kb.ts`。
+
+新架构下的主控位置：
+- 段Ⅰ：`pyramid/segment-inbox-to-out/index.ts`
+- 段Ⅱ：`pyramid/segment-out-to-knowledge/index.ts`
+- 段Ⅲ：`pyramid/segment-out-to-archive/index.ts`
+
+碎片相关的横切工具仍保留在侧车根目录，用来支撑 `09-formula-fragments`：
+- `fragment-audit.ts`
+- `fragment-list.ts`
+- `fragment-apply-inplace.ts`
+- `fragment-fixtures.ts`
+- `fragment-fixtures-check.ts`
 
 **仅碎片、就地更新成稿（不出新文件）**的助手步骤见 **`FRAGMENT-ASSISTANT-WORKFLOW.md`**。

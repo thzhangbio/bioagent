@@ -1,3 +1,4 @@
+import { mineruRawMarkdownToPreliminary } from "../../../raw-to-preliminary.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,
@@ -7,10 +8,15 @@ export const segmentInboxToOut03MineruPreliminaryStage: SegmentInboxToOutStage =
   {
     name: "03-mineru-preliminary",
     run(context) {
+      const preliminaryMd = mineruRawMarkdownToPreliminary(context.rawMdText ?? "");
+      const workingBody = `${context.structureSection ?? ""}${preliminaryMd}`;
       return appendSegmentInboxToOutNote(
-        context,
-        "03-mineru-preliminary: root stage placeholder created.",
+        {
+          ...context,
+          preliminaryMd,
+          workingBody,
+        },
+        "03-mineru-preliminary: normalized raw MinerU markdown into preliminary body.",
       );
     },
   };
-

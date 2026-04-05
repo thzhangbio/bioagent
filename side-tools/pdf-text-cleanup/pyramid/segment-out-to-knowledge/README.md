@@ -1,6 +1,18 @@
 # 段Ⅱ：out → 知识库
 
-成品从 `out/` 进入主项目知识库（如 `data/knowledge/literature-inbox/`）及索引流程；**多数实现不在本侧车**，此处为步骤占位与检查清单。
+根总控：
+- `segment-out-to-knowledge/index.ts`
+
+当前职责：
+- 从 `out/` 收集 `*.kb.md`
+- 复制到知识库目录（默认 `data/knowledge/literature-inbox/`）
+- 校验 DOI / slug 等元数据
+- 触发 `ingest:literature`
+- 对 `rag-store.json` 做最小验证
+- 在 `out/.archive-ready.json` 写入“可归档”标记，供段Ⅲ消费
+
+默认命令：
+- `pnpm run pdf-kb-out-to-knowledge`
 
 | 子目录 | 职责（规划） |
 |--------|----------------|

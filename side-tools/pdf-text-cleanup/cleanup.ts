@@ -91,7 +91,7 @@ function shouldDropLine(
   return "keep";
 }
 
-function applyLineFilters(text: string, opts: CleanupOptions): string {
+export function applyLineFilters(text: string, opts: CleanupOptions): string {
   const lines = text.split(/\r?\n/);
   const ctx = { keptCancerCell: false, keptArticle: false };
   const out: string[] = [];
@@ -116,14 +116,14 @@ function applyLineFilters(text: string, opts: CleanupOptions): string {
 }
 
 /** 英文单词在行尾被 `-` 拆开时合并（允许断行后多余空格，如 recruit-\n ment） */
-function mergeHyphenation(text: string): string {
+export function mergeHyphenation(text: string): string {
   return text.replace(/([a-zA-Z])-\s*\n\s*([a-z])/g, "$1$2");
 }
 
 /**
  * 列宽导致的词内 `-\s`（与行末 `-\n` 不同）。排除常见「保留连字符」复合词。
  */
-function mergeInlinePdfHyphenation(text: string): string {
+export function mergeInlinePdfHyphenation(text: string): string {
   const blockSecond = new Set([
     "being",
     "term",
@@ -326,7 +326,7 @@ function isParagraphBoundary(prev: string, next: string): boolean {
 /**
  * 将误拆成多行的同一段合并；在真实段分界处可选插入空行（`\n\n`）。
  */
-function mergeSoftLineBreaksAndSpaceParagraphs(
+export function mergeSoftLineBreaksAndSpaceParagraphs(
   text: string,
   joinWithBlankLine: boolean,
 ): string {
@@ -371,14 +371,14 @@ function mergeSoftLineBreaksAndSpaceParagraphs(
   return paragraphs.join(sep);
 }
 
-function collapseBlankLines(text: string): string {
+export function collapseBlankLines(text: string): string {
   return text.replace(/\n{3,}/g, "\n\n");
 }
 
 /**
  * OCR 常把「TGFβ」排成 LaTeX 碎片；统一为与 PDF 一致的 Unicode：**TGFβ**、**TGFβ1** 等。
  */
-function normalizeTgfBetaMarkup(text: string): string {
+export function normalizeTgfBetaMarkup(text: string): string {
   let s = text;
 
   /**
@@ -497,7 +497,7 @@ function isCdLikeToken(collapsed: string): boolean {
 /**
  * `$$ { \\tt C D 3 1 } ^ { + } $$`、`${ \\sf B } 2 2 0 ^ { + } $`、`${ \\sf T } _ { \\sf H } { \\sf 1 } $` 等 → **CD31+**、**B220+**、**TH1**。
  */
-function normalizeImmuneMarkerLatex(text: string): string {
+export function normalizeImmuneMarkerLatex(text: string): string {
   let s = text;
 
   const supToSuffix = (sup: string): string => {
@@ -576,7 +576,7 @@ function normalizeImmuneMarkerLatex(text: string): string {
 /**
  * 样本量、单位、误识标记等零散 LaTeX/OCR 碎片（与免疫/TGF 分函数互补）。
  */
-function normalizeOcrLatexMisc(text: string): string {
+export function normalizeOcrLatexMisc(text: string): string {
   let s = text;
 
   /** `$$_ { \it { n } } } = 5$$`（多一个 `}`）或 `$$_ { \it { n } } = 5$$` */
@@ -672,6 +672,49 @@ function softenLatexArtifacts(text: string): string {
     "TGFβ",
   );
   return s;
+}
+
+export function applyPdfHeadersFootersPagesCleanup(
+  raw: string,
+  options: CleanupOptions = {},
+): string {
+  const opts = { ...DEFAULT_OPTS, ...options };
+  return applyLineFilters(raw.replace(/\r\n/g, "\n"), opts);
+}
+
+export function applyPdfLayoutFlowCleanup(
+  raw: string,
+  options: CleanupOptions = {},
+): string {
+  const opts = { ...DEFAULT_OPTS, ...options };
+  let text = raw.replace(/\r\n/g, "\n");
+  if (opts.mergeHyphenation) text = mergeHyphenation(text);
+  if (opts.mergeInlinePdfHyphenation !== false) {
+    text = mergeInlinePdfHyphenation(text);
+  }
+  if (opts.mergeSoftLineBreaks !== false) {
+    text = mergeSoftLineBreaksAndSpaceParagraphs(
+      text,
+      opts.joinParagraphsWithBlankLine !== false,
+    );
+  }
+  return text;
+}
+
+export function applyPdfGenericCleanup(
+  raw: string,
+  options: CleanupOptions = {},
+): string {
+  const opts = { ...DEFAULT_OPTS, ...options };
+  let text = raw.replace(/\r\n/g, "\n");
+  if (opts.normalizeTgfBetaMarkup !== false) text = normalizeTgfBetaMarkup(text);
+  if (opts.normalizeImmuneMarkerLatex !== false) {
+    text = normalizeImmuneMarkerLatex(text);
+  }
+  if (opts.normalizeOcrLatexMisc !== false) text = normalizeOcrLatexMisc(text);
+  if (opts.softenLatexArtifacts) text = softenLatexArtifacts(text);
+  if (opts.collapseBlankLines) text = collapseBlankLines(text);
+  return text;
 }
 
 export function cleanPdfTextMd(

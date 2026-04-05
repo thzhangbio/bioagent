@@ -100,88 +100,88 @@
 
 #### B2. 第一批优先迁移节点
 
-- [ ] `00-entry-routing`：迁移参数解析与运行选项整理
-- [ ] `01-read-validate`：迁移输入读取、路径解析、基础校验
-- [ ] `02-structure-json`：迁移 MinerU JSON 结构块生成
-- [ ] `03-mineru-preliminary`：迁移原始稿初步规整逻辑
-- [ ] `10-metadata-fetch`：迁移 metadata 补全与获取逻辑
-- [ ] `11-write-final`：迁移最终输出路径决策与写文件逻辑
-- [ ] `12-inbox-sync`：迁移 inbox 源稿对齐与更名逻辑
+- [x] `00-entry-routing`：迁移参数解析与运行选项整理
+- [x] `01-read-validate`：迁移输入读取、路径解析、基础校验
+- [x] `02-structure-json`：迁移 MinerU JSON 结构块生成
+- [x] `03-mineru-preliminary`：迁移原始稿初步规整逻辑
+- [x] `10-metadata-fetch`：迁移 metadata 补全与获取逻辑
+- [x] `11-write-final`：迁移最终输出路径决策与写文件逻辑
+- [x] `12-inbox-sync`：迁移 inbox 源稿对齐与更名逻辑
 
 #### B3. 第二批正文清洗拆分
 
-- [ ] `04-layout-flow`：迁移段落流、断词、软换行合并逻辑
-- [ ] `05-headers-footers-pages`：迁移页眉页脚、页码、重复噪声清理
-- [ ] `07-cleanup-generic`：迁移通用清洗与非 KB 特定规则
+- [x] `04-layout-flow`：迁移段落流、断词、软换行合并逻辑
+- [x] `05-headers-footers-pages`：迁移页眉页脚、页码、重复噪声清理
+- [x] `07-cleanup-generic`：迁移通用清洗与非 KB 特定规则
 
 #### B4. 第三批高规则密度节点
 
-- [ ] `06-tables-blocks`：迁移表格与特殊块处理逻辑
-- [ ] `08-cleanup-kb-specific`：迁移 KB 专用清洗主逻辑
-- [ ] `09-formula-fragments`：迁移短公式与碎片规则主逻辑
+- [x] `06-tables-blocks`：迁移表格与特殊块处理逻辑
+- [x] `08-cleanup-kb-specific`：迁移 KB 专用清洗主逻辑
+- [x] `09-formula-fragments`：迁移短公式与碎片规则主逻辑
 
 #### B5. 段Ⅰ收口
 
-- [ ] 让新段Ⅰ总控跑通最小闭环
-- [ ] 让旧 `pipeline.ts` 转调新段Ⅰ总控，或确认退役方式
-- [ ] 更新段Ⅰ README，使其反映真实代码结构
+- [x] 让新段Ⅰ总控跑通最小闭环
+- [x] 让旧 `pipeline.ts` 转调新段Ⅰ总控，或确认退役方式
+- [x] 更新段Ⅰ README，使其反映真实代码结构
 
 ### C. 段Ⅱ `segment-out-to-knowledge`
 
 #### C1. 段级总控
 
-- [ ] 为 `segment-out-to-knowledge/` 建立根总控代码文件
-- [ ] 明确段Ⅱ输入、输出、前置条件与成功判定
+- [x] 为 `segment-out-to-knowledge/` 建立根总控代码文件
+- [x] 明确段Ⅱ输入、输出、前置条件与成功判定
 
 #### C2. 子节点落地
 
-- [ ] `00-pre-out-check`：定义入库前检查动作
-- [ ] `01-copy-to-knowledge`：落地复制到知识库目录的动作
-- [ ] `02-metadata-id`：处理 `paperId`、DOI、slug 对齐
-- [ ] `03-ingest-index`：接入 `ingest:literature` 等动作
-- [ ] `04-verify-search`：建立最小抽样验证
-- [ ] `05-mark-ready-archive`：定义可进入归档阶段的判定
+- [x] `00-pre-out-check`：定义入库前检查动作
+- [x] `01-copy-to-knowledge`：落地复制到知识库目录的动作
+- [x] `02-metadata-id`：处理 `paperId`、DOI、slug 对齐
+- [x] `03-ingest-index`：接入 `ingest:literature` 等动作
+- [x] `04-verify-search`：建立最小抽样验证
+- [x] `05-mark-ready-archive`：定义可进入归档阶段的判定
 
 #### C3. 段Ⅱ收口
 
-- [ ] 更新段Ⅱ README，使其反映真实代码结构
-- [ ] 明确与主项目根目录现有流程的衔接方式
+- [x] 更新段Ⅱ README，使其反映真实代码结构
+- [x] 明确与主项目根目录现有流程的衔接方式
 
 ### D. 段Ⅲ `segment-out-to-archive`
 
 #### D1. 段级总控
 
-- [ ] 为 `segment-out-to-archive/` 建立根总控代码文件
-- [ ] 明确段Ⅲ触发时机、输入、目标路径和幂等策略
+- [x] 为 `segment-out-to-archive/` 建立根总控代码文件
+- [x] 明确段Ⅲ触发时机、输入、目标路径和幂等策略
 
 #### D2. 子节点落地
 
-- [ ] `00-archive-trigger`：定义归档触发条件
-- [ ] `01-target-paths`：统一归档目标目录规则
-- [ ] `02-idempotency`：建立冲突与重复执行策略
-- [ ] `03-move-execute`：落地实际搬运逻辑
-- [ ] `04-inbox-archive-sidecar`：迁移 inbox 源稿归档逻辑
-- [ ] `05-audit-log`：决定是否记录审计日志，并实现最小版本
+- [x] `00-archive-trigger`：定义归档触发条件
+- [x] `01-target-paths`：统一归档目标目录规则
+- [x] `02-idempotency`：建立冲突与重复执行策略
+- [x] `03-move-execute`：落地实际搬运逻辑
+- [x] `04-inbox-archive-sidecar`：迁移 inbox 源稿归档逻辑
+- [x] `05-audit-log`：决定是否记录审计日志，并实现最小版本
 
 #### D3. 段Ⅲ收口
 
-- [ ] 让旧 `archive-inbox.ts` / `archive-out.ts` 转调新段Ⅲ总控，或确认退役方式
-- [ ] 更新段Ⅲ README，使其反映真实代码结构
+- [x] 让旧 `archive-inbox.ts` / `archive-out.ts` 转调新段Ⅲ总控，或确认退役方式
+- [x] 更新段Ⅲ README，使其反映真实代码结构
 
 ### E. 横切能力与回归
 
-- [ ] 明确 `fragment-audit.ts`、`fragment-list.ts`、`fragment-fixtures.ts`、`fragment-apply-inplace.ts` 在新架构中的位置
-- [ ] 确保 `09-formula-fragments` 与现有碎片审计/回归机制兼容
-- [ ] 为新总控链路建立最小验证方式
-- [ ] 为关键迁移节点补充必要测试或回归样例
+- [x] 明确 `fragment-audit.ts`、`fragment-list.ts`、`fragment-fixtures.ts`、`fragment-apply-inplace.ts` 在新架构中的位置
+- [x] 确保 `09-formula-fragments` 与现有碎片审计/回归机制兼容
+- [x] 为新总控链路建立最小验证方式
+- [x] 为关键迁移节点补充必要测试或回归样例
 
 ### F. 兼容入口与文档收尾
 
-- [ ] 确定旧入口脚本的保留、转调或删除策略
-- [ ] 更新 `pdf-text-cleanup/README.md`
-- [ ] 更新 `pdf-text-cleanup/WORKFLOW.md`
-- [ ] 更新 `pyramid/README.md`
-- [ ] 补充迁移完成后的维护约定
+- [x] 确定旧入口脚本的保留、转调或删除策略
+- [x] 更新 `pdf-text-cleanup/README.md`
+- [x] 更新 `pdf-text-cleanup/WORKFLOW.md`
+- [x] 更新 `pyramid/README.md`
+- [x] 补充迁移完成后的维护约定
 
 ## 8. 当前建议的立即下一步
 
@@ -198,3 +198,12 @@
 - 与旧实现一一对应
 - 最适合先建立“根总控 + 子节点”的工作方式
 - 能最快形成可运行的段Ⅰ骨架
+
+## 9. 已完成验证
+
+- [x] 直接运行段Ⅰ总控并生成临时 `kb.md`
+- [x] 用旧兼容入口 `pdf-kb-pipeline` 生成临时 `kb.md`
+- [x] 运行 `pnpm run pdf-kb-fragment-fixtures`
+- [x] 在临时目录运行段Ⅱ，生成 `.archive-ready.json`
+- [x] 在临时目录运行段Ⅲ，完成 out / inbox 归档并写审计日志
+- [x] 运行旧兼容入口 `pdf-archive-out` 与 `pdf-archive-inbox`

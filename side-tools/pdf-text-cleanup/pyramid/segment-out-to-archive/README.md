@@ -1,6 +1,22 @@
 # 段Ⅲ：out → archive
 
-入库完成后，将 `out` / 侧车 `inbox` 迁至 `archive/`；与现有 `archive-out.ts`、`archive-inbox.ts` 等对齐后，按子目录拆分实现。
+根总控：
+- `segment-out-to-archive/index.ts`
+
+当前职责：
+- 读取 `out/.archive-ready.json` 或当前 `out/*.kb.md`
+- 解析归档模式：`all` / `out-only` / `inbox-only`
+- 计算归档目标目录
+- 执行搬运
+- 写 `archive/audit-log/*.json`
+- 清理 `archive-ready` manifest
+
+兼容入口：
+- `archive-out.ts` → 转调 `out-only`
+- `archive-inbox.ts` → 转调 `inbox-only`
+
+默认命令：
+- `pnpm run pdf-kb-out-to-archive`
 
 | 子目录 | 职责（规划） |
 |--------|----------------|

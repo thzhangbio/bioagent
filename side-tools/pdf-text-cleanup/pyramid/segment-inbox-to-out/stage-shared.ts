@@ -27,6 +27,14 @@ export interface SegmentInboxToOutOptions {
   argv: string[];
   cwd: string;
   invokedFromCli: boolean;
+  rawMd?: string;
+  jsonPath?: string;
+  out?: string;
+  keepStructureManifest?: boolean;
+  alsoSimpleOut?: boolean;
+  noRenameInbox?: boolean;
+  noCrossref?: boolean;
+  noEuropepmc?: boolean;
 }
 
 export interface SegmentInboxToOutContext {
@@ -46,6 +54,8 @@ export interface SegmentInboxToOutContext {
   archiveNameParts?: SegmentInboxToOutArchiveNameParts;
   primaryOutPath?: string;
   renamedInboxPaths: string[];
+  simpleOutPath?: string;
+  outDirPath?: string;
 }
 
 export interface SegmentInboxToOutStage {
@@ -86,4 +96,3 @@ export function markSegmentInboxToOutStageComplete(
     completedStages: [...context.completedStages, stageName],
   };
 }
-

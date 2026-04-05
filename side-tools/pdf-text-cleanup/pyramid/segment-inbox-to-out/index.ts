@@ -1,3 +1,5 @@
+import { pathToFileURL } from "node:url";
+
 import {
   createSegmentInboxToOutContext,
   markSegmentInboxToOutStageComplete,
@@ -50,7 +52,7 @@ export async function runSegmentInboxToOut(
 }
 
 function printSegmentInboxToOutHelp(): void {
-  console.log("段Ⅰ总控骨架：segment-inbox-to-out");
+  console.log("段Ⅰ总控：segment-inbox-to-out");
   console.log(
     "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/index.ts [--help]",
   );
@@ -74,13 +76,21 @@ async function main(): Promise<void> {
     invokedFromCli: true,
   });
 
-  console.log("段Ⅰ总控骨架已执行。");
+  console.log("段Ⅰ总控已执行。");
   console.log(`已调度 ${context.completedStages.length} 个阶段。`);
   console.log(`阶段顺序: ${context.completedStages.join(" -> ")}`);
+  if (context.primaryOutPath) {
+    console.log(`主输出: ${context.primaryOutPath}`);
+  }
 }
 
-main().catch((error: unknown) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href;
 
+if (isDirectExecution) {
+  main().catch((error: unknown) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

@@ -1,3 +1,20 @@
+---
+kb_metadata:
+  title: "Pre-adaptation of stem cell-derived islet organoids to hypoxia via zinc transportation inhibition drives angiogenesis"
+  authors: "Zhaoyue Wang; Minglu Xu; Rui Hu; Xiangyi Chen; Xushu Wang; Guangyu Shi; Sirun Lu; Yiling Yang; Yajuan Su; Mengting Gong; Rongrong Le; Rui Zhao; Meng Guo; Yun Jin; Yajie Wang; Yingxin Fu; Jiacong Yan; Weida Li"
+  journal: "Cell Stem Cell"
+  doi: "10.1016/j.stem.2026.03.004"
+  doi_url: "https://doi.org/10.1016/j.stem.2026.03.004"
+  published: "2026-04-01"
+  abstract: "The clinical application of human stem cell-derived islet organoids (SC-islets) is hindered by immaturity and ischemia-induced dysfunction post-transplantation. Hypoxia-driven angiogenesis is a common adaptation, but the metabolic fragility of SC-islet β cells leads to early functional damage and suppressed vascular endothelial growth factor A (VEGFA) expression, thereby delaying vascularization and causing graft loss. The key challenge in SC-islet transplantation is how to prevent hypoxia-induced stress and promote rapid angiogenesis. We found that excessive zinc in SC-islet β cells induces oxidative modification that inhibits AMP-activated protein kinase (AMPK) activity. Chemical inhibition of zinc transportation activates AMPK, enhances functional maturation, improves hypoxia resistance, and increases hypoxia-inducible factor 1α (HIF1A)-independent VEGFA expression to facilitate endothelial cell integration. In diabetic animal models, this approach significantly improved hypoxia resistance, accelerated angiogenesis, and enhanced glycemic control. Our findings demonstrate that chemical inhibition of zinc transportation boosts SC-islet functional competence, offering a potential strategy to advance pre-adaptation to stress in regenerative medicine."
+  provenance:
+    title: crossref
+    authors: crossref
+    journal: crossref
+    doi: crossref
+    published: crossref
+    abstract: europepmc
+---
 Cell Stem Cell Article
 
 # Pre-adaptation of stem cell-derived islet organoids to hypoxia via zinc transportation inhibition drives angiogenesis
@@ -20,7 +37,6 @@ Li and colleagues show that inhibiting zinc transportation activates AMPK in ste
 
 Wang et al., 2026, Cell Stem Cell 33,676–694
 
-https://doi.org/10.1016/j.stem.2026.03.004
 
 Cell Stem Cell
 
@@ -50,9 +66,7 @@ Zhaoyue Wang,1,9 Minglu Xu,1,9 Rui Hu,1,9 Xiangyi Chen,1,9 Xushu Wang,1 Guangyu 
 
 *Correspondence: yan_jiacong@kust.edu.cn (J.Y.), weidali@tongji.edu.cn (W.L.)
 
-# SUMMARY
-
-The clinical application of human stem cell-derived islet organoids (SC-islets) is hindered by immaturity and ischemia-induced dysfunction post-transplantation. Hypoxia-driven angiogenesis is a common adaptation, but the metabolic fragility of SC-islet β cells leads to early functional damage and suppressed vascular endothelial growth factor A (VEGFA) expression, thereby delaying vascularization and causing graft loss. The key challenge in SC-islet transplantation is how to prevent hypoxia-induced stress and promote rapid angiogenesis. We found that excessive zinc in SC-islet β cells induces oxidative modification that inhibits AMP-activated protein kinase (AMPK) activity. Chemical inhibition of zinc transportation activates AMPK, enhances functional maturation, improves hypoxia resistance, and increases hypoxia-inducible factor 1α (HIF1A)-independent VEGFA expression to facilitate endothelial cell integration. In diabetic animal models, this approach significantly improved hypoxia resistance, accelerated angiogenesis, and enhanced glycemic control. Our findings demonstrate that chemical inhibition of zinc transportation boosts SC-islet functional competence, offering a potential strategy to advance pre-adaptation to stress in regenerative medicine.
+zation and causing graft loss. The key challenge in SC-islet transplantation is how to prevent hypoxia-induced stress and promote rapid angiogenesis. We found that excessive zinc in SC-islet β cells induces oxidative modification that inhibits AMP-activated protein kinase (AMPK) activity. Chemical inhibition of zinc transportation activates AMPK, enhances functional maturation, improves hypoxia resistance, and increases hypoxia-inducible factor 1α (HIF1A)-independent VEGFA expression to facilitate endothelial cell integration. In diabetic animal models, this approach significantly improved hypoxia resistance, accelerated angiogenesis, and enhanced glycemic control. Our findings demonstrate that chemical inhibition of zinc transportation boosts SC-islet functional competence, offering a potential strategy to advance pre-adaptation to stress in regenerative medicine.
 
 # INTRODUCTION
 

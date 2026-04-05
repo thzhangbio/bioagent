@@ -1,7 +1,20 @@
-# Inhibition of adipocyte RUNX1/2 enhances adipose tissue thermogenesis through distinct mechanisms https://doi.org/10.1038/s41467-026-71266-6
-
-Received: 19 October 2025 Accepted: 13 March 2026
-
+---
+kb_metadata:
+  title: "Inhibition of adipocyte RUNX1/2 enhances adipose tissue thermogenesis through distinct mechanisms"
+  authors: "Cuihua Wang; Na He; Shixiang Wang; Miao Lei; Jie Yao; Li Lin; Xue Ding; Jiaman Lin; Yixin Chen; Qiaoyun Long; Hannah Xiaoyan Hui; Liwei Xie; Yun-Shen Chan; Nan Cao; Shanshan Gu; Wenxiang Hu"
+  journal: "Nature Communications"
+  doi: "10.1038/s41467-026-71266-6"
+  doi_url: "https://doi.org/10.1038/s41467-026-71266-6"
+  published: "2026-04-02"
+  abstract: "Thermogenic adipocytes hold significant therapeutic promise for combating obesity and metabolic diseases due to their capacity to dissipate energy as heat. However, the transcriptional regulatory mechanisms underlying thermogenic adipocyte activation remain incompletely understood. Here, we identified RUNX1 and RUNX2 as key transcriptional barriers to thermogenic adipocyte differentiation and activation. RUNX1/2 expression is dynamically suppressed by thermal stress and positively associated with adverse metabolic traits. Genetic deletion of RUNX1 or RUNX2 in adipocytes enhances beige fat formation but differentially influences systemic metabolism in male mice. Conversely, enforced RUNX1/2 expression suppresses thermogenic gene programs and blunts thermogenic adipocyte activation. Mechanistically, RUNX1 recruits HDAC1 to enforce epigenetic silencing of thermogenic loci, whereas RUNX2 governs thermogenic cell fate through phase-separation-dependent repression. Notably, pharmacological inhibition of RUNX1/2 enhances adipose thermogenesis and improves energy metabolism. Our findings unveil an unrecognized role for RUNX in adipose thermogenesis, highlighting their potential as therapeutic targets for metabolic disease intervention."
+  provenance:
+    title: crossref
+    authors: crossref
+    journal: crossref
+    doi: crossref
+    published: crossref
+    abstract: europepmc
+---
 Cite this article as: Wang, C., He, N., Wang, S. et al. Inhibition of adipocyte RUNX1/2 enhances adipose tissue thermogenesis through distinct mechanisms. Nat Commun (2026). https://doi.org/10.1038/s41467-026-71266-6
 
 Cuihua Wang, Na He, Shixiang Wang, Miao Lei, Jie Yao, Li Lin, Xue Ding, Jiaman Lin, Yixin Chen, Qiaoyun Long, Hannah Xiaoyan Hui, Liwei Xie, Yun-Shen Chan, Nan Cao, Shanshan Gu & Wenxiang Hu
@@ -30,9 +43,7 @@ $^{6}$ School of Biomedical Sciences, The Chinese University of Hong Kong, Hong 
 
 *Correspondence: Shanshan Gu, gushsh3@mail.sysu.edu.cn; Wenxiang Hu, hu_wenxiang@gzlab.ac.cn
 
-# Abstract
-
-Thermogenic adipocytes hold significant therapeutic promise for combating obesity and metabolic diseases due to their capacity to dissipate energy as heat. However, the transcriptional regulatory mechanisms underlying thermogenic adipocyte activation remain incompletely understood. Here, we identified RUNX1 and RUNX2 as key transcriptional barriers to thermogenic adipocyte differentiation and activation. RUNX1/2 expression is dynamically suppressed by thermal stress and positively associated with adverse metabolic traits. Genetic deletion of RUNX1 or RUNX2 in adipocytes enhances beige fat formation but differentially influences systemic metabolism in male mice. Conversely, enforced RUNX1/2 expression suppresses thermogenic gene programs and blunts thermogenic adipocyte activation. Mechanistically, RUNX1 recruits HDAC1 to enforce epigenetic silencing of thermogenic loci, whereas RUNX2 governs thermogenic cell fate through phase-separation-dependent repression. Notably, pharmacological inhibition of RUNX1/2 enhances adipose thermogenesis and improves energy metabolism. Our findings unveil an unrecognized role for RUNX in adipose thermogenesis, highlighting their potential as therapeutic targets for metabolic disease intervention.
+zed role for RUNX in adipose thermogenesis, highlighting their potential as therapeutic targets for metabolic disease intervention.
 
 # Introduction
 

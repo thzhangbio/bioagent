@@ -3,7 +3,7 @@
  * 原始 MinerU MD → {@link mineruRawMarkdownToPreliminary} →（可选 JSON 结构摘要）→ {@link cleanMarkdownForKnowledgeBase}
  *
  * 用法:
- *   pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始.md> [--json <结构化.json>] [--out <输出.md>] [--also-simple-out] [--no-rename-inbox]
+ *   pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始.md> [--json <结构化.json>] [--out <输出.md>] [--also-simple-out] [--no-rename-inbox] [--no-crossref] [--no-europepmc]
  *
  * 未指定 `--out` 时：
  * - 写入 `out/{YYYYMMDDHHmm}+{slug}+{DOI下划线}.kb.md`；
@@ -31,8 +31,9 @@ import {
 import { mineruRawMarkdownToPreliminary } from "./raw-to-preliminary.js";
 import {
   buildKbArchiveBasename,
-  buildKbArchiveFilenameParts,
+  buildKbArchiveFilenamePartsFromKbMetadata,
 } from "./kb-archive-filename.js";
+import { prependNormalizedKbMetadata } from "./kb-metadata.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -43,6 +44,8 @@ function parseArgs(): {
   keepStructureManifest?: boolean;
   alsoSimpleOut?: boolean;
   noRenameInbox?: boolean;
+  noCrossref?: boolean;
+  noEuropepmc?: boolean;
 } {
   const argv = process.argv.slice(2);
   let rawMd = "";
@@ -51,6 +54,8 @@ function parseArgs(): {
   let keepStructureManifest = false;
   let alsoSimpleOut = false;
   let noRenameInbox = false;
+  let noCrossref = false;
+  let noEuropepmc = false;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--raw-md" && argv[i + 1]) rawMd = argv[++i];
@@ -59,8 +64,19 @@ function parseArgs(): {
     else if (a === "--keep-structure-manifest") keepStructureManifest = true;
     else if (a === "--also-simple-out") alsoSimpleOut = true;
     else if (a === "--no-rename-inbox") noRenameInbox = true;
+    else if (a === "--no-crossref") noCrossref = true;
+    else if (a === "--no-europepmc") noEuropepmc = true;
   }
-  return { rawMd, jsonPath, out, keepStructureManifest, alsoSimpleOut, noRenameInbox };
+  return {
+    rawMd,
+    jsonPath,
+    out,
+    keepStructureManifest,
+    alsoSimpleOut,
+    noRenameInbox,
+    noCrossref,
+    noEuropepmc,
+  };
 }
 
 /**
@@ -97,7 +113,7 @@ function renameInboxSourcesToMatchArchiveKb(opts: {
   console.log(`inbox 已更名: ${currentJsonBase}.json → ${archiveBase}.json`);
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const {
     rawMd: rawArg,
     jsonPath,
@@ -105,10 +121,12 @@ function main(): void {
     keepStructureManifest,
     alsoSimpleOut,
     noRenameInbox,
+    noCrossref,
+    noEuropepmc,
   } = parseArgs();
   if (!rawArg) {
     console.error(
-      "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始MinerU.md> [--json <同篇.json>] [--out <输出.md>] [--keep-structure-manifest] [--also-simple-out] [--no-rename-inbox]",
+      "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始MinerU.md> [--json <同篇.json>] [--out <输出.md>] [--keep-structure-manifest] [--also-simple-out] [--no-rename-inbox] [--no-crossref] [--no-europepmc]",
     );
     process.exit(1);
   }
@@ -126,8 +144,15 @@ function main(): void {
     body = formatStructureSectionForKb(entries) + body;
   }
 
-  const finalMd = cleanMarkdownForKnowledgeBase(body, {
+  const cleanedBody = cleanMarkdownForKnowledgeBase(body, {
     stripMineruStructureManifest: !keepStructureManifest,
+  });
+
+  const baseForDoi = basename(rawArg, ".md");
+  const finalMd = await prependNormalizedKbMetadata(cleanedBody, {
+    fetchCrossref: !noCrossref,
+    fetchEuropePmc: !noEuropepmc,
+    doiFallbackFromBasename: baseForDoi,
   });
 
   const outDir = join(__dirname, "out");
@@ -138,7 +163,7 @@ function main(): void {
   if (outArg) {
     primaryOut = resolve(process.cwd(), outArg);
   } else {
-    const parts = buildKbArchiveFilenameParts(finalMd, base);
+    const parts = buildKbArchiveFilenamePartsFromKbMetadata(finalMd, base);
     primaryOut = join(outDir, buildKbArchiveBasename(parts));
     console.log(
       `归档名: ${parts.timestamp} + ${parts.slug} + ${parts.doiSegment}`,
@@ -164,4 +189,7 @@ function main(): void {
   }
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

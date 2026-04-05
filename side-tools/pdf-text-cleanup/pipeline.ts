@@ -1,7 +1,9 @@
 /**
- * 终版知识库流水线：
+ * 终版知识库流水线（**仅清洗步骤**，不自带「发现新版式 / 自改规则」能力）：
  * 原始 MinerU MD → {@link mineruRawMarkdownToPreliminary} →（可选 JSON 结构摘要）→ {@link cleanMarkdownForKnowledgeBase}
- * （收尾在 {@link cleanMarkdownForKnowledgeBase} 内执行 {@link finalizeKbShortInlineDollarMathFragments}：短 `$…$` 公式碎片结构化归一）
+ *
+ * 协作上「跑一遍流水线」的完整含义见 **`WORKFLOW.md`**：清洗 → `pdf-kb-fragment-audit` → 助手分析未解析碎片、
+ * 写通用规则进 `mineru-kb.ts` → `pdf-kb-fragment-fixtures` 通过 → **再**跑本脚本生成新稿。
  *
  * 用法:
  *   pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始.md> [--json <结构化.json>] [--out <输出.md>] [--also-simple-out] [--no-rename-inbox] [--no-crossref] [--no-europepmc]

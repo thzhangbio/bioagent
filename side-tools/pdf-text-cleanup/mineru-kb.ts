@@ -15,8 +15,9 @@ function collapseSpacedChars(fragment: string): string {
 /**
  * 行内 `$…$` 内层长度上限（不含两侧 `$`）。
  * 略放宽以覆盖 `$\mathbf{\beta}(\beta=…$`、括号内 `\mathsf{GDS}\ge` 等统计碎片（仍远短于整段公式）。
+ * 与 {@link side-tools/pdf-text-cleanup/fragment-audit.ts} 默认扫描上限一致。
  */
-const SHORT_INLINE_MATH_MAX_INNER_LEN = 160;
+export const KB_SHORT_INLINE_MATH_MAX_INNER_LEN = 160;
 
 /** OCR 在数字间插入空格：`6 0`→`60`、`6 7 2`→`672`（仅作用于公式内层字符串） */
 function collapseOcrSpacesBetweenDigitsInMath(inner: string): string {
@@ -137,13 +138,13 @@ function tryShortInlineMathToPlainUnicode(inner: string): string | null {
 }
 
 /**
- * 仅处理「短」行内公式 `$…$`（内层 {@link SHORT_INLINE_MATH_MAX_INNER_LEN} 字符以内、非 `$$`）：
+ * 仅处理「短」行内公式 `$…$`（内层 {@link KB_SHORT_INLINE_MATH_MAX_INNER_LEN} 字符以内、非 `$$`）：
  * 合并数字间 OCR 空格、简化单层字体嵌套；可读统计式转为纯文本；其余仍保留 `$…$`。
  */
 export function normalizeShortInlineDollarMath(text: string): string {
   return text.replace(
     new RegExp(
-      `(?<!\$)\\$(?!\\$)([^$\\n]{1,${SHORT_INLINE_MATH_MAX_INNER_LEN}})\\$(?!\\$)`,
+      `(?<!\$)\\$(?!\\$)([^$\\n]{1,${KB_SHORT_INLINE_MATH_MAX_INNER_LEN}})\\$(?!\\$)`,
       "g",
     ),
     (full, inner: string) => {
@@ -163,20 +164,6 @@ export function normalizeShortInlineDollarMath(text: string): string {
       return `$${t}$`;
     },
   );
-}
-
-/**
- * KB 流水线**最后一步**：再扫一轮「短」`$…$`（内层长度 ≤ {@link SHORT_INLINE_MATH_MAX_INNER_LEN}、非 `$$`），
- * 与 {@link normalizeMineruInlineLatex} 开头一致——先 {@link normalizeMineruBeginArrayDollarBlocks}，再
- * {@link normalizeShortInlineDollarMath}（结构化规则、**不硬编码**具体数值/标签）。
- *
- * 置于 {@link cleanPdfTextMd}、{@link normalizeKbResidualDollarMath}、OCR 修正与插图折叠**之后**，以便处理前述步骤才暴露或仍残留的公式碎片。
- */
-export function finalizeKbShortInlineDollarMathFragments(text: string): string {
-  let s = text;
-  s = normalizeMineruBeginArrayDollarBlocks(s);
-  s = normalizeShortInlineDollarMath(s);
-  return s;
 }
 
 /** `3, 13` → `³,¹³`；`1, 2, 3` → `¹,²,³`（逗号可任意多段，每段位数不限） */
@@ -231,6 +218,23 @@ function normStatIntervalToken(raw: string): string {
   return collapseOcrDecimalInMathFragment(
     collapseSpacedChars(raw.replace(/\s+/g, " ").trim()),
   );
+}
+
+/**
+ * `$30\mathrm{min}$`、`$5.21\mathrm{kcal / g}$` 等：前置数字 + `\mathrm{…}` 内为**短单位**（字母/数字/斜杠），不含反斜杠命令。
+ */
+function tryNumericMathrmUnitToPlain(x: string): string | null {
+  const m = x.match(/^([\d.,]+)\s*~?\s*\\mathrm\s*\{\s*([^}]+)\s*\}\s*;?\s*$/);
+  if (!m) return null;
+  const numRaw = m[1];
+  if (!/^[\d.,]+$/.test(numRaw) || !/\d/.test(numRaw)) return null;
+  const unitRaw = m[2];
+  if (/\\/.test(unitRaw)) return null;
+  const u = collapseMathrmLikeBraceContent(unitRaw).replace(/\s*\/\s*/g, "/");
+  if (!/^[a-zA-Z0-9./µμ-]{1,28}$/.test(u)) return null;
+  if (u.length > 14) return null;
+  if (u.length === 1 && u !== "g") return null;
+  return `${numRaw} ${u}`;
 }
 
 /**
@@ -327,6 +331,199 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
     /^\(\s*(-?[\d.]+)\s*(?:\{\s*\}\s*)*\^\s*\{\s*\\circ\s*\}\s*[Cc]\s*$/,
   );
   if (m) return `(${m[1]}°C`;
+
+  /**
+   * Bayesian 文献常见：`( 95 \% \mathrm { { H P D } } … \times 10 ^ { … } \mathrm { { t o } } … ) ^ { … }`
+   *（数值与指数由捕获组给出，不硬编码。）
+   */
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\\%\s*\\mathrm\s*\{\s*\{\s*H\s*P\s*D\s*\}\s*\}\s*([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*\\mathrm\s*\{\s*\{\s*t\s*o\s*\}\s*\}\s*([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*\)\s*(?:\^\s*\{\s*([\d.\s]+)\s*\})?\s*$/,
+  );
+  if (m) {
+    const e1 = normStatIntervalToken(m[3]).replace(/\s+/g, "");
+    const e2 = normStatIntervalToken(m[5]).replace(/\s+/g, "");
+    if (/^-?[\d.]+$/.test(e1) && /^-?[\d.]+$/.test(e2)) {
+      let out = `(${m[1]}% HPD ${m[2]}×10^${e1} to ${m[4]}×10^${e2})`;
+      if (m[6]) {
+        const sup = normStatIntervalToken(m[6]).replace(/\s+/g, "");
+        if (/^\d+$/.test(sup)) out += `^${sup}`;
+      }
+      return out;
+    }
+  }
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\\%\s*\\mathrm\s*\{\s*H\s*P\s*D\s*\}\s*([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*\\mathrm\s*\{\s*t\s*o\s*\}\s*([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*\)\s*(?:\^\s*\{\s*([\d.\s]+)\s*\})?\s*$/,
+  );
+  if (m) {
+    const e1 = normStatIntervalToken(m[3]).replace(/\s+/g, "");
+    const e2 = normStatIntervalToken(m[5]).replace(/\s+/g, "");
+    if (/^-?[\d.]+$/.test(e1) && /^-?[\d.]+$/.test(e2)) {
+      let out = `(${m[1]}% HPD ${m[2]}×10^${e1} to ${m[4]}×10^${e2})`;
+      if (m[6]) {
+        const sup = normStatIntervalToken(m[6]).replace(/\s+/g, "");
+        if (/^\d+$/.test(sup)) out += `^${sup}`;
+      }
+      return out;
+    }
+  }
+
+  /**
+   * 空格分隔基因名 + 敲除上标：`$S L C 30 A 8 ^ { - / - }$` → `SLC30A8−/−`（字母/数字由捕获折叠，不绑具体符号名）
+   */
+  m = x.match(
+    /^((?:[A-Za-z0-9]\s*)+)\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*$/,
+  );
+  if (m) {
+    const gene = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z0-9]{4,28}$/.test(gene)) return `${gene}−/−`;
+  }
+
+  /** `$(30^{\circ}C)$` 等：括号内 LaTeX 摄氏度（与裸 `37^{\circ}C` 规则区分） */
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\^\s*\{\s*\\circ\s*\}\s*[Cc]\s*\)\s*$/,
+  );
+  if (m) return `(${m[1]}°C)`;
+
+  /** 尺度条 / 浓度：`$50 \mu m$`、`$10 \mu M$`、`$1~\mu M$`（须先匹配 `M` 摩尔浓度，避免 `/i` 把 `M` 当 `m`） */
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*M\s*$/);
+  if (m) return `${m[1]} μM`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*m\s*$/i);
+  if (m) return `${m[1]} μm`;
+
+  /** 纯文本式基因/蛋白标记（无反斜杠）：`$Ebf2$`、`$RUNX1$`（2–16 字符，须含字母且非纯数字） */
+  if (
+    !/\\/.test(x) &&
+    /^[A-Za-z][A-Za-z0-9]{1,15}$/.test(x) &&
+    !/^\d+$/.test(x)
+  ) {
+    return x;
+  }
+
+  /** `$Pgc1\alpha$` 类 */
+  m = x.match(/^([A-Za-z][A-Za-z0-9]*)\\alpha\s*$/);
+  if (m) return `${m[1]}α`;
+
+  /** `$^ +$` 上标正号（图注） */
+  m = x.match(/^\^\s*\+\s*$/);
+  if (m) return "⁺";
+
+  /** `$\beta 3$` */
+  m = x.match(/^\\beta\s*(\d+)\s*$/);
+  if (m) return `β${m[1]}`;
+
+  /** `$^{\Delta \mathrm{IDR}}$` 等 */
+  m = x.match(
+    /^\^\s*\{\s*\\Delta\s*\\mathrm\s*\{\s*([^}]+)\s*\}\s*\}\s*$/,
+  );
+  if (m) {
+    const lab = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[A-Za-z]{1,12}$/.test(lab)) return `^Δ${lab}`;
+  }
+
+  /** `$30\mathrm{min}$`、`$1\mathrm{nM}$` 等（见 {@link tryNumericMathrmUnitToPlain}） */
+  const numMathrmUnit = tryNumericMathrmUnitToPlain(x);
+  if (numMathrmUnit !== null) return numMathrmUnit;
+
+  /** `$300 \times 9$` */
+  m = x.match(/^([\d][\d.,]*)\s*\\times\s*([\d][\d.,]*)\s*$/);
+  if (m) {
+    const a = m[1].replace(/,/g, "");
+    const b = m[2].replace(/,/g, "");
+    if (/^\d+$/.test(a) && /^\d+$/.test(b)) return `${m[1]}×${m[2]}`;
+  }
+
+  /** `$12,000 \times g$` */
+  m = x.match(/^([\d,]+)\s*\\times\s*g\s*$/);
+  if (m) {
+    const compact = m[1].replace(/,/g, "");
+    if (/^\d+$/.test(compact)) return `${m[1]}×g`;
+  }
+
+  /** `$8\times$` */
+  m = x.match(/^([\d.]+)\s*\\times\s*$/);
+  if (m) return `${m[1]}×`;
+
+  m = x.match(/^\\geq\s*([\d.]+)\s*\^\s*\{\s*\\circ\s*\}\s*C\s*$/i);
+  if (m) return `≥${m[1]}°C`;
+
+  m = x.match(/^([\d.]+)\s*\\pm\s*([\d.]+)\s*$/);
+  if (m) return `${m[1]}±${m[2]}`;
+
+  m = x.match(
+    /^\s*\\mathrm\s*\{\s*V\s*O\s*\}\s*_\s*(?:\{\s*2\s*\}|2)\s*$/,
+  );
+  if (m) return "VO₂";
+  m = x.match(
+    /^\s*\\mathrm\s*\{\s*V\s*C\s*O\s*\}\s*_\s*(?:\{\s*2\s*\}|2)\s*$/,
+  );
+  if (m) return "VCO₂";
+  m = x.match(/^\s*\\mathrm\s*\{\s*VCO_2\s*\}\s*$/);
+  if (m) return "VCO₂";
+
+  m = x.match(/^O\s*_\s*\{\s*2\s*\}\s*$/);
+  if (m) return "O₂";
+
+  m = x.match(/^\\mathrm\s*\{\s*PPAR\s*\}\s*\\gamma\s*$/);
+  if (m) return "PPARγ";
+
+  m = x.match(/^\\mu\s*\\mathrm\s*\{\s*M\s*\}\s*$|^\\mu\s*M\s*$/);
+  if (m) return "μM";
+
+  m = x.match(
+    /^([\d.]+)\s*~?\s*\\mu\s*\\?\s*g\s*\/\s*\\mathrm\s*\{\s*mL\s*\}\s*;?\s*$/,
+  );
+  if (m) return `${m[1]} μg/mL`;
+  m = x.match(
+    /^([\d.]+)\s*~?\s*\\mu\s*\\mathrm\s*\{\s*g\s*\/\s*mL\s*\}\s*;?\s*$/,
+  );
+  if (m) return `${m[1]} μg/mL`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*M\s*\)\s*$/);
+  if (m) return `${m[1]} μM)`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\{\s*\\mu\s*m\s*\}\s*;?\s*$/i);
+  if (m) return `${m[1]} μm`;
+  m = x.match(/^([\d.]+)\s*~?\s*\{\s*\\mum\s*\}\s*;?\s*$/i);
+  if (m) return `${m[1]} μm`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*h\s*;?\s*$/);
+  if (m) return `${m[1]} h`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\^\s*\{\s*\\circ\s*\}\s*C\s*;?\s*$/i);
+  if (m) return `${m[1]}°C`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathsf\s*\{\s*mL\s*\}\s*;?\s*$/);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*L\s*;?\s*$/i);
+  if (m) return `${m[1]} μL`;
+
+  m = x.match(/^>\s*([\d.]+)\s*\\mathsf\s*\{\s*mM\s*\}\s*;?\s*$/);
+  if (m) return `> ${m[1]} mM`;
+
+  m = x.match(
+    /^\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$/,
+  );
+  if (m) return `(${m[1]}, ${m[2]})`;
+
+  m = x.match(/^([A-Za-z][A-Za-z0-9]*)\^\s*\{\s*fl\s*\/\s*f\s*\}\s*;?\s*$/);
+  if (m) return `${m[1]}^fl/f`;
+
+  m = x.match(/^\(\s*n\s*=\s*(\d+)\s*\)\s*\(\s*([a-z])\s*\)\s*;?\s*$/i);
+  if (m) return `(n = ${m[1]})(${m[2]})`;
+
+  /**
+   * 质量 `$300g$`、`$12,000g$`、`$1.5g$`（单数字 `$1g$` 不匹配，减少与变量混淆）
+   */
+  m = x.match(
+    /^((?:\d{1,3}(?:,\d{3})+|\d{2,}|\d+\.\d+))g\s*;?\s*$/,
+  );
+  if (m) return `${m[1]} g`;
+
+  /** 统计量单字母 `$P$`（p 值） */
+  m = x.match(/^([A-Z])\s*;?\s*$/);
+  if (m) return m[1];
 
   m = x.match(/^\(\s*O\s*_\s*\{\s*2\s*\}\s*\)\s*$/);
   if (m) return "(O₂)";
@@ -1131,6 +1328,15 @@ export function normalizeMineruInlineLatex(text: string): string {
   s = s.replace(/\(\s*mm²\s*\)\s*\$\s*\)/g, "(mm²)");
 
   return s;
+}
+
+/**
+ * KB 行内「碎片」规则入口：与 `pdf-kb-fragment-audit` 对孤立 `$…$` 调用 {@link normalizeMineruInlineLatex} 的语义一致，
+ * 用于在已有 `.kb.md` 上就地套用规则（见 `fragment-apply-inplace.ts`）。
+ * 实现即 {@link normalizeMineruInlineLatex}（短 `$…$` + 全文行内 LaTeX 替换）。
+ */
+export function applyKbFragmentRulesToMarkdown(text: string): string {
+  return normalizeMineruInlineLatex(text.replace(/\r\n/g, "\n"));
 }
 
 /**
@@ -2921,8 +3127,6 @@ export function cleanMarkdownForKnowledgeBase(
   if (collapseImageBlocks !== false) {
     text = collapseImageBlocksForKb(text, maxImagesPerRun ?? 1);
   }
-
-  text = finalizeKbShortInlineDollarMathFragments(text);
 
   return text.trim() + "\n";
 }

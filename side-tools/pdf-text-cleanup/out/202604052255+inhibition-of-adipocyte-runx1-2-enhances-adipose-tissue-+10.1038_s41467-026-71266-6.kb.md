@@ -193,7 +193,7 @@ Differentiated adipocytes were washed three with PBS, fixed with 4% paraformalde
 
 # Triglyceride assay
 
-Cellular triglyceride content was quantified using the Triglyceride (TG) Content Assay Kit (Sangon Biotech, D799795) according to the manufacturer's instructions. Briefly, cells were washed twice with cold PBS and lysed in the provided extraction buffer. Lysates were centrifuged at 12,000×g for $10 \mathrm{~min}$ at 4°C, and the supernatants were collected for subsequent analysis. Triglycerides were enzymatically hydrolyzed to glycerol and quantified by colorimetric detection. Absorbance was measured at $510 \mathrm{~nm}$ using a microplate reader. TG concentrations were calculated from a standard curve and normalized to total protein content.
+Cellular triglyceride content was quantified using the Triglyceride (TG) Content Assay Kit (Sangon Biotech, D799795) according to the manufacturer's instructions. Briefly, cells were washed twice with cold PBS and lysed in the provided extraction buffer. Lysates were centrifuged at 12,000×g for 10 min at 4°C, and the supernatants were collected for subsequent analysis. Triglycerides were enzymatically hydrolyzed to glycerol and quantified by colorimetric detection. Absorbance was measured at 510 nm using a microplate reader. TG concentrations were calculated from a standard curve and normalized to total protein content.
 
 # Mouse insulin ELISA
 

@@ -153,10 +153,26 @@ export function normalizeShortInlineDollarMath(text: string): string {
       t = collapseMathbfDigitChunksInMath(t);
       t = collapseOcrSpacesBetweenDigitsInMath(t);
       t = collapseOcrDecimalInMathFragment(t);
+      if (/^\\scriptstyle\s*n\s*=\s*30\s*$/i.test(t)) return "n = 30";
+      if (
+        /^Z\s*n\s*\\mathsf\s*\{\s*P\s*T\s*O\s*\}\s*\+\s*S\s*L\s*C\s*30\s*A\s*\\&\s*\^\s*\{\s*-\s*\\prime\s*-\s*\}\s*$/i.test(
+          t,
+        )
+      )
+        return "ZnPTO + SLC30A−/−";
+      if (
+        /^\(\s*1\.060\s*-\s*1\.100\s*\\pm\s*0\.01\s*\\\s*:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/i.test(
+          t,
+        )
+      )
+        return "(1.060-1.100 ± 0.01 g/mL)";
       /** 须先于 {@link simplifyMineruShortMathFontNesting}，否则 `\mathsf { X }` 被压成 `X` 后无法匹配 */
       const authorPlain = tryMathsfAuthorSuperscriptToPlain(t);
       if (authorPlain !== null) return authorPlain;
       t = simplifyMineruShortMathFontNesting(t);
+      if (/^n\s*=\s*30\s*$/i.test(t)) return "n = 30";
+      if (/^ZnPTO\s*\+\s*SLC30A\s*&\s*\^\s*\{\s*-\s*\\prime\s*-\s*\}\s*$/i.test(t))
+        return "ZnPTO + SLC30A−/−";
       const statPlain = tryParenAndStatFragmentsToPlain(t);
       if (statPlain !== null) return statPlain;
       const plain = tryShortInlineMathToPlainUnicode(t);
@@ -1093,6 +1109,10 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
 
   m = x.match(/^\{\s*>\s*\}\s*([\d.]+)\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*_\s*\{\s*\\beta\s*\}\s*$/i);
   if (m) return `> ${m[1]} mM β`;
+  m = x.match(
+    /^\{\s*>\s*\}\s*([\d.]+)\s*\\\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*_\s*\{\s*\\beta\s*\}\s*$/i,
+  );
+  if (m) return `> ${m[1]} mM β`;
 
   m = x.match(/^\{\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*\}\s*$/);
   if (m) return `c.${m[1]} ${m[2]}>${m[3]}`;
@@ -1104,12 +1124,48 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
 
   m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*$/i);
   if (m) return `${m[1]} ng/mL`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*\\mathsf\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*\\?\s*n\s*g\s*\/\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*\\\s*n\s*g\s*\/\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
 
   m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*\\\s*n\s*g\s*\}\s*$/i);
   if (m) return `${m[1]} ng`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathsf\s*\{\s*n\s*g\s*\}\s*\/\s*$/i);
+  if (m) return `${m[1]} ng/`;
 
   m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*\\iota\s*$/i);
   if (m) return `${m[1]} μL`;
+  m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*~\s*min\s*\}\s*$/i);
+  if (m) return `${m[1]} min`;
+  m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*~\s*nm\s*\}\s*$/i);
+  if (m) return `${m[1]} nm`;
+  m = x.match(/^([\d.]+)\s*~\s*\\mathrm\s*\{\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
+  m = x.match(/^\(\s*([\d.]+)\s*\\mathsf\s*\{\s*n\s*m\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} nm)`;
+  m = x.match(/^\\scriptstyle\s*n\s*=\s*(\d+)\s*$/i);
+  if (m) return `n = ${m[1]}`;
+  m = x.match(
+    /^\\begin\s*\{\s*array\s*\}\s*\{\s*[a-z]\s*\}\s*\{\s*n\s*=\s*(\d+)\s*\}\s*\\end\s*\{\s*array\s*\}\s*$/i,
+  );
+  if (m) return `n = ${m[1]}`;
+  m = x.match(/^n\s*=\s*(\d+)\s*\^\s*\{\s*\\circ\s*\}\s*,?\s*$/i);
+  if (m) return `n = ${m[1]},`;
+  m = x.match(/^n\s*=\s*(\d+)\s*,\s*$/i);
+  if (m) return `n = ${m[1]},`;
+  m = x.match(/^n\s*=\s*(\d+)\s*_\s*\{\s*\\cdot\s*\}\s*$/i);
+  if (m) return `n = ${m[1]}`;
+  m = x.match(/^\\mathsf\s*\{\s*Z\s*n\s*2\s*\+\s*\}\s*$/i);
+  if (m) return "Zn2+";
+  m = x.match(/^\\complement\s*a\s*2\s*\+\s*$/i);
+  if (m) return "Ca2+";
+  m = x.match(/^Z\s*_\s*\{\s*\\mathsf\s*\{\s*n\s*P\s*T\s*O\s*\}\s*\}\s*$/i);
+  if (m) return "ZnPTO";
+  m = x.match(/^Z\s*n\s*\\mathsf\s*\{\s*P\s*T\s*O\s*\}\s*\+\s*S\s*L\s*C\s*30\s*A\s*\&\s*\^\s*\{\s*-\s*\\prime\s*-\s*\}\s*$/i);
+  if (m) return "ZnPTO + SLC30A−/−";
 
   m = x.match(/^Z\s*n\s*S\s*O\s*_\s*\{\s*4\s*\}\s*$/i);
   if (m) return "ZnSO₄";
@@ -1118,6 +1174,84 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
     /^W\s*\{\s*\\sf\s*S\s*\}\s*\^\s*\{\s*\+\s*\}\s*N\s*\{\s*\\sf\s*K\s*\}\s*\\times\s*6\.1\s*\^\s*\{\s*\+\s*\}\s*\\\s*\\beta\s*$/i,
   );
   if (m) return "WS+ NKX6.1+ β";
+
+  m = x.match(
+    /^\{\s*\\sf\s*M\s*g\s*S\s*O\s*_\s*\{\s*4\s*\}\s*\}\s*,\s*1\s*mM\s*\{\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\mathsf\s*\{\s*H\s*P\s*O\s*\}\s*\}\s*_\s*\{\s*4\s*\}\s*,\s*1\.2\s*mM\s*\{\s*\\sf\s*K\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*P\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*$/,
+  );
+  if (m) return "MgSO₄, 1 mM Na₂HPO₄, 1.2 mM KH₂PO₄";
+  m = x.match(/^\{\s*\\sf\s*M\s*g\s*S\s*O\s*_\s*\{\s*4\s*\}\s*\}\s*$/i);
+  if (m) return "MgSO₄";
+  m = x.match(
+    /^\{\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\mathsf\s*\{\s*H\s*P\s*O\s*\}\s*\}\s*_\s*\{\s*4\s*\}\s*$/i,
+  );
+  if (m) return "Na₂HPO₄";
+  m = x.match(
+    /^\{\s*\\sf\s*K\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*P\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*$/i,
+  );
+  if (m) return "KH₂PO₄";
+
+  m = x.match(/^\(\s*([\d.]+)\s*\\mathrm\s*\{\s*mg\s*\/\s*kg\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} mg/kg)`;
+
+  m = x.match(/^\(\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*$/i);
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(/^\(\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*$/i);
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(/^([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]}-${m[2]} μ/mL`;
+  m = x.match(/^([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*\.\s*$/i);
+  if (m) return `${m[1]}-${m[2]} μ/mL.`;
+  m = x.match(/^\(\s*([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*\.\s*$/i);
+  if (m) return `(${m[1]}-${m[2]} μ/mL.`;
+  m = x.match(/^([\d.]+)\s*-\s*([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]}-${m[2]} μ/mL`;
+  m = x.match(/^([\d.]+)\s*-\s*([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*\.\s*$/i);
+  if (m) return `${m[1]}-${m[2]} μ/mL.`;
+
+  m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*\\\s*m\s*l\s*\}\s*$/i);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(/^([\d.]+)\s*\\\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(/^([\d.]+)\s*\\\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} μ/mL`;
+
+  m = x.match(/^>\s*([\d.]+)\s*\\\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*_\s*\{\s*\\beta\s*\}\s*$/i);
+  if (m) return `> ${m[1]} mM β`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\pm\s*([\d.]+)\s*\\:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\pm\s*([\d.]+)\s*\\\s*:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\\s*pm\s*([\d.]+)\s*\\\s*:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+
+  m = x.match(
+    /^\(\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*$/,
+  );
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+  m = x.match(
+    /^\(\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*\}\s*([A-Za-z])\s*\}\s*$/i,
+  );
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(
+    /^\(\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*$/,
+  );
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+  m = x.match(
+    /^\(\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*\}\s*([A-Za-z])\s*$/i,
+  );
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
 
   m = x.match(
     /^\{\s*\\sf\s*M\s*g\s*S\s*O\s*_\s*\{\s*4\s*\}\s*\}\s*,\s*1\s*mM\s*\{\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\mathsf\s*\{\s*H\s*P\s*O\s*\}\s*\}\s*_\s*\{\s*4\s*\}\s*,\s*1\.2\s*mM\s*\{\s*\\sf\s*K\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*P\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*$/,

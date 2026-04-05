@@ -12,14 +12,222 @@ function collapseSpacedChars(fragment: string): string {
   return fragment.replace(/\s+/g, "");
 }
 
-/** `3, 13` → `³,¹³`（作者单位上标） */
+/**
+ * 行内 `$…$` 内层长度上限（不含两侧 `$`）。
+ * 略放宽以覆盖 `$\mathbf{\beta}(\beta=…$`、括号内 `\mathsf{GDS}\ge` 等统计碎片（仍远短于整段公式）。
+ */
+const SHORT_INLINE_MATH_MAX_INNER_LEN = 120;
+
+/** OCR 在数字间插入空格：`6 0`→`60`、`6 7 2`→`672`（仅作用于公式内层字符串） */
+function collapseOcrSpacesBetweenDigitsInMath(inner: string): string {
+  let t = inner;
+  let prev = "";
+  while (t !== prev) {
+    prev = t;
+    t = t.replace(/(\d)\s+(?=\d)/g, "$1");
+  }
+  return t;
+}
+
+/** 小数点被 OCR 拆开：`0 . 0 8 7` → `0.087`（与 {@link collapseOcrSpacesBetweenDigitsInMath} 交替直至稳定） */
+function collapseOcrDecimalInMathFragment(inner: string): string {
+  let t = inner;
+  let prev = "";
+  while (t !== prev) {
+    prev = t;
+    t = t.replace(/(\d)\s*\.\s*(?=\d)/g, "$1.");
+    t = t.replace(/(\d)\s+(?=\d)/g, "$1");
+  }
+  return t;
+}
+
+/**
+ * MinerU 常把单个样本量字母包成 `\boldsymbol{\mathsf{n}}`；在短行内公式里压成单字母，不依赖具体字符。
+ * 须在「仅单字母」的 `\mathsf{…}` 上执行，避免误伤 `TGF` 等多字母序列（其花括号内不止一个字母单元）。
+ */
+function simplifyMineruShortMathFontNesting(inner: string): string {
+  let t = inner;
+  t = t.replace(
+    /\\boldsymbol\s*\{\s*\\mathsf\s*\{\s*([A-Za-z])\s*\}\s*\}/g,
+    "$1",
+  );
+  t = t.replace(
+    /\\mathbf\s*\{\s*\\mathsf\s*\{\s*([A-Za-z])\s*\}\s*\}/g,
+    "$1",
+  );
+  t = t.replace(/\\boldsymbol\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  t = t.replace(/\\mathbf\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  /** 仅「花括号内单个拉丁字母」的 `\mathsf` / `\mathrm` 等，如 `\mathsf { n }` */
+  t = t.replace(/\\mathsf\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  t = t.replace(/\\mathrm\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  t = t.replace(/\\mathit\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  t = t.replace(/\\mathtt\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  return t;
+}
+
+/**
+ * 短行内公式在 OCR/字体修复后，若已是「正文可读」的统计写法，则输出与 PDF 一致的纯文本（非 `$…$`）。
+ */
+function tryShortInlineMathToPlainUnicode(inner: string): string | null {
+  const x = inner.replace(/\s+/g, " ").trim();
+
+  let m = x.match(/^\\(?:geq|geqslant|ge)\s*(\d+)$/);
+  if (m) return `≥ ${m[1]}`;
+
+  m = x.match(/^\\(?:leq|leqslant|le)\s*(\d+)$/);
+  if (m) return `≤ ${m[1]}`;
+
+  /** 样本量 `n = 672`（字母与数字均不硬编码） */
+  m = x.match(/^([A-Za-z])\s*=\s*(\d+)$/);
+  if (m) return `${m[1]} = ${m[2]}`;
+
+  return null;
+}
+
+/**
+ * 仅处理「短」行内公式 `$…$`（内层 {@link SHORT_INLINE_MATH_MAX_INNER_LEN} 字符以内、非 `$$`）：
+ * 合并数字间 OCR 空格、简化单层字体嵌套；可读统计式转为纯文本；其余仍保留 `$…$`。
+ */
+export function normalizeShortInlineDollarMath(text: string): string {
+  return text.replace(
+    new RegExp(
+      `(?<!\$)\\$(?!\\$)([^$\\n]{1,${SHORT_INLINE_MATH_MAX_INNER_LEN}})\\$(?!\\$)`,
+      "g",
+    ),
+    (full, inner: string) => {
+      let t = collapseOcrSpacesBetweenDigitsInMath(inner);
+      t = collapseOcrDecimalInMathFragment(t);
+      /** 须先于 {@link simplifyMineruShortMathFontNesting}，否则 `\mathsf { X }` 被压成 `X` 后无法匹配 */
+      const authorPlain = tryMathsfAuthorSuperscriptToPlain(t);
+      if (authorPlain !== null) return authorPlain;
+      t = simplifyMineruShortMathFontNesting(t);
+      const statPlain = tryParenAndStatFragmentsToPlain(t);
+      if (statPlain !== null) return statPlain;
+      const plain = tryShortInlineMathToPlainUnicode(t);
+      if (plain !== null) return plain;
+      return `$${t}$`;
+    },
+  );
+}
+
+/** `3, 13` → `³,¹³`；`1, 2, 3` → `¹,²,³`（逗号可任意多段，每段位数不限） */
 function affiliationSuperscriptFromSpacedDigits(raw: string): string | null {
   const compact = raw.replace(/\s+/g, "");
-  const m = compact.match(/^(\d+),(\d+)$/);
-  if (!m) return null;
+  const parts = compact.split(",").filter((p) => p.length > 0);
+  if (parts.length < 2) return null;
+  if (!parts.every((p) => /^\d+$/.test(p))) return null;
   const sup = (d: string) =>
     [...d].map((c) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(c)] ?? c).join("");
-  return `${sup(m[1])},${sup(m[2])}`;
+  return parts.map(sup).join(",");
+}
+
+function digitStringToUnicodeSuperscript(d: string): string {
+  return [...d].map((c) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(c)] ?? c).join("");
+}
+
+/**
+ * `$\mathsf { Y e } ^ { 1, 2 }$` → `Ye¹,²`（作者姓名字母间 OCR 空格 + 上标；段数与位数均不限）
+ * 亦匹配已去掉 `\mathsf` 的 `Ye ^ { … }`（供与其它规则顺序配合时兜底）
+ */
+function tryMathsfAuthorSuperscriptToPlain(inner: string): string | null {
+  const x = inner.replace(/\s+/g, " ").trim();
+  const m = x.match(
+    /^\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\^\s*\{\s*((?:[\d\s,])+)\s*\}$/,
+  );
+  const m2 =
+    m ??
+    x.match(
+      /^([A-Za-z]+)\s*\^\s*\{\s*((?:[\d\s,])+)\s*\}$/,
+    );
+  if (!m2) return null;
+  const base = m
+    ? collapseSpacedChars(m[1])
+    : collapseSpacedChars(m2[1]);
+  if (!/^[A-Za-z]+$/.test(base)) return null;
+  const supRaw = (m ? m[2] : m2[2]).trim();
+  const aff = affiliationSuperscriptFromSpacedDigits(supRaw);
+  if (aff !== null) return `${base}${aff}`;
+  const supC = supRaw.replace(/\s+/g, "");
+  if (/^\d+$/.test(supC))
+    return `${base}${digitStringToUnicodeSuperscript(supC)}`;
+  return null;
+}
+
+/**
+ * 括号 / 统计符号类短碎片：`$(n=…)$`、`\beta`、`\mathsf p`、`\mathsf{GDS}\ge`、`CD4^+`、`array` 等；不硬编码具体数值与标签文本。
+ */
+function tryParenAndStatFragmentsToPlain(inner: string): string | null {
+  let x = inner.replace(/\s+/g, " ").trim();
+  x = x.replace(/^\\scriptstyle\s+/i, "");
+
+  const cd = x.match(/^C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}$/i);
+  if (cd) return `CD${cd[1]}+`;
+
+  const im = x.match(/^\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*(\d+)\s*$/);
+  if (im) {
+    const letters = collapseSpacedChars(im[1]);
+    if (/^[A-Za-z]{1,12}$/.test(letters))
+      return `${letters} ${im[2]}`;
+  }
+
+  let m = x.match(/^\(\s*n\s*=\s*([\d.]+)\s*\)$/);
+  if (m) return `(n = ${m[1]})`;
+
+  m = x.match(
+    /^\(\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge\s*(\d+)\s*\)$/,
+  );
+  if (m) {
+    const ac = collapseSpacedChars(m[1]);
+    if (/^[A-Z]{2,12}$/.test(ac)) return `(${ac} ≥ ${m[2]})`;
+  }
+
+  m = x.match(/^\(\s*\\beta\s*=\s*([\d.]+)\s*\)\s*$/);
+  if (m) return `(β = ${m[1]})`;
+  m = x.match(/^\(\s*\\beta\s*=\s*([\d.]+)\s*$/);
+  if (m) return `(β = ${m[1]})`;
+
+  m = x.match(
+    /^\(\s*\\mathsf\s*\{\s*f\s*\}\s*\^\s*\{\s*2\s*\}\s*=\s*([\d.]+)\s*\)$/,
+  );
+  if (m) return `(f² = ${m[1]})`;
+  /** {@link simplifyMineruShortMathFontNesting} 已把 `\mathsf{f}` 收成 `f` */
+  m = x.match(/^\(\s*f\s*\^\s*\{\s*2\s*\}\s*=\s*([\d.]+)\s*\)$/);
+  if (m) return `(f² = ${m[1]})`;
+
+  m = x.match(
+    /^\\mathbf\s*\{\s*\\beta\s*\}\s*\(\s*\\beta\s*=\s*([\d.]+)\s*$/,
+  );
+  if (m) return `β (β = ${m[1]})`;
+
+  m = x.match(
+    /^\s*\{\s*\\mathsf\s*p\s*\}\s*=\s*([\d.]+)\s*\)\s*$/,
+  );
+  if (m) return `p = ${m[1]})`;
+  m = x.match(
+    /^\\mathsf\s*\{\s*p\s*\}\s*=\s*([\d.]+)\s*\)\s*$/,
+  );
+  if (m) return `p = ${m[1]})`;
+
+  return null;
+}
+
+/**
+ * `$\begin{array}{…}…(>…0.95)…\end{array}$` → `(> 0.95)`（内层任意长度，仅抽取 `> … )` 与数字）
+ */
+export function normalizeMineruBeginArrayDollarBlocks(text: string): string {
+  return text.replace(
+    /\$\\begin\{array\}[\s\S]*?\\end\{array\}\$/g,
+    (full) => {
+      if (!/>/.test(full)) return full;
+      const dec = full.match(/(\d(?:\s*\.\s*\d|\s+\d)+)\s*\)/);
+      if (!dec) return full;
+      const num = collapseOcrDecimalInMathFragment(
+        dec[1].replace(/\s+/g, " ").trim(),
+      );
+      if (!/^[\d.]+$/.test(num)) return full;
+      return `(> ${num})`;
+    },
+  );
 }
 
 function isCdLikeToken(collapsed: string): boolean {
@@ -221,6 +429,12 @@ export function neutralizeCatalogHashesAndHexColors(text: string): string {
 
 export function normalizeMineruInlineLatex(text: string): string {
   let s = text;
+
+  /** `$\begin{array}…\end{array}$` 内层可极长，须先于短 `$…$` */
+  s = normalizeMineruBeginArrayDollarBlocks(s);
+
+  /** 短 `$…$` 内 OCR 数字/小数点、字体嵌套、括号统计式（先于其它按全文写的公式规则） */
+  s = normalizeShortInlineDollarMath(s);
 
   s = s.replace(/\$\s*(\d+)\s*\\\s*%\s*\$/g, "$1%");
   s = s.replace(

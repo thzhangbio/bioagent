@@ -127,6 +127,12 @@ function tryShortInlineMathToPlainUnicode(inner: string): string | null {
   m = x.match(/^([A-Za-z])\s*=\s*(\d+)$/);
   if (m) return `${m[1]} = ${m[2]}`;
 
+  m = x.match(/^n\s*=\s*(\d+)\s*$/);
+  if (m) return `n = ${m[1]}`;
+
+  m = x.match(/^p\s*=\s*([\d.]+)\s*$/);
+  if (m) return `p = ${m[1]}`;
+
   return null;
 }
 
@@ -157,6 +163,20 @@ export function normalizeShortInlineDollarMath(text: string): string {
       return `$${t}$`;
     },
   );
+}
+
+/**
+ * KB 流水线**最后一步**：再扫一轮「短」`$…$`（内层长度 ≤ {@link SHORT_INLINE_MATH_MAX_INNER_LEN}、非 `$$`），
+ * 与 {@link normalizeMineruInlineLatex} 开头一致——先 {@link normalizeMineruBeginArrayDollarBlocks}，再
+ * {@link normalizeShortInlineDollarMath}（结构化规则、**不硬编码**具体数值/标签）。
+ *
+ * 置于 {@link cleanPdfTextMd}、{@link normalizeKbResidualDollarMath}、OCR 修正与插图折叠**之后**，以便处理前述步骤才暴露或仍残留的公式碎片。
+ */
+export function finalizeKbShortInlineDollarMathFragments(text: string): string {
+  let s = text;
+  s = normalizeMineruBeginArrayDollarBlocks(s);
+  s = normalizeShortInlineDollarMath(s);
+  return s;
 }
 
 /** `3, 13` → `³,¹³`；`1, 2, 3` → `¹,²,³`（逗号可任意多段，每段位数不限） */
@@ -224,6 +244,111 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
   /** `= - 0.082` → `= -0.082` */
   x = x.replace(/([+-])\s+(?=\d)/g, "$1");
 
+  let m = x.match(/^=$/);
+  if (m) return "=";
+
+  m = x.match(/^([A-Za-z])\s*,\s*$/);
+  if (m) return `${m[1]},`;
+
+  m = x.match(/^\{\s*([A-Za-z])\s*\}\s*,\s*$/);
+  if (m) return `${m[1]},`;
+
+  m = x.match(/^n\s*=\s*(\d+)\s*\)\s*$/);
+  if (m) return `n = ${m[1]})`;
+
+  m = x.match(/^\(\s*p\s*=\s*([\d.]+)\s*$/);
+  if (m) return `(p = ${m[1]}`;
+
+  m = x.match(/^\{\s*<\s*\}\s*([\d.]+)\s*\\%\s*$/);
+  if (m) return `< ${m[1]}%`;
+  m = x.match(/^\{\s*<\s*\}\s*([\d.]+)\s*$/);
+  if (m) return `< ${m[1]}`;
+  m = x.match(/^\{\s*>\s*\}\s*([\d.]+)\s*$/);
+  if (m) return `> ${m[1]}`;
+
+  m = x.match(/^\\#\s*p\s*<\s*([\d.]+)\s*$/);
+  if (m) return `# p < ${m[1]}`;
+
+  m = x.match(/^\)\s*<\s*([\d.]+)\s*$/);
+  if (m) return `) < ${m[1]}`;
+
+  m = x.match(/^\{\s*\\tt\s*p\s*\}\s*<\s*([\d.]+)\s*$/);
+  if (m) return `p < ${m[1]}`;
+
+  m = x.match(/^\\phantom\s*\{\s*-\s*\}\s*0\s*<\s*([\d.]+)\s*$/);
+  if (m) return `0 < ${m[1]}`;
+
+  m = x.match(/^\\Subset\s*$/);
+  if (m) return "⊆";
+
+  m = x.match(/^>\s*([\d.]+)\s*$/);
+  if (m) return `> ${m[1]}`;
+  m = x.match(/^<\s*([\d.]+)\s*$/);
+  if (m) return `< ${m[1]}`;
+
+  m = x.match(
+    /^\^\s*\{\s*([^}]*?)\s*\}\s*\\mathfrak\s*\{\s*p\s*\}\s*<\s*([\d.]+)\s*$/,
+  );
+  if (m) {
+    const astCount = (m[1].match(/\\ast/g) ?? []).length;
+    if (astCount >= 1) return `${"*".repeat(astCount)}p < ${m[2]}`;
+  }
+
+  m = x.match(
+    /^(-?[\d.]+)\s*(?:\{\s*\}\s*)*\^\s*\{\s*\\circ\s*\}\s*[Cc]\s*$/,
+  );
+  if (m) return `${m[1]}°C`;
+
+  m = x.match(
+    /^([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*$/,
+  );
+  if (m) {
+    const exp = normStatIntervalToken(m[2]);
+    if (/^-?[\d.]+$/.test(exp.replace(/\s+/g, "")))
+      return `${m[1]}×10^${exp.replace(/\s+/g, "")}`;
+  }
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\\times\s*10\s*\^\s*\{\s*([-+]?[\d.\s]+)\s*\}\s*$/,
+  );
+  if (m) {
+    const exp = normStatIntervalToken(m[2]);
+    if (/^-?[\d.]+$/.test(exp.replace(/\s+/g, "")))
+      return `(${m[1]}×10^${exp.replace(/\s+/g, "")}`;
+  }
+
+  m = x.match(/^\\geq\s*([\d.]+)\s*\\%\s*$/);
+  if (m) return `≥ ${m[1]}%`;
+
+  m = x.match(/^\\sim\s*([\d.]+)\s*$/);
+  if (m) return `∼${m[1]}`;
+
+  m = x.match(
+    /^\(\s*(-?[\d.]+)\s*(?:\{\s*\}\s*)*\^\s*\{\s*\\circ\s*\}\s*[Cc]\s*$/,
+  );
+  if (m) return `(${m[1]}°C`;
+
+  m = x.match(/^\(\s*O\s*_\s*\{\s*2\s*\}\s*\)\s*$/);
+  if (m) return "(O₂)";
+
+  m = x.match(/^\{\s*\\sf\s*O\s*\}\s*_\s*\{\s*2\s*\}\s*$/);
+  if (m) return "O₂";
+
+  m = x.match(
+    /^\^\s*\{\s*((?:[\d,\s]|\*)+)\s*\}\s*$/,
+  );
+  if (m) {
+    const raw = m[1].replace(/\s+/g, "").replace(/\*+$/, "");
+    const star = m[1].includes("*") ? "*" : "";
+    if (/^[\d,]+$/.test(raw) && raw.length <= 14) {
+      const aff = affiliationSuperscriptFromSpacedDigits(
+        raw.split(",").join(", "),
+      );
+      if (aff !== null) return `${aff}${star}`;
+      if (/^\d+$/.test(raw)) return `${digitStringToUnicodeSuperscript(raw)}${star}`;
+    }
+  }
+
   const cd = x.match(/^C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}$/i);
   if (cd) return `CD${cd[1]}+`;
 
@@ -234,7 +359,7 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
       return `${letters} ${im[2]}`;
   }
 
-  let m = x.match(/^\[\s*\\%\s*\]\s*\)\s*$/);
+  m = x.match(/^\[\s*\\%\s*\]\s*\)\s*$/);
   if (m) return `[%])`;
 
   m = x.match(
@@ -2796,6 +2921,8 @@ export function cleanMarkdownForKnowledgeBase(
   if (collapseImageBlocks !== false) {
     text = collapseImageBlocksForKb(text, maxImagesPerRun ?? 1);
   }
+
+  text = finalizeKbShortInlineDollarMathFragments(text);
 
   return text.trim() + "\n";
 }

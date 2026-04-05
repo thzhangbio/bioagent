@@ -1,6 +1,7 @@
 /**
  * 终版知识库流水线：
  * 原始 MinerU MD → {@link mineruRawMarkdownToPreliminary} →（可选 JSON 结构摘要）→ {@link cleanMarkdownForKnowledgeBase}
+ * （收尾在 {@link cleanMarkdownForKnowledgeBase} 内执行 {@link finalizeKbShortInlineDollarMathFragments}：短 `$…$` 公式碎片结构化归一）
  *
  * 用法:
  *   pnpm exec tsx side-tools/pdf-text-cleanup/pipeline.ts --raw-md <原始.md> [--json <结构化.json>] [--out <输出.md>] [--also-simple-out] [--no-rename-inbox] [--no-crossref] [--no-europepmc]

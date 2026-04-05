@@ -16,7 +16,7 @@ function collapseSpacedChars(fragment: string): string {
  * 行内 `$…$` 内层长度上限（不含两侧 `$`）。
  * 略放宽以覆盖 `$\mathbf{\beta}(\beta=…$`、括号内 `\mathsf{GDS}\ge` 等统计碎片（仍远短于整段公式）。
  */
-const SHORT_INLINE_MATH_MAX_INNER_LEN = 120;
+const SHORT_INLINE_MATH_MAX_INNER_LEN = 160;
 
 /** OCR 在数字间插入空格：`6 0`→`60`、`6 7 2`→`672`（仅作用于公式内层字符串） */
 function collapseOcrSpacesBetweenDigitsInMath(inner: string): string {
@@ -62,7 +62,53 @@ function simplifyMineruShortMathFontNesting(inner: string): string {
   t = t.replace(/\\mathrm\s*\{\s*([A-Za-z])\s*\}/g, "$1");
   t = t.replace(/\\mathit\s*\{\s*([A-Za-z])\s*\}/g, "$1");
   t = t.replace(/\\mathtt\s*\{\s*([A-Za-z])\s*\}/g, "$1");
+  /** `\boldsymbol { { \ O } }`、`\boldsymbol { { \cal O } }` 等嵌套花括号单字母 */
+  t = t.replace(
+    /\\boldsymbol\s*\{\s*\{\s*\\?\s*([A-Za-z])\s*\}\s*\}/g,
+    "$1",
+  );
+  t = t.replace(
+    /\\boldsymbol\s*\{\s*\{\s*\\cal\s*([A-Za-z])\s*\}\s*\}/gi,
+    "$1",
+  );
   return t;
+}
+
+/** `m a l e s`、`N e v e r`：`=\s` 后连续「字母+空格」OCR → 并为一词（≥3 字母） */
+function collapseOcrSpacedLatinWordRuns(s: string): string {
+  return s.replace(
+    /=\s*((?:[a-zA-Z]\s+){2,}[a-zA-Z])(?=[\s,);]|$)/g,
+    (_, w: string) => `= ${w.replace(/\s+/g, "")}`,
+  );
+}
+
+/** `\nobreakspace`、多余 `\left`/`\right`（保留括号语义由外层规则处理） */
+function normalizeMineruLatexSpacingNoise(s: string): string {
+  let t = s;
+  t = t.replace(/\\nobreakspace\s*/g, " ");
+  t = t.replace(/\\left\s*/g, "");
+  t = t.replace(/\\right\s*/g, "");
+  /** MinerU 偶见 `\ :`（反斜杠与冒号间有空格），与 `\: ` 一并当作细空格 */
+  t = t.replace(/\\\s*:\s*/g, " ");
+  return t;
+}
+
+/** `$\mathbf { 6 } 72$`、`( n = \mathbf { 6 } 72` → 数字并成一段后再走 digit collapse */
+function collapseMathbfDigitChunksInMath(s: string): string {
+  let t = s;
+  let prev = "";
+  while (t !== prev) {
+    prev = t;
+    t = t.replace(/\\mathbf\s*\{\s*((?:\d\s*)+)\}/g, (_, raw: string) =>
+      collapseSpacedChars(raw),
+    );
+  }
+  return t;
+}
+
+/** `a - b` 区间类：减号与数字间空格 */
+function normalizeMinusBeforeNumberInMath(s: string): string {
+  return s.replace(/-\s+(?=\d)/g, "-");
 }
 
 /**
@@ -96,6 +142,9 @@ export function normalizeShortInlineDollarMath(text: string): string {
     ),
     (full, inner: string) => {
       let t = collapseOcrSpacesBetweenDigitsInMath(inner);
+      t = collapseOcrDecimalInMathFragment(t);
+      t = collapseMathbfDigitChunksInMath(t);
+      t = collapseOcrSpacesBetweenDigitsInMath(t);
       t = collapseOcrDecimalInMathFragment(t);
       /** 须先于 {@link simplifyMineruShortMathFontNesting}，否则 `\mathsf { X }` 被压成 `X` 后无法匹配 */
       const authorPlain = tryMathsfAuthorSuperscriptToPlain(t);
@@ -153,12 +202,27 @@ function tryMathsfAuthorSuperscriptToPlain(inner: string): string | null {
   return null;
 }
 
+/** `\mathrm` / `\mathsf` / `\tt` 下标花括号内字母 OCR 空格 → 连续文本 */
+function collapseMathrmLikeBraceContent(raw: string): string {
+  return collapseSpacedChars(raw.replace(/\s+/g, " ").trim());
+}
+
+function normStatIntervalToken(raw: string): string {
+  return collapseOcrDecimalInMathFragment(
+    collapseSpacedChars(raw.replace(/\s+/g, " ").trim()),
+  );
+}
+
 /**
- * 括号 / 统计符号类短碎片：`$(n=…)$`、`\beta`、`\mathsf p`、`\mathsf{GDS}\ge`、`CD4^+`、`array` 等；不硬编码具体数值与标签文本。
+ * 括号 / 统计符号类短碎片：`$(n=…)$`、`\beta`、`\mathsf p`、`\mathsf{GDS}\ge`、`CD4^+`、Δ/ρ、问卷残片等；不硬编码具体数值与标签文本。
  */
 function tryParenAndStatFragmentsToPlain(inner: string): string | null {
   let x = inner.replace(/\s+/g, " ").trim();
   x = x.replace(/^\\scriptstyle\s+/i, "");
+  x = normalizeMineruLatexSpacingNoise(x);
+  x = collapseOcrSpacedLatinWordRuns(x);
+  /** `= - 0.082` → `= -0.082` */
+  x = x.replace(/([+-])\s+(?=\d)/g, "$1");
 
   const cd = x.match(/^C\s*D\s*(\d+)\s*\^\s*\{\s*\+\s*\}$/i);
   if (cd) return `CD${cd[1]}+`;
@@ -170,27 +234,248 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
       return `${letters} ${im[2]}`;
   }
 
-  let m = x.match(/^\(\s*n\s*=\s*([\d.]+)\s*\)$/);
-  if (m) return `(n = ${m[1]})`;
+  let m = x.match(/^\[\s*\\%\s*\]\s*\)\s*$/);
+  if (m) return `[%])`;
 
   m = x.match(
-    /^\(\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge\s*(\d+)\s*\)$/,
+    /^\|\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*>\s*([\d.]+)\s*\\rangle\s*$/,
+  );
+  if (m) {
+    const name = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z]{1,16}$/.test(name)) return `|${name}| > ${m[2]}`;
+  }
+
+  m = x.match(
+    /^([\d.]+)\s*\(\s*\\pm\s*([\d.]+)\s*\)\s*$/,
+  );
+  if (m) return `${m[1]} (± ${m[2]})`;
+
+  m = x.match(/^\(\s*\\pm\s*([\d.]+)\s*\)\s*$/);
+  if (m) return `(± ${m[1]})`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*\\%\s*\)\s*$/);
+  if (m) return `(${m[1]}%)`;
+
+  m = x.match(/^\(\s*R\s*=\s*([\d\s,]+)\s*\)\s*$/);
+  if (m) {
+    const num = m[1]
+      .split(",")
+      .map((p) => collapseSpacedChars(p.replace(/\s+/g, "")))
+      .join(",");
+    if (/^[\d,]+$/.test(num.replace(/,/g, ""))) return `(R = ${num})`;
+  }
+
+  m = x.match(/^\(\s*n\s*=\s*([\d.]+)\s*;\s*$/);
+  if (m) return `(n = ${m[1]};`;
+
+  m = x.match(/^\(\s*n\s*=\s*([\d.]+)\s*\)$/);
+  if (m) return `(n = ${m[1]})`;
+
+  m = x.match(/^\(\s*n\s*=\s*(\d+)\s*$/);
+  if (m) return `(n = ${m[1]}`;
+
+  m = x.match(
+    /^\(\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge(?:q|qslant)?\s*(\d+)\s*\)$/,
   );
   if (m) {
     const ac = collapseSpacedChars(m[1]);
-    if (/^[A-Z]{2,12}$/.test(ac)) return `(${ac} ≥ ${m[2]})`;
+    if (/^[A-Za-z]{2,12}$/.test(ac)) return `(${ac} ≥ ${m[2]})`;
   }
 
-  m = x.match(/^\(\s*\\beta\s*=\s*([\d.]+)\s*\)\s*$/);
+  m = x.match(
+    /^\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge(?:q|qslant)?\s*(\d+)\s*\)\s*$/,
+  );
+  if (m) {
+    const ac = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z]{2,12}$/.test(ac)) return `${ac} ≥ ${m[2]})`;
+  }
+
+  m = x.match(
+    /^\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge(?:q|qslant)?\s*(\d+)\s*$/,
+  );
+  if (m) {
+    const ac = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z]{2,12}$/.test(ac)) return `${ac} ≥ ${m[2]}`;
+  }
+
+  m = x.match(
+    /^\(\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\\ge\s*(\d+)\s*$/,
+  );
+  if (m) {
+    const ac = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z]{2,12}$/.test(ac)) return `(${ac} ≥ ${m[2]}`;
+  }
+
+  m = x.match(/^\(\s*\\beta\s*=\s*([-+]?[\d.]+)\s*,\s*$/);
+  if (m) return `(β = ${m[1]},`;
+
+  m = x.match(/^\(\s*\\beta\s*=\s*([\d.+-]+)\s*\)\s*$/);
   if (m) return `(β = ${m[1]})`;
-  m = x.match(/^\(\s*\\beta\s*=\s*([\d.]+)\s*$/);
+  m = x.match(/^\(\s*\\beta\s*=\s*([\d.+-]+)\s*$/);
   if (m) return `(β = ${m[1]})`;
+
+  m = x.match(
+    /^\\mathbf\s*\{\s*\\zeta\s*\}\s*_\s*\{\s*(\d+)\s*\}\s*=\s*((?:[A-Za-z]\s*)+)$/,
+  );
+  if (m) {
+    const lab = collapseSpacedChars(m[2]);
+    if (/^[A-Za-z]{1,24}$/.test(lab)) return `ζ${m[1]} = ${lab}`;
+  }
+
+  m = x.match(/^\{\s*(\d+)\s*=\s*\}\s*$/);
+  if (m) return `${m[1]} =`;
+
+  m = x.match(/^(\d+)\s*=\s*$/);
+  if (m) return `${m[1]} =`;
+
+  m = x.match(/^(\d+)\s*=\s*((?:[a-z]\s*)+)\)\s*$/i);
+  if (m) {
+    const w = collapseSpacedChars(m[2]);
+    if (/^[a-z]{2,16}$/i.test(w)) return `${m[1]} = ${w})`;
+  }
+
+  m = x.match(/^\(\s*O\s*=\s*([A-Za-z]+)\s*,\s*$/);
+  if (m) return `(O = ${m[1]},`;
+
+  m = x.match(/^([A-Za-z])\s*\(\s*o\s*=\s*$/);
+  if (m) return `${m[1]} (o =`;
+
+  m = x.match(/^O\s*=\s*$/);
+  if (m) return `O =`;
+
+  m = x.match(
+    /^\(\s*\\Delta\s*_\s*\{\s*\\tt\s*((?:[A-Za-z]\s*)+)\}\s*\)\s*$/,
+  );
+  if (m) {
+    const sub = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[A-Za-z]{1,12}$/.test(sub)) return `(Δ${sub})`;
+  }
+
+  m = x.match(/^\\Delta\s*_\s*\{\s*\\tt\s*([^}]+)\}\s*$/);
+  if (m) {
+    const sub = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[A-Za-z]{1,12}$/.test(sub)) return `Δ${sub}`;
+  }
+
+  m = x.match(
+    /^\(\s*\\Delta\s*_\s*\{\s*\\mathrm\s*\{\s*([^}]+)\}\s*\}?\s*$/,
+  );
+  if (m) {
+    const sub = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[\s\S]{1,48}$/.test(sub) && sub.trim().length >= 1)
+      return `(Δ${sub.trim()}`;
+  }
+
+  m = x.match(
+    /^\(\s*\\Delta\s*_\s*\{\s*\\mathrm\s*\{\s*([^}]+)\}\s*,\s*\}\s*\s*~\s*\\Delta\s*_\s*\{\s*\\mathsf\s*\{\s*([^}]+)\}\s*\}\s*\)\s*$/,
+  );
+  if (m) {
+    const a = collapseMathrmLikeBraceContent(m[1]);
+    const b = collapseMathrmLikeBraceContent(m[2]);
+    if (/^[A-Za-z]{1,16}$/.test(a) && /^[A-Za-z]{1,16}$/.test(b))
+      return `(Δ${a}, Δ${b})`;
+  }
+
+  m = x.match(
+    /^\(\s*\\Delta\s*_\s*\{\s*\\mathsf\s*\{\s*((?:[A-Za-z]\s*)+)\}\s*\}\s*\)\s*$/,
+  );
+  if (m) {
+    const sub = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[A-Za-z]{1,20}$/.test(sub)) return `(Δ${sub})`;
+  }
+
+  m = x.match(
+    /^\\Delta\s*_\s*\{\s*\\mathsf\s*\{\s*((?:[a-zA-Z]\s*)+)\}\s*\}\s*$/,
+  );
+  if (m) {
+    const sub = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[a-zA-Z]{3,32}$/.test(sub)) return `Δ${sub}`;
+  }
+
+  m = x.match(
+    /^\(\s*\\rho\s*=\s*([-+]?[\d.]+)\s*$/,
+  );
+  if (m) return `(ρ = ${m[1]})`;
+
+  m = x.match(
+    /^\(\s*\\pmb\s*\{\s*\\rho\s*\}\s*=\s*([-+]?[\d.]+)\s*$/,
+  );
+  if (m) return `(ρ = ${m[1]})`;
+
+  m = x.match(/^\\beta\s*=\s*([-+]?[\d.]+)\s*$/);
+  if (m) return `β = ${m[1]}`;
+
+  m = x.match(
+    /^([-+]?[\d.]+)\s*\\substack\s*\{\s*([-+]?[\d.]+)\s*\}\s*\)\s*$/,
+  );
+  if (m) return `${m[1]} (${m[2]})`;
+
+  m = x.match(
+    /^\[\s*([-+]?[\d.\s]+)\s*,\s*([-+]?[\d.\s]+)\s*\]\s*\\\}\s*$/,
+  );
+  if (m) {
+    const a = normStatIntervalToken(m[1]);
+    const b = normStatIntervalToken(m[2]);
+    if (/^-?[\d.]+$/.test(a) && /^-?[\d.]+$/.test(b))
+      return `[${a}, ${b}]`;
+  }
+
+  m = x.match(
+    /^\[\s*([-+]?[\d.\s]+)\s*,\s*~\s*([-+]?[\d.\s]+)\s*\]\s*\)\s*$/,
+  );
+  if (m) {
+    const a = normStatIntervalToken(m[1]);
+    const b = normStatIntervalToken(m[2]);
+    if (/^-?[\d.]+$/.test(a) && /^-?[\d.]+$/.test(b))
+      return `[${a}, ${b}])`;
+  }
+
+  m = x.match(/^\[\s*([\d.]+)\s*\\%\s*\]\s*$/);
+  if (m) return `[${m[1]}%]`;
+
+  m = x.match(
+    /^\(\s*\\chi\s*\^\s*\{\s*2\s*\}\s*\(\s*(\d+)\s*\)\s*=\s*([\d.\s]+)\s*-\s*([\d.\s]+)\s*$/,
+  );
+  if (m) {
+    const mid = normStatIntervalToken(m[2]);
+    const last = normStatIntervalToken(m[3]);
+    if (/^[\d.]+$/.test(mid) && /^[\d.]+$/.test(last))
+      return `χ² (${m[1]}) = ${mid}–${last}`;
+  }
+
+  m = x.match(
+    /^\(\s*\^\s*\{\s*\*?\s*\}\s*\\mathfrak\s*\{\s*p\s*\}\s*<\s*([\d.]+)\s*;\s*$/,
+  );
+  if (m) return `(*p < ${m[1]};`;
+
+  m = x.match(/^\\mathsf\s*\{\s*((?:[a-z]\s*)+)\}\s*\)\s*$/);
+  if (m) {
+    const w = collapseMathrmLikeBraceContent(m[1]);
+    if (/^[a-z]{2,12}$/.test(w)) return `${w})`;
+  }
+
+  m = x.match(/^p\s*=\s*([\d.]+)\s*\\\}\s*$/);
+  if (m) return `p = ${m[1]}`;
+
+  m = x.match(/^\{\s*\\mathsf\s*p\s*\}\s*<\s*([\d.]+)\s*$/);
+  if (m) return `p < ${m[1]}`;
+
+  m = x.match(/^\{\s*p\s*\}\s*<\s*([\d.]+)\s*$/);
+  if (m) return `p < ${m[1]}`;
+
+  m = x.match(/^p\s*>\s*([\d.]+)\s*\)\s*$/);
+  if (m) return `p > ${m[1]})`;
+
+  m = x.match(/^p\s*=\s*([\d.]+)\s*\)\s*$/);
+  if (m) return `p = ${m[1]})`;
+
+  m = x.match(/^p\s*>\s*([\d.]+)\s*$/);
+  if (m) return `p > ${m[1]}`;
 
   m = x.match(
     /^\(\s*\\mathsf\s*\{\s*f\s*\}\s*\^\s*\{\s*2\s*\}\s*=\s*([\d.]+)\s*\)$/,
   );
   if (m) return `(f² = ${m[1]})`;
-  /** {@link simplifyMineruShortMathFontNesting} 已把 `\mathsf{f}` 收成 `f` */
   m = x.match(/^\(\s*f\s*\^\s*\{\s*2\s*\}\s*=\s*([\d.]+)\s*\)$/);
   if (m) return `(f² = ${m[1]})`;
 

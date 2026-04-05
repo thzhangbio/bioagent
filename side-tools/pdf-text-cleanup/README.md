@@ -6,6 +6,8 @@ MinerU 导出的论文 **`.md` + 可选 `.json`** → 清洗为 **`*.kb.md`**，
 
 **只迭代碎片规则、并在成稿上就地更新（不出新文件）**的步骤见 **`FRAGMENT-ASSISTANT-WORKFLOW.md`**。
 
+**流水线金字塔（inbox → out → archive 与各子步骤占位目录）**见 **`pyramid/README.md`**。
+
 ## 命令
 
 | 命令 | 说明 |

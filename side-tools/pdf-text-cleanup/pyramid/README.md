@@ -19,9 +19,9 @@
 
 | 段 | 文件夹 | 说明 |
 |----|--------|------|
-| Ⅰ | `segment-inbox-to-out/` | 原始 MinerU 稿 → `*.kb.md`，根总控：`segment-inbox-to-out/index.ts` |
-| Ⅱ | `segment-out-to-knowledge/` | 成品进入知识库目录、`ingest`、验证、标记可归档，根总控：`segment-out-to-knowledge/index.ts` |
-| Ⅲ | `segment-out-to-archive/` | 入库后 `out` / `inbox` 归档并写审计日志，根总控：`segment-out-to-archive/index.ts` |
+| Ⅰ | `segment-inbox-to-out/` | 原始 MinerU 稿 → `*.kb.md`，根总控：`segment-inbox-to-out/segment-inbox-to-out.ts` |
+| Ⅱ | `segment-out-to-knowledge/` | 成品进入知识库目录、`ingest`、验证、标记可归档，根总控：`segment-out-to-knowledge/segment-out-to-knowledge.ts` |
+| Ⅲ | `segment-out-to-archive/` | 入库后 `out` / `inbox` 归档并写审计日志，根总控：`segment-out-to-archive/segment-out-to-archive.ts` |
 
 各段下 **`00-…`～编号子文件夹** 对应该段的一级功能拆分；各子目录中的根代码文件就是该一级节点的总控或实现。
 

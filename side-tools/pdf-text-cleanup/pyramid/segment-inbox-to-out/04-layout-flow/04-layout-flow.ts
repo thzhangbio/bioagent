@@ -1,7 +1,7 @@
 import {
   applyPdfLayoutFlowCleanup,
   type CleanupOptions,
-} from "../../../cleanup.js";
+} from "../segment-inbox-to-out.cleanup-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

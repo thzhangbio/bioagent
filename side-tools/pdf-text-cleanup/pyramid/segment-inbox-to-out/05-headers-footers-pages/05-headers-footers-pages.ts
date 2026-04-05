@@ -1,4 +1,4 @@
-import { applyPdfHeadersFootersPagesCleanup } from "../../../cleanup.js";
+import { applyPdfHeadersFootersPagesCleanup } from "../segment-inbox-to-out.cleanup-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

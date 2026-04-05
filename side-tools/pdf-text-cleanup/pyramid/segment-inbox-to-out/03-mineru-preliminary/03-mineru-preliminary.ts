@@ -1,4 +1,4 @@
-import { mineruRawMarkdownToPreliminary } from "../../../raw-to-preliminary.js";
+import { mineruRawMarkdownToPreliminary } from "./mineru-raw-to-preliminary.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

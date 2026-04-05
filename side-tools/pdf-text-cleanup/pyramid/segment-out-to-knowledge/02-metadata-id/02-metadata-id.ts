@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import {
   extractPrimaryDoiFromMarkdown,
   slugFromKbMarkdown,
-} from "../../../kb-archive-filename.js";
+} from "../../segment-inbox-to-out/segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentOutToKnowledgeNote,
   type SegmentOutToKnowledgeStage,

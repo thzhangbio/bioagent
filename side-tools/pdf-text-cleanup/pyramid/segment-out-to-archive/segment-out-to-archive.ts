@@ -7,12 +7,12 @@ import {
   type SegmentOutToArchiveOptions,
   type SegmentOutToArchiveStage,
 } from "./stage-shared.js";
-import { segmentOutToArchive00ArchiveTriggerStage } from "./00-archive-trigger/index.js";
-import { segmentOutToArchive01TargetPathsStage } from "./01-target-paths/index.js";
-import { segmentOutToArchive02IdempotencyStage } from "./02-idempotency/index.js";
-import { segmentOutToArchive03MoveExecuteStage } from "./03-move-execute/index.js";
-import { segmentOutToArchive04InboxArchiveSidecarStage } from "./04-inbox-archive-sidecar/index.js";
-import { segmentOutToArchive05AuditLogStage } from "./05-audit-log/index.js";
+import { segmentOutToArchive00ArchiveTriggerStage } from "./00-archive-trigger/00-archive-trigger.js";
+import { segmentOutToArchive01TargetPathsStage } from "./01-target-paths/01-target-paths.js";
+import { segmentOutToArchive02IdempotencyStage } from "./02-idempotency/02-idempotency.js";
+import { segmentOutToArchive03MoveExecuteStage } from "./03-move-execute/03-move-execute.js";
+import { segmentOutToArchive04InboxArchiveSidecarStage } from "./04-inbox-archive-sidecar/04-inbox-archive-sidecar.js";
+import { segmentOutToArchive05AuditLogStage } from "./05-audit-log/05-audit-log.js";
 
 export const segmentOutToArchiveStages: SegmentOutToArchiveStage[] = [
   segmentOutToArchive00ArchiveTriggerStage,
@@ -40,7 +40,7 @@ export async function runSegmentOutToArchive(
 function printHelp(): void {
   console.log("段Ⅲ总控：segment-out-to-archive");
   console.log(
-    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/index.ts [--mode all|out-only|inbox-only] [--force]",
+    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts [--mode all|out-only|inbox-only] [--force]",
   );
 }
 

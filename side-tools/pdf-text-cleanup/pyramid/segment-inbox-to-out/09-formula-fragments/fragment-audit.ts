@@ -20,13 +20,14 @@ import { fileURLToPath } from "node:url";
 import {
   KB_SHORT_INLINE_MATH_MAX_INNER_LEN,
   normalizeMineruInlineLatex,
-} from "./mineru-kb.js";
+} from "../segment-inbox-to-out.kb-shared.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const PDF_TEXT_CLEANUP_ROOT = resolve(__dirname, "../../..");
 
 function parseArgs(): { dir: string; maxInner: number; out?: string } {
   const argv = process.argv.slice(2);
-  let dir = join(__dirname, "out");
+  let dir = join(PDF_TEXT_CLEANUP_ROOT, "out");
   let maxInner = KB_SHORT_INLINE_MATH_MAX_INNER_LEN;
   let out: string | undefined;
   for (let i = 0; i < argv.length; i++) {

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { pdfArchiveStamp } from "../../../archive-stamp.js";
+import { pdfArchiveStamp } from "../segment-out-to-archive.archive-stamp.js";
 import {
   appendSegmentOutToArchiveNote,
   type SegmentOutToArchiveStage,

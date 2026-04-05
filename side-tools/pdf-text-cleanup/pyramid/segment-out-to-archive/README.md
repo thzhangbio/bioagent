@@ -1,7 +1,7 @@
 # 段Ⅲ：out → archive
 
 根总控：
-- `segment-out-to-archive/index.ts`
+- `segment-out-to-archive/segment-out-to-archive.ts`
 
 当前职责：
 - 读取 `out/.archive-ready.json` 或当前 `out/*.kb.md`
@@ -12,8 +12,8 @@
 - 清理 `archive-ready` manifest
 
 兼容入口：
-- `archive-out.ts` → 转调 `out-only`
-- `archive-inbox.ts` → 转调 `inbox-only`
+- `pnpm run pdf-archive-out` → 以 `out-only` 模式运行本段总控
+- `pnpm run pdf-archive-inbox` → 以 `inbox-only` 模式运行本段总控
 
 默认命令：
 - `pnpm run pdf-kb-out-to-archive`

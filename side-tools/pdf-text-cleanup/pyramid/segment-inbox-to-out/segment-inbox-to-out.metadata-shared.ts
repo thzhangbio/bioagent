@@ -7,7 +7,7 @@ import {
   doiSegmentToDoi,
   extractDoiSegmentFromArchiveBasename,
   extractPrimaryDoiFromMarkdown,
-} from "./kb-archive-filename.js";
+} from "./segment-inbox-to-out.archive-name-shared.js";
 
 export interface KbArticleMetadata {
   title: string;

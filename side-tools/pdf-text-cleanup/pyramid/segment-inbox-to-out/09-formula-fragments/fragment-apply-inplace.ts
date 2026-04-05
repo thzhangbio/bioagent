@@ -12,7 +12,7 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-import { applyKbFragmentRulesToMarkdown } from "./mineru-kb.js";
+import { applyKbFragmentRulesToMarkdown } from "../segment-inbox-to-out.kb-shared.js";
 
 function parseArgs(): {
   file?: string;

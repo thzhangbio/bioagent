@@ -1,9 +1,9 @@
 import {
   prependNormalizedKbMetadata,
-} from "../../../kb-metadata.js";
+} from "../segment-inbox-to-out.metadata-shared.js";
 import {
   buildKbArchiveFilenamePartsFromKbMetadata,
-} from "../../../kb-archive-filename.js";
+} from "../segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

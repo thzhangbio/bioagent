@@ -1,7 +1,7 @@
 # 段Ⅱ：out → 知识库
 
 根总控：
-- `segment-out-to-knowledge/index.ts`
+- `segment-out-to-knowledge/segment-out-to-knowledge.ts`
 
 当前职责：
 - 从 `out/` 收集 `*.kb.md`

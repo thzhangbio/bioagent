@@ -9,5 +9,5 @@
 
 ---
 
-- 已解析片段种类数: **3**（本表不逐条列出）
+- 已解析片段种类数: **0**（本表不逐条列出）
 - 下一步: 为「未解析」行推导规则 → 写入 `mineru-kb.ts` → 在 `fragment-fixtures.ts` 加用例 → `pnpm run pdf-kb-fragment-fixtures` → 再跑 `pdf-kb-pipeline`

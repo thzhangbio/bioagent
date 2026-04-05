@@ -1,10 +1,10 @@
 # 段Ⅰ：inbox → out
 
 根总控：
-- `segment-inbox-to-out/index.ts`
+- `segment-inbox-to-out/segment-inbox-to-out.ts`
 
 当前职责：
-- 解析 `pipeline.ts` 兼容入口的参数
+- 解析段Ⅰ命令入口参数
 - 读入 MinerU `.md` / 可选 `.json`
 - 生成结构块与初步稿
 - 依次完成版面流、页眉页脚、表格块、通用清洗、KB 专用清洗、公式碎片清洗
@@ -13,11 +13,11 @@
 - 在需要时对齐 inbox 源文件命名
 
 与本段直接相关的横切工具：
-- `fragment-audit.ts`
-- `fragment-list.ts`
-- `fragment-apply-inplace.ts`
-- `fragment-fixtures.ts`
-- `fragment-fixtures-check.ts`
+- `09-formula-fragments/fragment-audit.ts`
+- `09-formula-fragments/fragment-list.ts`
+- `09-formula-fragments/fragment-apply-inplace.ts`
+- `09-formula-fragments/fragment-fixtures.ts`
+- `09-formula-fragments/fragment-fixtures-check.ts`
 
 这些工具仍位于侧车根目录，但它们服务的核心规则层就是本段的 `09-formula-fragments`。
 

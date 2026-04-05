@@ -7,19 +7,19 @@ import {
   type SegmentInboxToOutOptions,
   type SegmentInboxToOutStage,
 } from "./stage-shared.js";
-import { segmentInboxToOut00EntryRoutingStage } from "./00-entry-routing/index.js";
-import { segmentInboxToOut01ReadValidateStage } from "./01-read-validate/index.js";
-import { segmentInboxToOut02StructureJsonStage } from "./02-structure-json/index.js";
-import { segmentInboxToOut03MineruPreliminaryStage } from "./03-mineru-preliminary/index.js";
-import { segmentInboxToOut04LayoutFlowStage } from "./04-layout-flow/index.js";
-import { segmentInboxToOut05HeadersFootersPagesStage } from "./05-headers-footers-pages/index.js";
-import { segmentInboxToOut06TablesBlocksStage } from "./06-tables-blocks/index.js";
-import { segmentInboxToOut07CleanupGenericStage } from "./07-cleanup-generic/index.js";
-import { segmentInboxToOut08CleanupKbSpecificStage } from "./08-cleanup-kb-specific/index.js";
-import { segmentInboxToOut09FormulaFragmentsStage } from "./09-formula-fragments/index.js";
-import { segmentInboxToOut10MetadataFetchStage } from "./10-metadata-fetch/index.js";
-import { segmentInboxToOut11WriteFinalStage } from "./11-write-final/index.js";
-import { segmentInboxToOut12InboxSyncStage } from "./12-inbox-sync/index.js";
+import { segmentInboxToOut00EntryRoutingStage } from "./00-entry-routing/00-entry-routing.js";
+import { segmentInboxToOut01ReadValidateStage } from "./01-read-validate/01-read-validate.js";
+import { segmentInboxToOut02StructureJsonStage } from "./02-structure-json/02-structure-json.js";
+import { segmentInboxToOut03MineruPreliminaryStage } from "./03-mineru-preliminary/03-mineru-preliminary.js";
+import { segmentInboxToOut04LayoutFlowStage } from "./04-layout-flow/04-layout-flow.js";
+import { segmentInboxToOut05HeadersFootersPagesStage } from "./05-headers-footers-pages/05-headers-footers-pages.js";
+import { segmentInboxToOut06TablesBlocksStage } from "./06-tables-blocks/06-tables-blocks.js";
+import { segmentInboxToOut07CleanupGenericStage } from "./07-cleanup-generic/07-cleanup-generic.js";
+import { segmentInboxToOut08CleanupKbSpecificStage } from "./08-cleanup-kb-specific/08-cleanup-kb-specific.js";
+import { segmentInboxToOut09FormulaFragmentsStage } from "./09-formula-fragments/09-formula-fragments.js";
+import { segmentInboxToOut10MetadataFetchStage } from "./10-metadata-fetch/10-metadata-fetch.js";
+import { segmentInboxToOut11WriteFinalStage } from "./11-write-final/11-write-final.js";
+import { segmentInboxToOut12InboxSyncStage } from "./12-inbox-sync/12-inbox-sync.js";
 
 export const segmentInboxToOutStages: SegmentInboxToOutStage[] = [
   segmentInboxToOut00EntryRoutingStage,
@@ -54,7 +54,7 @@ export async function runSegmentInboxToOut(
 function printSegmentInboxToOutHelp(): void {
   console.log("段Ⅰ总控：segment-inbox-to-out");
   console.log(
-    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/index.ts [--help]",
+    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/segment-inbox-to-out.ts [--help]",
   );
   console.log("");
   console.log("当前阶段顺序:");

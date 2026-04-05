@@ -7,13 +7,13 @@
  *   pnpm run pdf-archive-legacy-flat
  */
 import { mkdirSync, readdirSync, renameSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { pdfArchiveStamp } from "./archive-stamp.js";
+import { pdfArchiveStamp } from "../segment-out-to-archive.archive-stamp.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = __dirname;
+const ROOT = resolve(__dirname, "../../..");
 const ARCHIVE = join(ROOT, "archive");
 
 function main(): void {

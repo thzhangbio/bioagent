@@ -1,7 +1,7 @@
 /**
  * 校验 {@link KB_FRAGMENT_FIXTURES} 与当前 {@link normalizeMineruInlineLatex} 行为一致。
  */
-import { normalizeMineruInlineLatex } from "./mineru-kb.js";
+import { normalizeMineruInlineLatex } from "../segment-inbox-to-out.kb-shared.js";
 import { KB_FRAGMENT_FIXTURES } from "./fragment-fixtures.js";
 
 function main(): void {

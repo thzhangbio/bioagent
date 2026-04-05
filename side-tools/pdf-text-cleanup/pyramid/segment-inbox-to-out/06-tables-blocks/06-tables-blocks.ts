@@ -1,4 +1,4 @@
-import { flattenHtmlTablesToPlain } from "../../../mineru-kb.js";
+import { flattenHtmlTablesToPlain } from "../segment-inbox-to-out.kb-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

@@ -2,7 +2,7 @@ import {
   applyKbSpecificPostCleanup,
   normalizeKbResidualDollarMath,
   normalizeMineruInlineLatex,
-} from "../../../mineru-kb.js";
+} from "../segment-inbox-to-out.kb-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

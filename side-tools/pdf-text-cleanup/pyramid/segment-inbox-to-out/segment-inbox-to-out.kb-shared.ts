@@ -6,7 +6,7 @@ import {
   cleanPdfTextMd,
   looksLikeLetterPrefixedAffiliation,
   type CleanupOptions,
-} from "./cleanup.js";
+} from "./segment-inbox-to-out.cleanup-shared.js";
 
 function collapseSpacedChars(fragment: string): string {
   return fragment.replace(/\s+/g, "");
@@ -15,7 +15,7 @@ function collapseSpacedChars(fragment: string): string {
 /**
  * 行内 `$…$` 内层长度上限（不含两侧 `$`）。
  * 略放宽以覆盖 `$\mathbf{\beta}(\beta=…$`、括号内 `\mathsf{GDS}\ge` 等统计碎片（仍远短于整段公式）。
- * 与 {@link side-tools/pdf-text-cleanup/fragment-audit.ts} 默认扫描上限一致。
+ * 与 `pyramid/segment-inbox-to-out/09-formula-fragments/fragment-audit.ts` 默认扫描上限一致。
  */
 export const KB_SHORT_INLINE_MATH_MAX_INNER_LEN = 160;
 

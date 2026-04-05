@@ -1,7 +1,7 @@
 import {
   formatStructureSectionForKb,
   listMineruStructure,
-} from "../../../mineru-json-structure.js";
+} from "./mineru-json-structure.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

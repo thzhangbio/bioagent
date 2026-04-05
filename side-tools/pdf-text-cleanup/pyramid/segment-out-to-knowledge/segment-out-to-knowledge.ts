@@ -7,12 +7,12 @@ import {
   type SegmentOutToKnowledgeOptions,
   type SegmentOutToKnowledgeStage,
 } from "./stage-shared.js";
-import { segmentOutToKnowledge00PreOutCheckStage } from "./00-pre-out-check/index.js";
-import { segmentOutToKnowledge01CopyToKnowledgeStage } from "./01-copy-to-knowledge/index.js";
-import { segmentOutToKnowledge02MetadataIdStage } from "./02-metadata-id/index.js";
-import { segmentOutToKnowledge03IngestIndexStage } from "./03-ingest-index/index.js";
-import { segmentOutToKnowledge04VerifySearchStage } from "./04-verify-search/index.js";
-import { segmentOutToKnowledge05MarkReadyArchiveStage } from "./05-mark-ready-archive/index.js";
+import { segmentOutToKnowledge00PreOutCheckStage } from "./00-pre-out-check/00-pre-out-check.js";
+import { segmentOutToKnowledge01CopyToKnowledgeStage } from "./01-copy-to-knowledge/01-copy-to-knowledge.js";
+import { segmentOutToKnowledge02MetadataIdStage } from "./02-metadata-id/02-metadata-id.js";
+import { segmentOutToKnowledge03IngestIndexStage } from "./03-ingest-index/03-ingest-index.js";
+import { segmentOutToKnowledge04VerifySearchStage } from "./04-verify-search/04-verify-search.js";
+import { segmentOutToKnowledge05MarkReadyArchiveStage } from "./05-mark-ready-archive/05-mark-ready-archive.js";
 
 export const segmentOutToKnowledgeStages: SegmentOutToKnowledgeStage[] = [
   segmentOutToKnowledge00PreOutCheckStage,
@@ -40,7 +40,7 @@ export async function runSegmentOutToKnowledge(
 function printHelp(): void {
   console.log("段Ⅱ总控：segment-out-to-knowledge");
   console.log(
-    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-knowledge/index.ts [--out-dir <路径>] [--knowledge-dir <路径>] [--skip-copy] [--skip-ingest]",
+    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-knowledge/segment-out-to-knowledge.ts [--out-dir <路径>] [--knowledge-dir <路径>] [--skip-copy] [--skip-ingest]",
   );
 }
 

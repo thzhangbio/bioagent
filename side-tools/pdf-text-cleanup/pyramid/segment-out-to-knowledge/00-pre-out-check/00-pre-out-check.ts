@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   extractPrimaryDoiFromMarkdown,
   slugFromKbMarkdown,
-} from "../../../kb-archive-filename.js";
+} from "../../segment-inbox-to-out/segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentOutToKnowledgeNote,
   type SegmentOutToKnowledgeFileRecord,

@@ -2,7 +2,7 @@
 
 目标：在**不跑** `pdf-kb-pipeline` 出新稿的前提下，专门迭代 **短 `$…$` 行内碎片**的规则，并在确认后**直接写回同一 Markdown 文件**。
 
-与 **`WORKFLOW.md`** 的关系：`WORKFLOW.md` 描述「MinerU → 清洗 → 审计 → 补规则 → 再 pipeline」的**整篇闭环**；本文件描述**只动碎片规则、就地更新成稿**的侧向流程。规则代码仍落在同一处：**`mineru-kb.ts`**（见下「规则入库」）。
+与 **`WORKFLOW.md`** 的关系：`WORKFLOW.md` 描述「MinerU → 清洗 → 审计 → 补规则 → 再 pipeline」的**整篇闭环**；本文件描述**只动碎片规则、就地更新成稿**的侧向流程。规则代码仍落在同一处：**`pyramid/segment-inbox-to-out/segment-inbox-to-out.kb-shared.ts`**（见下「规则入库」）。
 
 ---
 
@@ -27,13 +27,13 @@ pnpm run pdf-kb-fragment-list -- --dir side-tools/pdf-text-cleanup/out --max-inn
 
 - **不要**为审计表里的每一行单独 `if (s === '某基因某数字')`。
 - **要**抽象版式：用正则**捕获组**、折叠 OCR 空格（`collapseSpacedChars` 等已有工具）、长度/字符类约束，使**一类** PDF 版式共用一条规则。
-- **落点**：在 **`mineru-kb.ts`** 中扩展 `tryParenAndStatFragmentsToPlain`、`normalizeShortInlineDollarMath` 或 `normalizeMineruInlineLatex` 内与行内 `$…$` 相关的替换（与现有代码风格一致）。
+- **落点**：在 **`pyramid/segment-inbox-to-out/segment-inbox-to-out.kb-shared.ts`** 中扩展 `tryParenAndStatFragmentsToPlain`、`normalizeShortInlineDollarMath` 或 `normalizeMineruInlineLatex` 内与行内 `$…$` 相关的替换（与现有代码风格一致）。
 
 ---
 
 ## 3️⃣ 测试更新规则是否生效
 
-在 **`fragment-fixtures.ts`** 中为新版式增加 `input`（完整短 `$…$`）与 `expected`（`normalizeMineruInlineLatex` 期望输出），然后：
+在 **`pyramid/segment-inbox-to-out/09-formula-fragments/fragment-fixtures.ts`** 中为新版式增加 `input`（完整短 `$…$`）与 `expected`（`normalizeMineruInlineLatex` 期望输出），然后：
 
 ```bash
 pnpm run pdf-kb-fragment-fixtures
@@ -45,10 +45,10 @@ pnpm run pdf-kb-fragment-fixtures
 
 ## 4️⃣ 将规则「入库」为碎片更新规则
 
-本仓库的**唯一事实来源**仍是 **`mineru-kb.ts`**（外加 `fragment-fixtures.ts` 的回归用例）。  
+本仓库的**唯一事实来源**仍是 **`pyramid/segment-inbox-to-out/segment-inbox-to-out.kb-shared.ts`**（外加 `pyramid/segment-inbox-to-out/09-formula-fragments/fragment-fixtures.ts` 的回归用例）。  
 对外说明可写：碎片规则由 **`applyKbFragmentRulesToMarkdown`**（实现上等同于对全文调用 **`normalizeMineruInlineLatex`**）统一套用。
 
-**未命中即保留**：短 `$…$` 在 **`tryParenAndStatFragmentsToPlain`** 与 **`tryShortInlineMathToPlainUnicode`** 均未命中时**不**做猜测性剥壳，仍输出 **`$…$`**；`pdf-kb-fragment-audit` 会将此类记为未解析，直至在 `mineru-kb.ts` 中增加显式规则并通过夹具验证。
+**未命中即保留**：短 `$…$` 在 **`tryParenAndStatFragmentsToPlain`** 与 **`tryShortInlineMathToPlainUnicode`** 均未命中时**不**做猜测性剥壳，仍输出 **`$…$`**；`pdf-kb-fragment-audit` 会将此类记为未解析，直至在 `pyramid/segment-inbox-to-out/segment-inbox-to-out.kb-shared.ts` 中增加显式规则并通过夹具验证。
 
 ---
 

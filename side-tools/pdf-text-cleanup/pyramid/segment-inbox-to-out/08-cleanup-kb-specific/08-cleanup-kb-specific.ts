@@ -1,6 +1,6 @@
 import {
   applyKbSpecificPreCleanup,
-} from "../../../mineru-kb.js";
+} from "../segment-inbox-to-out.kb-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

@@ -1,4 +1,4 @@
-import { applyPdfGenericCleanup } from "../../../cleanup.js";
+import { applyPdfGenericCleanup } from "../segment-inbox-to-out.cleanup-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

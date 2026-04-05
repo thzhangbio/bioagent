@@ -12,9 +12,10 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { normalizeMineruInlineLatex } from "./mineru-kb.js";
+import { normalizeMineruInlineLatex } from "../segment-inbox-to-out.kb-shared.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const PDF_TEXT_CLEANUP_ROOT = resolve(__dirname, "../../..");
 
 function parseArgs(): {
   dir: string;
@@ -23,7 +24,7 @@ function parseArgs(): {
   globPat: string;
 } {
   const argv = process.argv.slice(2);
-  let dir = join(__dirname, "out");
+  let dir = join(PDF_TEXT_CLEANUP_ROOT, "out");
   let maxInner = 100;
   let out: string | undefined;
   let globPat = "*.kb.md";

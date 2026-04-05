@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildKbArchiveBasename } from "../../../kb-archive-filename.js";
+import { buildKbArchiveBasename } from "../segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,

@@ -2,7 +2,11 @@
  * MinerU 稿在 {@link cleanPdfTextMd} 前后的知识库专用规则。
  */
 
-import { cleanPdfTextMd, type CleanupOptions } from "./cleanup.js";
+import {
+  cleanPdfTextMd,
+  looksLikeLetterPrefixedAffiliation,
+  type CleanupOptions,
+} from "./cleanup.js";
 
 function collapseSpacedChars(fragment: string): string {
   return fragment.replace(/\s+/g, "");
@@ -26,17 +30,86 @@ function isCdLikeToken(collapsed: string): boolean {
   );
 }
 
+/** Springer / Nature 系页眉常单独成行；粘连在句首时见 {@link stripJournalRunningHeaderPrefix} */
+const DROP_STANDALONE_LINE: RegExp[] = [
+  /^\(legend continued on next page\)\s*$/i,
+  /** 勿在此丢弃 `# Cancer Cell` / `# Article`：保留标题；重复刊名见 {@link cleanPdfTextMd} `maybeJournal` */
+  /^May 11, 2026\s+\$?\\?circledcirc/i,
+  /^OPEN ACCESS\s*$/i,
+  /^SPRINGERNATURE\s*$/i,
+  /^SPRINGER NATURE\s*$/i,
+  /^Check for updates\s*$/i,
+  /^ARTICLE OPEN\s*$/i,
+  /^ARTICLE IN PRESS\s*$/i,
+  /^Article in Press\s*$/i,
+  /^Nature Medicine Brief Communication\s*$/i,
+  /^Nature Communications\s*$/i,
+  /^Molecular Psychiatry\s*$/i,
+  /^nature medicine\s*$/i,
+  /^Brief Communication\s*$/i,
+  /^Articles\s*$/i,
+  /^www\.thelancet\.com\b.*$/i,
+  /^eBioMedicine\s+\d{4};\s*\d+\s*:\s*\d+.*$/i,
+  /^Vol\s+\d+\s+April,?\s+\d{4}\s+Articles\s*$/i,
+  /** 仅作者短行（与下一段重复） */
+  /^J\.\s+[A-Za-zÀ-ÿ' -]+\s+et al\.\s*$/u,
+];
+
+/**
+ * 去掉句首「期刊名 + J. Xxx et al.」式 running header（与 Elsevier 已处理的 OPEN ACCESS 类似）。
+ */
+export function stripJournalRunningHeaderPrefix(line: string): string {
+  return line.replace(
+    /^(?:Molecular Psychiatry\s+)?J\.\s+[A-Za-zÀ-ÿ' -]+\s+et al\.\s+/u,
+    "",
+  );
+}
+
 export function dropMineruMarkdownNoise(text: string): string {
   const lines = text.split(/\r?\n/);
   const out: string[] = [];
+  let lastStandaloneDoi = "";
   for (const line of lines) {
     const t = line.trim();
-    if (/^\(legend continued on next page\)\s*$/i.test(t)) continue;
-    if (/^#\s*Cancer Cell\s*$/i.test(t)) continue;
-    if (/^#\s*Article\s*$/i.test(t)) continue;
-    if (/^May 11, 2026\s+\$?\\?circledcirc/i.test(t)) continue;
-    /** Elsevier 等期刊页眉，MinerU 常插在段中造成「…was [换页] completed…」式断句 */
-    if (/^OPEN ACCESS\s*$/i.test(t)) continue;
+
+    let drop = false;
+    for (const re of DROP_STANDALONE_LINE) {
+      if (re.test(t)) {
+        drop = true;
+        break;
+      }
+    }
+    if (drop) continue;
+
+    /** 重复出现的独立 DOI 行（Nature Medicine 等每页眉块一条） */
+    const doiOnly = t.match(/^https:\/\/doi\.org\/(10\.\S+)\s*$/i);
+    if (doiOnly) {
+      const id = doiOnly[1].toLowerCase();
+      if (lastStandaloneDoi === id) continue;
+      lastStandaloneDoi = id;
+    }
+
+    out.push(stripJournalRunningHeaderPrefix(line));
+  }
+  return out.join("\n");
+}
+
+/** 知识库向量化：连续完全相同的非短行多为 MinerU 重复块（如 Nat Commun 标题） */
+export function dedupeConsecutiveLongLines(
+  text: string,
+  minLen = 28,
+): string {
+  const lines = text.split(/\r?\n/);
+  const out: string[] = [];
+  for (const line of lines) {
+    const tr = line.trim();
+    if (
+      out.length > 0 &&
+      tr.length >= minLen &&
+      out[out.length - 1].trim() === tr
+    ) {
+      continue;
+    }
     out.push(line);
   }
   return out.join("\n");
@@ -46,6 +119,12 @@ function shouldJoinLineAfterPageNoise(prev: string, next: string): boolean {
   const p = prev.trimEnd();
   const n = next.trimStart();
   if (!p || !n) return false;
+  /** 作者单位脚注 `a Genetics` / `b CIRI` 等以小写开头，勿与上一段跨空行拼成一行 */
+  if (looksLikeLetterPrefixedAffiliation(n)) return false;
+  /** Springer / Nature 日期页脚与正文之间删去页眉后，勿把「Published online…」与下段正文接成一行 */
+  if (/\bPublished online:\s*/i.test(p)) return false;
+  if (/^\s*Received:\s/i.test(p) && /\b(?:Revised|Accepted|Published online):/i.test(p))
+    return false;
   if (/[.!?;:]["')\]\s]*$/.test(p)) return false;
   if (!/^[a-z(\u201c\u2018]/.test(n)) return false;
   return true;
@@ -2058,8 +2137,24 @@ export function stripMineruStructureManifest(text: string): string {
 export function normalizeKbOcrTypos(text: string): string {
   let s = text;
   s = s.replace(/\bPreybus\b/g, "Prebys");
+  /** MinerU OCR：`https://doi. org/...`（PDF 折行在 doi. 与 org 之间，合并后误插空格） */
+  s = s.replace(/https?:\/\/doi\.\s+org\//gi, "https://doi.org/");
+  /** PDF 折行：`https://` 与 `doi.org/` 分两行 → `https:// doi.org/` */
+  s = s.replace(/https:\/\/\s+doi\.org\//gi, "https://doi.org/");
   /** MinerU：DOI 链接中 `doi.org/ 10.` 误插入空格 */
   s = s.replace(/https:\/\/doi\.org\/\s+/gi, "https://doi.org/");
+  s = s.replace(/\b10\.\s+1016\//g, "10.1016/");
+  s = s.replace(/\b10\.\s+1038\//g, "10.1038/");
+  /**
+   * MinerU OCR：`https://doi.org/10. 1016/... 106209` 等**同一行内**误插空格。
+   * 路径段**勿用** `\s`：否则会匹配换行，把 DOI 与下段 `References` 一并纳入并 `replace(/\s+/g,'')` 吃掉段落界，变成 `106209.References1Watson`。
+   */
+  s = s.replace(
+    /https:\/\/doi\.org\/10\.[\d \t./a-z-]+(?=\s|$|[,;)\]\u4e00-\u9fff]|[A-Z][a-z])/gi,
+    (m) => m.replace(/[ \t]+/g, ""),
+  );
+  /** 图注与编号粘连：`Fig. 1covariates` */
+  s = s.replace(/\bFig\.\s*(\d+)([a-z]{3,})\b/gi, "Fig. $1 $2");
   s = s.replace(/(https?:\/\/zenodo)\.\s+(org[^\s)\]]*)/gi, "$1.$2");
   /** Elsevier 路径常见断行：`j. ccell` → `j.ccell` */
   s = s.replace(/(10\.1016\/j\.)\s+(ccell)/gi, "$1$2");
@@ -2071,7 +2166,63 @@ export function normalizeKbOcrTypos(text: string): string {
   /** `+` 非 \\w，勿在词尾用 \\b */
   s = s.replace(/\btota CD8\+/gi, "total CD8+");
   s = s.replace(/\bpathogenfree\b/gi, "pathogen-free");
+  /** Lancet / eBioMedicine 页眉词「Articles」残留在句中或行尾 */
+  s = s.replace(/\bArticles\s+(?=[a-z])/g, "");
+  s = s.replace(/\.\s*Articles\s*(?=\n|$)/gm, ".");
+  /** 句末单独一词 `Articles`（换页刊眉） */
+  s = s.replace(/\s+Articles\s*$/gm, "");
+  /** Springer：日期页脚与正文被软换行合并成一行时拆开，便于向量化分段 */
+  s = s.replace(
+    /(Published online:\s*\d{1,2}\s+\w+\s+\d{4})\s+([a-z][a-z]{2,})/gi,
+    "$1\n\n$2",
+  );
+  /**
+   * 作者单位上标与机构名粘连（MinerU 常见）：`aaDepartment`→`aa Department`，`abINSERM`→`ab INSERM`；
+   * 双字母后接大写字母（含全大写缩写 INSERM）；单字母 `mDepartment` / `wService` 另条。
+   */
+  s = s.replace(/^([a-z]{2})(?=[A-Z])/gm, "$1 ");
+  s = s.replace(/^([a-z])(?=Department\b|Service\b)/gim, "$1 ");
   return s;
+}
+
+/**
+ * Elsevier 双栏/换页时，ae–ah 脚注常被插在刊头（Articles / eBioMedicine）之后，阅读顺序落在 ai–ak 后面。
+ * 若 ae–ah 行整体出现在 ak 行之后，则整段挪到 ad 行之后（与 PDF 字母序一致）。
+ */
+export function reorderAaToAkAffiliationsAfterAd(text: string): string {
+  const lines = text.split(/\r?\n/);
+  const reFoot = /^(ae|af|ag|ah)(?=\s|[A-Z])/;
+  const reAd = /^ad(?=\s|[A-Z])/;
+  const reAk = /^ak(?=\s|[A-Z])/;
+
+  const feet: { idx: number; prefix: string; content: string }[] = [];
+  let adIdx = -1;
+  let akIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const t = raw.trim();
+    if (reAd.test(t)) adIdx = i;
+    if (reAk.test(t)) akIdx = i;
+    const m = t.match(reFoot);
+    if (m) feet.push({ idx: i, prefix: m[1]!, content: raw });
+  }
+  if (adIdx < 0 || feet.length === 0 || akIdx < 0) return text;
+  const needsReorder = feet.some((f) => f.idx > akIdx);
+  if (!needsReorder) return text;
+
+  const order = ["ae", "af", "ag", "ah"] as const;
+  const byPrefix = new Map(feet.map((f) => [f.prefix, f.content] as const));
+  const block = order.map((p) => byPrefix.get(p)).filter(Boolean) as string[];
+  if (block.length === 0) return text;
+
+  const removeIdx = feet.map((f) => f.idx).sort((a, b) => b - a);
+  for (const i of removeIdx) lines.splice(i, 1);
+
+  const removedBeforeAd = feet.filter((f) => f.idx < adIdx).length;
+  const newAdIdx = adIdx - removedBeforeAd;
+  if (newAdIdx < 0) return lines.join("\n");
+  lines.splice(newAdIdx + 1, 0, ...block);
+  return lines.join("\n");
 }
 
 export function collapseImageBlocksForKb(text: string, maxKeep = 1): string {
@@ -2131,6 +2282,7 @@ export function cleanMarkdownForKnowledgeBase(
     text = stripMineruStructureManifest(text);
   }
   text = dropMineruMarkdownNoise(text);
+  text = dedupeConsecutiveLongLines(text);
   text = joinLinesBrokenByRemovedPageNoise(text);
   text = flattenHtmlTablesToPlain(text);
   text = neutralizeCatalogHashesAndHexColors(text);
@@ -2139,6 +2291,7 @@ export function cleanMarkdownForKnowledgeBase(
   text = normalizeKbResidualDollarMath(text);
   if (applyKbOcrTypoFixes !== false) {
     text = normalizeKbOcrTypos(text);
+    text = reorderAaToAkAffiliationsAfterAd(text);
   }
 
   if (collapseImageBlocks !== false) {

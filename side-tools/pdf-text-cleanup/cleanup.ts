@@ -73,11 +73,17 @@ function shouldDropLine(
   if (/^\d{1,3}\s*$/.test(trimmed)) return "drop";
   if (/^e\d{1,3}\s*$/i.test(trimmed)) return "drop";
 
-  if (opts.keepFirstJournalTitle && trimmed === "Cancer Cell") {
+  if (
+    opts.keepFirstJournalTitle &&
+    (trimmed === "Cancer Cell" || /^#\s*Cancer Cell\s*$/i.test(trimmed))
+  ) {
     if (!ctx.keptCancerCell) return "maybeJournal";
     return "drop";
   }
-  if (opts.keepFirstJournalTitle && trimmed === "Article") {
+  if (
+    opts.keepFirstJournalTitle &&
+    (trimmed === "Article" || /^#\s*Article\s*$/i.test(trimmed))
+  ) {
     if (!ctx.keptArticle) return "maybeJournal";
     return "drop";
   }
@@ -96,8 +102,10 @@ function applyLineFilters(text: string, opts: CleanupOptions): string {
 
     if (decision === "drop") continue;
     if (decision === "maybeJournal") {
-      if (trimmed === "Cancer Cell") ctx.keptCancerCell = true;
-      if (trimmed === "Article") ctx.keptArticle = true;
+      if (trimmed === "Cancer Cell" || /^#\s*Cancer Cell\s*$/i.test(trimmed))
+        ctx.keptCancerCell = true;
+      if (trimmed === "Article" || /^#\s*Article\s*$/i.test(trimmed))
+        ctx.keptArticle = true;
       out.push(line);
       continue;
     }
@@ -189,10 +197,27 @@ function isMarkdownHeadingOnlyLine(line: string): boolean {
   return /^#{1,6}\s+\S/.test(t) && t.length < 220;
 }
 
+/**
+ * Elsevier / Lancet 作者单位脚注：`a Genetics …`、`mDepartment …`、`aeStudy …`、`aaDepartment …`。
+ * 以小写字母开头易被 {@link shouldMergeSoftBreak} 误判为上一行折行续句。
+ */
+export function looksLikeLetterPrefixedAffiliation(line: string): boolean {
+  const t = line.trim();
+  if (t.length < 4) return false;
+  /** 单字母上标 + 空格 + 机构名：`a Genetics`、`b CIRI` */
+  if (/^[a-z]\s+[A-Z]/.test(t)) return true;
+  /** `mDepartment`、`wService` */
+  if (/^[a-z]Department\b/i.test(t) || /^[a-z]Service\b/i.test(t)) return true;
+  /** `aaDepartment`、`aeStudy`、`abINSERM`、`acDepartment` */
+  if (/^[a-z]{2}(?:Department|[A-Z])/.test(t)) return true;
+  return false;
+}
+
 function shouldMergeSoftBreak(prev: string, next: string): boolean {
   const a = prev.trimEnd();
   const b = next.trim();
   if (a.length === 0 || b.length === 0) return false;
+  if (looksLikeLetterPrefixedAffiliation(b)) return false;
   /** Elsevier 刊信息行 / 版权句 */
   if (/\bet al\.,\s*\d{4}/i.test(a) || /^text and data mining/i.test(b))
     return false;
@@ -226,6 +251,7 @@ function isHardWrappedContinuation(prev: string, next: string): boolean {
   const a = prev.trimEnd();
   const b = next.trim();
   if (a.length === 0 || b.length === 0) return false;
+  if (looksLikeLetterPrefixedAffiliation(b)) return false;
   if (isMarkdownHeadingOnlyLine(a)) return false;
   if (isMarkdownHeadingOnlyLine(b)) return false;
   if (/\bet al\.,\s*\d{4}/i.test(a)) return false;
@@ -261,6 +287,10 @@ function isParagraphBoundary(prev: string, next: string): boolean {
   const n = next.trim();
   if (p.length === 0 || n.length === 0) return true;
   if (isMarkdownHeadingOnlyLine(p) || isMarkdownHeadingOnlyLine(n)) return true;
+  /** 单位脚注行始终新起一段，避免与作者行或彼此合并 */
+  if (looksLikeLetterPrefixedAffiliation(n)) return true;
+  /** 参考文献编号行：`1 Watson L, …`、`22 Bousfiha A, …`（避免 `References` 与首条文献并成一段） */
+  if (/^\d{1,3}\s+[A-ZÀ-ſ]/.test(n)) return true;
   /** Markdown 列表行（含 JSON 结构摘要 `- [p1] …`） */
   if (/^-\s/.test(n)) return true;
   if (/^[A-Z][a-zA-Z]+ et al\.,\s*\d{4}/.test(n) || /^text and data mining/i.test(n))

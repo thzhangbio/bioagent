@@ -98,4 +98,120 @@ export const KB_FRAGMENT_FIXTURES: KbFragmentFixture[] = [
     input: "$300g$",
     expected: "300 g",
   },
+  {
+    input: "$2022 ^ { 8, 9 }$",
+    expected: "2022^8,9",
+  },
+  {
+    input: "$ { \\mathrm { I I b } } ^ { 2, 3 }$",
+    expected: "IIb^2,3",
+  },
+  {
+    input: "$1^{*}10^{13}\\mathrm{Vg / ml}$",
+    expected: "1×10^13 Vg/ml",
+  },
+  {
+    input: "$1 \\mathsf { c m } ^ { 3 }$",
+    expected: "1 cm^3",
+  },
+  {
+    input: "$1 \\mathrm{~h}$",
+    expected: "1 h",
+  },
+  {
+    input: "$3.34 ~ \\mathsf { m L }$",
+    expected: "3.34 mL",
+  },
+  {
+    input: "$100 ~ \\mu \\ L$",
+    expected: "100 μL",
+  },
+  {
+    input: "$0.125M$",
+    expected: "0.125 M",
+  },
+  {
+    input: "$1.5x$",
+    expected: "1.5×",
+  },
+  {
+    input: "$( 1 \\% 0 _ { 2 } )$",
+    expected: "(1% O₂)",
+  },
+  {
+    input: "$40 { - } 60 \\%$",
+    expected: "40-60%",
+  },
+  {
+    input: "$\\left|\\mathrm{FC}\\right| \\geq 1.5$",
+    expected: "|FC| ≥ 1.5",
+  },
+  {
+    input: "$c . 3019 G \\mathrm { > A }$",
+    expected: "c.3019 G>A",
+  },
+  {
+    input: "${ \\sf H } _ { 2 } { \\sf O } _ { 2 }$",
+    expected: "H₂O₂",
+  },
+  {
+    input: "$(1\\mathrm{mg / kg})$",
+    expected: "(1 mg/kg)",
+  },
+  {
+    input: "$( 1 \\mu g)$",
+    expected: "(1 μg)",
+  },
+  {
+    input: "$3548 ~ \\mu g / L ;$",
+    expected: "3548 μg/L",
+  },
+  {
+    input: "$10 \\mu \\ M$",
+    expected: "10 μM",
+  },
+  {
+    input: "$50 \\mu m ;$",
+    expected: "50 μm",
+  },
+  {
+    input: "$7, 10, 110 { - } 119$",
+    expected: "7,10,110-119",
+  },
+  {
+    input: "$\\mathbf { \\sigma } \\cdot \\kappa B$",
+    expected: "σ·κB",
+  },
+  {
+    input: "$\\mu \\mathrm { B C A }$",
+    expected: "μBCA",
+  },
+  {
+    input: "$( \\boldsymbol { \\| } )$",
+    expected: "(I)",
+  },
+  {
+    input: "$\\cdot D A ^ { + }$",
+    expected: "·DA+",
+  },
+  {
+    input: "$( I N S ^ { w / G F P } )$",
+    expected: "(INS^w/GFP)",
+  },
+  {
+    input: "$11 S ^ { + } \\mathrm { ~ \\beta ~ }$",
+    expected: "11S+ β",
+  },
+  {
+    input: "$1g$",
+    expected: "1 g",
+  },
+  {
+    input: "${ 20 ~ 9 }$",
+    expected: "20 g",
+  },
+  {
+    input: "${ \\mathrm { c . 1303 C { > } T } }$",
+    expected: "c.1303 C>T",
+  },
 ];

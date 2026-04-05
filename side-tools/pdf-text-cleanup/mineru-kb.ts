@@ -181,6 +181,14 @@ function digitStringToUnicodeSuperscript(d: string): string {
   return [...d].map((c) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(c)] ?? c).join("");
 }
 
+function normalizeLooseSuperscriptPayload(raw: string): string {
+  return raw
+    .replace(/\{\s*([<>+\-])\s*\}/g, "$1")
+    .replace(/\\mathrm\s*\{\s*([^}]+)\s*\}/g, "$1")
+    .replace(/\\mathsf\s*\{\s*([^}]+)\s*\}/g, "$1")
+    .replace(/\s+/g, "");
+}
+
 /**
  * `$\mathsf { Y e } ^ { 1, 2 }$` → `Ye¹,²`（作者姓名字母间 OCR 空格 + 上标；段数与位数均不限）
  * 亦匹配已去掉 `\mathsf` 的 `Ye ^ { … }`（供与其它规则顺序配合时兜底）
@@ -475,16 +483,28 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
   );
   if (m) return `${m[1]} μg/mL`;
   m = x.match(
+    /^([\d.]+)\s*~?\s*\\mu\s*\\?\s*g\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*;?\s*$/i,
+  );
+  if (m) return `${m[1]} μg/mL`;
+  m = x.match(
     /^([\d.]+)\s*~?\s*\\mu\s*\\mathrm\s*\{\s*g\s*\/\s*mL\s*\}\s*;?\s*$/,
   );
   if (m) return `${m[1]} μg/mL`;
+  m = x.match(
+    /^([\d.]+)\s*~?\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*;?\s*$/i,
+  );
+  if (m) return `${m[1]} μ/mL`;
 
   m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*M\s*\)\s*$/);
   if (m) return `${m[1]} μM)`;
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*\\\s*M\s*$/i);
+  if (m) return `${m[1]} μM`;
 
   m = x.match(/^([\d.]+)\s*~?\s*\{\s*\\mu\s*m\s*\}\s*;?\s*$/i);
   if (m) return `${m[1]} μm`;
   m = x.match(/^([\d.]+)\s*~?\s*\{\s*\\mum\s*\}\s*;?\s*$/i);
+  if (m) return `${m[1]} μm`;
+  m = x.match(/^([\d.]+)\s*\\mu\s*m\s*;?\s*$/i);
   if (m) return `${m[1]} μm`;
 
   m = x.match(/^([\d.]+)\s*~?\s*h\s*;?\s*$/);
@@ -814,6 +834,295 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
     /^\\mathsf\s*\{\s*p\s*\}\s*=\s*([\d.]+)\s*\)\s*$/,
   );
   if (m) return `p = ${m[1]})`;
+
+  m = x.match(/^p\s*$/i);
+  if (m) return "p";
+
+  m = x.match(
+    /^((?:[A-Za-z0-9.-]\s*){2,})\s*\^\s*\{\s*([0-9,\s\-]+)\s*\}\s*([).,])?\s*$/,
+  );
+  if (m) {
+    const base = collapseSpacedChars(m[1]);
+    const sup = m[2].replace(/\s+/g, "");
+    if (
+      /^[A-Za-z0-9.-]{2,32}$/.test(base) &&
+      /^[0-9,-]+$/.test(sup)
+    ) {
+      return `${base}^${sup}${m[3] ?? ""}`;
+    }
+  }
+
+  m = x.match(
+    /^\{\s*\\mathrm\s*\{\s*((?:[A-Za-z0-9]\s*)+)\}\s*\}\s*\^\s*\{\s*([0-9,\s\-]+)\s*\}\s*$/,
+  );
+  if (m) {
+    const base = collapseSpacedChars(m[1]);
+    const sup = m[2].replace(/\s+/g, "");
+    if (/^[A-Za-z0-9.-]{2,32}$/.test(base) && /^[0-9,-]+$/.test(sup)) {
+      return `${base}^${sup}`;
+    }
+  }
+
+  m = x.match(
+    /^((?:[A-Za-z0-9.-]\s*){2,})\s*\^\s*\{\s*([A-Za-z0-9/.\s-]+)\s*\}\s*([).|])?\s*$/,
+  );
+  if (m) {
+    const base = collapseSpacedChars(m[1]);
+    const sup = collapseSpacedChars(m[2]);
+    if (
+      /^[A-Za-z0-9.-]{2,32}$/.test(base) &&
+      /^[A-Za-z0-9/.-]{1,32}$/.test(sup)
+    ) {
+      return `${base}^${sup}${m[3] ?? ""}`;
+    }
+  }
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*\\?\s*[Ll]\s*;?\s*$/);
+  if (m) return `${m[1]} μL`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*~?\s*\\mu\s*M\s*\)\s*$/);
+  if (m) return `(${m[1]} μM)`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*~?\s*\\mu\s*\\?\s*[Ll]\s*\)\s*$/);
+  if (m) return `(${m[1]} μL)`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*;?\s*$/i);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(
+    /^([\d.]+)\s*\\mathrm\s*\{\s*~?\s*h\s*\}\s*;?\s*$/i,
+  );
+  if (m) return `${m[1]} h`;
+
+  m = x.match(
+    /^([\d.]+)\s*\\mathsf\s*\{\s*c\s*m\s*\}\s*\^\s*\{\s*(\d+)\s*\}\s*$/,
+  );
+  if (m) return `${m[1]} cm^${m[2]}`;
+
+  m = x.match(
+    /^([\d.]+)\s*\^\s*\{\s*\*\s*\}\s*10\s*\^\s*\{\s*([-+]?\d+)\s*\}\s*\\mathrm\s*\{\s*Vg\s*\/\s*ml\s*\}\s*$/i,
+  );
+  if (m) return `${m[1]}×10^${m[2]} Vg/ml`;
+
+  m = x.match(/^([\d.]+)\s*M\s*$/);
+  if (m) return `${m[1]} M`;
+
+  m = x.match(/^([\d.]+)x\s*$/i);
+  if (m) return `${m[1]}×`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\\%\s*[0O]\s*_\s*\{\s*2\s*\}\s*\)\s*$/,
+  );
+  if (m) return `(${m[1]}% O₂)`;
+
+  m = x.match(/^([\d.]+)\s*\\%\s*[0O]\s*_\s*\{\s*2\s*\}\s*$/);
+  if (m) return `${m[1]}% O₂`;
+
+  m = x.match(/^([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\%\s*$/);
+  if (m) return `${m[1]}-${m[2]}%`;
+
+  m = x.match(/^>\s*([\d.]+)\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*;?\s*$/i);
+  if (m) return `> ${m[1]} mM`;
+
+  m = x.match(
+    /^\{\s*\\sf\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*[O0]\s*\}\s*_\s*\{\s*2\s*\}\s*$/,
+  );
+  if (m) return "H₂O₂";
+
+  m = x.match(
+    /^\{\s*\\sf\s*M\s*g\s*S\s*O\s*_\s*\{\s*4\s*\}\s*\}\s*,\s*1\s*mM\s*\{\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\mathsf\s*\{\s*H\s*P\s*O\s*\}\s*\}\s*_\s*\{\s*4\s*\}\s*,\s*1\.2\s*mM\s*\{\s*\\sf\s*K\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*P\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*$/i,
+  );
+  if (m) return "MgSO₄, 1 mM Na₂HPO₄, 1.2 mM KH₂PO₄";
+
+  m = x.match(
+    /^\\left\|\s*\\mathrm\s*\{\s*FC\s*\}\s*\\right\|\s*\\geq\s*([\d.]+)\s*$/,
+  );
+  if (m) return `|FC| ≥ ${m[1]}`;
+
+  m = x.match(/^\|\s*\\mathrm\s*\{\s*FC\s*\}\s*\|\s*\\geq\s*([\d.]+)\s*$/);
+  if (m) return `|FC| ≥ ${m[1]}`;
+
+  m = x.match(/^([\d.]+)\s*\\pm\s*([\d.]+)\s*\^\s*\{\s*\\circ\s*\}\s*C\s*$/i);
+  if (m) return `${m[1]} ± ${m[2]}°C`;
+
+  m = x.match(
+    /^([Cc])\s*\.\s*(\d+)\s*([A-Za-z])\s*\\mathrm\s*\{\s*>\s*([A-Za-z])\s*\}\s*$/,
+  );
+  if (m) return `${m[1]}.${m[2]} ${m[3]}>${m[4]}`;
+
+  m = x.match(
+    /^\(\s*([Cc])\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}.${m[2]} ${m[3]}>${m[4]}`;
+
+  m = x.match(
+    /^\{\s*\\mathrm\s*\{\s*([Cc])\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*\}\s*$/,
+  );
+  if (m) return `${m[1]}.${m[2]} ${m[3]}>${m[4]}`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\pm\s*([\d.]+)\s*\\:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*\\mu\s*g\s*\/\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} μg/mL)`;
+
+  m = x.match(/^([A-Za-z])\s*\(\s*([\d.]+)\s*\\mu\s*g\s*\/\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*\)\s*$/i);
+  if (m) return `${m[1]} (${m[2]} μg/mL)`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*~?\s*\\mu\s*\\?\s*[Ll]\s*of\s*DPBS\s*containing\s*([\d.]+)\s*%\s*BSA\.?\s*$/,
+  );
+  if (m) return `(${m[1]} μL of DPBS containing ${m[2]}% BSA.`;
+
+  m = x.match(
+    /^\{\s*\\sf\s*O\s*\}\s*2\s*\(\s*-\s*\\mathrm\s*\{\s*\^\s*\{\s*\\star\s*\}\s*\}\s*\)\s*$/,
+  );
+  if (m) return "O₂(−*)";
+
+  m = x.match(
+    /^\{\s*20\s*~?\s*9\s*\}\s*of\s*BSA,\s*45\s*~?\s*\\mathsf\s*\{\s*m\s*L\s*\}\s*$/,
+  );
+  if (m) return "20 g of BSA, 45 mL";
+
+  m = x.match(/^\(\s*([\d.]+)\s*\\mu\s*g\s*\)\s*$/i);
+  if (m) return `(${m[1]} μg)`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*~?\s*\\mu\s*\\mathfrak\s*\{\s*g\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} μg)`;
+
+  m = x.match(/^\(\s*([\d.]+)\s*\\mathrm\s*\{\s*mg\s*\/\s*kg\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} mg/kg)`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\pm\s*([\d.]+)\s*\\:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*g\s*\/\s*L\s*;?\s*$/i);
+  if (m) return `${m[1]} μg/L`;
+
+  m = x.match(/^([\d.]+)\s*-\s*([\d.]+)\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]}-${m[2]} μ/mL`;
+
+  m = x.match(/^([\d,\s]+)\s*\{\s*-\s*\}\s*([\d,\s]+)\s*$/);
+  if (m) {
+    const a = collapseSpacedChars(m[1]);
+    const b = collapseSpacedChars(m[2]);
+    if (/^\d[\d,]*$/.test(a) && /^\d[\d,]*$/.test(b)) return `${a}-${b}`;
+  }
+
+  m = x.match(/^\\mathbf\s*\{\s*\\sigma\s*\}\s*\\cdot\s*\\kappa\s*B\s*$/i);
+  if (m) return "σ·κB";
+
+  m = x.match(/^\\mu\s*\\mathrm\s*\{\s*B\s*C\s*A\s*\}\s*$/i);
+  if (m) return "μBCA";
+
+  m = x.match(/^\\mathrm\s*\{\s*S\s*L\s*E\s*\^\s*\{\s*([0-9,\s-]+)\s*\}\s*\}\s*$/);
+  if (m) return `SLE^${m[1].replace(/\s+/g, "")}`;
+
+  m = x.match(
+    /^\\mathsf\s*\{\s*G\s*C\s*G\s*\}\s*\^\s*\{\s*\+\s*\}\s*\\mathrm\s*\{\s*~\s*\\pmb\s*~\s*\{\s*\\alpha\s*\}\s*~\s*\}\s*$/i,
+  );
+  if (m) return "GCG+ α";
+
+  m = x.match(/^\^\s*\{\s*\+\s*\}\s*NKX6\.1\+\s*$/i);
+  if (m) return "+ NKX6.1+";
+
+  m = x.match(/^\(\s*\\boldsymbol\s*\{\s*\\\|\s*\}\s*\)\s*$/);
+  if (m) return "(I)";
+
+  m = x.match(/^\\cdot\s*D\s*A\s*\^\s*\{\s*\+\s*\}\s*$/i);
+  if (m) return "·DA+";
+
+  m = x.match(/^BMP4\s*\(R&D,\s*#314-BP-01M\),\s*$/i);
+  if (m) return "BMP4 (R&D, #314-BP-01M),";
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\pm\s*([\d.]+)\s*\\:\s*\\mathrm\s*\{\s*g\s*\/\s*m\s*L\)\s*\}\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} ± ${m[3]} g/mL)`;
+
+  m = x.match(
+    /^\(\s*([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\mu\s*\/\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*\.\s*$/,
+  );
+  if (m) return `(${m[1]}-${m[2]} μ/mL.`;
+
+  m = x.match(/^\(\s*I\s*N\s*S\s*\^\s*\{\s*w\s*\/\s*G\s*F\s*P\s*\}\s*\)\s*$/i);
+  if (m) return "(INS^w/GFP)";
+
+  m = x.match(/^\(\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*$/);
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(/^\(\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*$/);
+  if (m) return `(c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(/^([\d]+)\s*S\s*\^\s*\{\s*\+\s*\}\s*\\mathrm\s*\{\s*~\s*\\beta\s*~\s*\}\s*$/i);
+  if (m) return `${m[1]}S+ β`;
+
+  m = x.match(/^1g\s*$/);
+  if (m) return "1 g";
+
+  m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*\\\s*m\s*l\s*\}\s*$/i);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(/^([\d.]+)\s*\\\s*\\mathrm\s*\{\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} mL`;
+
+  m = x.match(
+    /^((?:[A-Za-z0-9]\s*)+)\s*\^\s*\{\s*-\s*\/\s*-\s*\}\s*\\mathsf\s*\{\s*A\s*D\s*-\s*\}\s*\|\s*$/i,
+  );
+  if (m) {
+    const gene = collapseSpacedChars(m[1]);
+    if (/^[A-Za-z0-9]{4,28}$/.test(gene)) return `${gene}−/− AD-B`;
+  }
+
+  m = x.match(
+    /^W\s*\{\s*\\sf\s*S\s*\}\s*\^\s*\{\s*\+\s*\}\s*N\s*\{\s*\\sf\s*K\s*\}\s*\\times\s*6\.1\s*\^\s*\{\s*\+\s*\}\s*\\beta\s*$/i,
+  );
+  if (m) return "WS+ NKX6.1+ β";
+
+  m = x.match(
+    /^W\s*\{\s*\\sf\s*S\s*\}\s*\^\s*\{\s*\+\s*\}\s*\\sf\s*N\s*K\s*X\s*6\.1\s*\^\s*\{\s*\+\s*\}\s*\\beta\s*$/i,
+  );
+  if (m) return "WS+ NKX6.1+ β";
+
+  m = x.match(/^\{\s*20\s*~?\s*9\s*\}\s*$/);
+  if (m) return "20 g";
+
+  m = x.match(/^\{\s*>\s*\}\s*([\d.]+)\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*_\s*\{\s*\\beta\s*\}\s*$/i);
+  if (m) return `> ${m[1]} mM β`;
+
+  m = x.match(/^\{\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*([A-Za-z])\s*\}\s*\}\s*\}\s*$/);
+  if (m) return `c.${m[1]} ${m[2]}>${m[3]}`;
+  m = x.match(/^\{\s*\\mathrm\s*\{\s*c\s*\.\s*(\d+)\s*([A-Za-z])\s*\{\s*>\s*\}\s*([A-Za-z])\s*\}\s*\}\s*$/i);
+  if (m) return `c.${m[1]} ${m[2]}>${m[3]}`;
+
+  m = x.match(/^([\d.]+)\s*\\\s*\\mathrm\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*$/i);
+  if (m) return `${m[1]} ng/mL`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mathrm\s*\{\s*\\\s*n\s*g\s*\}\s*$/i);
+  if (m) return `${m[1]} ng`;
+
+  m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*\\iota\s*$/i);
+  if (m) return `${m[1]} μL`;
+
+  m = x.match(/^Z\s*n\s*S\s*O\s*_\s*\{\s*4\s*\}\s*$/i);
+  if (m) return "ZnSO₄";
+
+  m = x.match(
+    /^W\s*\{\s*\\sf\s*S\s*\}\s*\^\s*\{\s*\+\s*\}\s*N\s*\{\s*\\sf\s*K\s*\}\s*\\times\s*6\.1\s*\^\s*\{\s*\+\s*\}\s*\\\s*\\beta\s*$/i,
+  );
+  if (m) return "WS+ NKX6.1+ β";
+
+  m = x.match(
+    /^\{\s*\\sf\s*M\s*g\s*S\s*O\s*_\s*\{\s*4\s*\}\s*\}\s*,\s*1\s*mM\s*\{\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\mathsf\s*\{\s*H\s*P\s*O\s*\}\s*\}\s*_\s*\{\s*4\s*\}\s*,\s*1\.2\s*mM\s*\{\s*\\sf\s*K\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*P\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*$/,
+  );
+  if (m) return "MgSO₄, 1 mM Na₂HPO₄, 1.2 mM KH₂PO₄";
 
   return null;
 }

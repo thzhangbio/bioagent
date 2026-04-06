@@ -4,6 +4,7 @@ import { createEmbeddingClient } from "../../knowledge/embeddings.js";
 import { DEFAULT_RAG_STORE_PATH } from "../../knowledge/paths.js";
 import { retrieve } from "../../knowledge/retrieve.js";
 import type { SearchHit } from "../../knowledge/vector-file-store.js";
+import type { WechatContentSlot } from "../../knowledge/types.js";
 
 /** 与 content-create 一致，避免循环 import */
 function normalizeUserTextForIntent(raw: string): string {
@@ -118,6 +119,41 @@ function formatHitsBlock(hits: SearchHit[]): string {
         `[#${i + 1} ${h.chunk.collection} | ${h.chunk.sourceLabel}]\n${h.chunk.text}`,
       )
     .join("\n\n---\n\n");
+}
+
+const MEDSCI_STYLE_SLOT_PLAN: Array<{
+  slot: WechatContentSlot;
+  label: string;
+  queryHint: string;
+  topK: number;
+}> = [
+  { slot: "title", label: "标题样本", queryHint: "标题 题目 起标题", topK: 3 },
+  { slot: "intro", label: "引入样本", queryHint: "开篇 引入 导语 首屏", topK: 4 },
+  { slot: "bridge", label: "承接样本", queryHint: "承接 过渡 推进 判断句", topK: 4 },
+  { slot: "subheading", label: "小标题样本", queryHint: "小标题 段标题 判断句标题", topK: 6 },
+  { slot: "caption", label: "图注样本", queryHint: "图注 插图占位 配图说明", topK: 4 },
+  { slot: "ending", label: "结尾样本", queryHint: "结尾 收束 总结 最后一句", topK: 4 },
+];
+
+function formatStyleSlotHitsBlock(
+  label: string,
+  slot: WechatContentSlot,
+  hits: SearchHit[],
+): string {
+  if (hits.length === 0) {
+    return `【梅斯风格·${label}｜slot=${slot}】\n（当前槽位未命中稳定样本。）`;
+  }
+  return [
+    `【梅斯风格·${label}｜slot=${slot}】`,
+    hits
+      .map(
+        (h, i) =>
+          `[#S${i + 1} ${h.chunk.wechatStyleSource ?? "wechat"} | ${
+            h.chunk.wechatStyleGenre ?? "unknown"
+          } | ${h.chunk.wechatStyleTask ?? "unknown"}]\n${h.chunk.text}`,
+      )
+      .join("\n\n---\n\n"),
+  ].join("\n");
 }
 
 function parseLiteratureKbMetadataFromSourcePath(sourcePath: string): LiteratureKbMetadata | null {
@@ -263,22 +299,30 @@ export async function fetchMedsciLiteratureRagContext(
         formatHitsBlock(literatureHits.slice(0, 10))
       : "（文献无命中片段。）";
 
-    const styleQuery = `${userText}\n仿梅斯学术 微信公众号 医学科普长文`.slice(0, 800);
-    const styleHits = await retrieve(client, styleQuery, {
-      collections: ["wechat_style"],
-      wechatStyleVariants: ["medsci"],
-      topK: 8,
-      storePath: DEFAULT_RAG_STORE_PATH,
-    });
-    const styleBlock =
-      styleHits.length > 0 ?
-        styleHits
-          .map(
-            (h, i) =>
-              `[#S${i + 1} ${h.chunk.collection} | ${h.chunk.sourceLabel}]\n${h.chunk.text}`,
-          )
-          .join("\n\n---\n\n")
-      : "（梅斯风格库检索无命中片段。）";
+    const styleSlotBlocks: string[] = [];
+    for (const plan of MEDSCI_STYLE_SLOT_PLAN) {
+      const styleQuery = [
+        literatureTopic,
+        userText,
+        "梅斯学术 微信公众号 文献解读",
+        plan.queryHint,
+      ]
+        .join("\n")
+        .slice(0, 1000);
+      const styleHits = await retrieve(client, styleQuery, {
+        collections: ["wechat_style"],
+        wechatStyleVariants: ["medsci"],
+        wechatStyleSources: ["medsci"],
+        wechatStyleGenres: ["literature_digest"],
+        wechatStyleTasks: ["literature_to_wechat"],
+        wechatContentSlots: [plan.slot],
+        topK: plan.topK,
+        storePath: DEFAULT_RAG_STORE_PATH,
+      });
+      styleSlotBlocks.push(
+        formatStyleSlotHitsBlock(plan.label, plan.slot, styleHits),
+      );
+    }
 
     return [
       `【文献主题】${literatureTopic}`,
@@ -286,8 +330,8 @@ export async function fetchMedsciLiteratureRagContext(
       "【以下为文献库事实参考（literature），正文数据与结论仅可据此与 user 任务表述，不得编造）】",
       litBlock,
       "",
-      "【以下为梅斯学术风格参考（wechat_style / medsci），仅作标题节奏、段落与语气参考，不得当作事实来源】",
-      styleBlock,
+      "【以下为梅斯学术风格参考（wechat_style / medsci / literature_digest / literature_to_wechat），仅作标题、引入、承接、小标题、图注与结尾写法参考，不得当作事实来源】",
+      styleSlotBlocks.join("\n\n"),
     ].join("\n");
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

@@ -56,14 +56,30 @@ export function segmentWechatBody(markdownBody: string): WechatSegment[] {
   const trimmed = markdownBody.replace(/\r\n/g, "\n").trim();
   if (!trimmed) return [];
   const blocks = trimmed.split(/\n\n+/).map((b) => b.trim()).filter(Boolean);
-  return blocks.map((text) => {
+  const segments: WechatSegment[] = [];
+  for (const text of blocks) {
+    const lines = text.split("\n").map((line) => line.trim()).filter(Boolean);
+    const styleLines = lines.filter((line) => /^>\s*\[风格·/.test(line));
+    if (styleLines.length > 0) {
+      for (const styleLine of styleLines) {
+        const classified = classifyWechatBlock(styleLine);
+        segments.push({
+          slot: classified.slot,
+          captionKind: classified.captionKind,
+          text: styleLine,
+        });
+      }
+      continue;
+    }
+
     const classified = classifyWechatBlock(text);
-    return {
+    segments.push({
       slot: classified.slot,
       captionKind: classified.captionKind,
       text,
-    };
-  });
+    });
+  }
+  return segments;
 }
 
 export function parseSimpleYamlFrontMatter(

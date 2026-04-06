@@ -8,6 +8,9 @@ import type {
   KnowledgeCollection,
   SectionPriority,
   WechatContentSlot,
+  WechatStyleGenre,
+  WechatStyleSource,
+  WechatStyleTask,
   WechatStyleVariant,
 } from "./types.js";
 
@@ -19,6 +22,12 @@ export interface RetrieveOptions {
    * 不传或空数组：不额外过滤（与 `collections` 含 `wechat_style` 时即「混合参考全部微信风格」）。
    */
   wechatStyleVariants?: WechatStyleVariant[];
+  /** 仅作用于 `wechat_style` 块：限定来源，如 medsci / liangyi_hui。 */
+  wechatStyleSources?: WechatStyleSource[];
+  /** 仅作用于 `wechat_style` 块：限定文体，如 literature_digest。 */
+  wechatStyleGenres?: WechatStyleGenre[];
+  /** 仅作用于 `wechat_style` 块：限定任务，如 literature_to_wechat。 */
+  wechatStyleTasks?: WechatStyleTask[];
   /**
    * 仅作用于 `wechat_style` 块：限定槽位（导流 / 正文 / 文献区等）。
    * 不传或空数组：不按槽位过滤。旧块无 `wechatContentSlot` 时视为仅在与 `body` 一并请求时命中。
@@ -38,6 +47,39 @@ function passesWechatStyleFilter(
   if (!requested?.length) return true;
   if (variant == null) return false;
   return requested.includes(variant);
+}
+
+function passesWechatStyleSourceFilter(
+  collection: KnowledgeCollection,
+  source: WechatStyleSource | undefined,
+  requested: WechatStyleSource[] | undefined,
+): boolean {
+  if (collection !== "wechat_style") return true;
+  if (!requested?.length) return true;
+  if (source == null) return false;
+  return requested.includes(source);
+}
+
+function passesWechatStyleGenreFilter(
+  collection: KnowledgeCollection,
+  genre: WechatStyleGenre | undefined,
+  requested: WechatStyleGenre[] | undefined,
+): boolean {
+  if (collection !== "wechat_style") return true;
+  if (!requested?.length) return true;
+  if (genre == null) return false;
+  return requested.includes(genre);
+}
+
+function passesWechatStyleTaskFilter(
+  collection: KnowledgeCollection,
+  task: WechatStyleTask | undefined,
+  requested: WechatStyleTask[] | undefined,
+): boolean {
+  if (collection !== "wechat_style") return true;
+  if (!requested?.length) return true;
+  if (task == null) return false;
+  return requested.includes(task);
 }
 
 function passesWechatContentSlotFilter(
@@ -82,6 +124,9 @@ export async function retrieve(
   }
   const store = loadVectorStore(path);
   const requestedVariants = options.wechatStyleVariants;
+  const requestedSources = options.wechatStyleSources;
+  const requestedGenres = options.wechatStyleGenres;
+  const requestedTasks = options.wechatStyleTasks;
   const requestedSlots = options.wechatContentSlots;
   const chunks =
     options.collections?.length ?
@@ -92,6 +137,21 @@ export async function retrieve(
             c.collection,
             c.wechatStyleVariant,
             requestedVariants,
+          ) &&
+          passesWechatStyleSourceFilter(
+            c.collection,
+            c.wechatStyleSource,
+            requestedSources,
+          ) &&
+          passesWechatStyleGenreFilter(
+            c.collection,
+            c.wechatStyleGenre,
+            requestedGenres,
+          ) &&
+          passesWechatStyleTaskFilter(
+            c.collection,
+            c.wechatStyleTask,
+            requestedTasks,
           ) &&
           passesWechatContentSlotFilter(
             c.collection,
@@ -105,6 +165,21 @@ export async function retrieve(
             c.collection,
             c.wechatStyleVariant,
             requestedVariants,
+          ) &&
+          passesWechatStyleSourceFilter(
+            c.collection,
+            c.wechatStyleSource,
+            requestedSources,
+          ) &&
+          passesWechatStyleGenreFilter(
+            c.collection,
+            c.wechatStyleGenre,
+            requestedGenres,
+          ) &&
+          passesWechatStyleTaskFilter(
+            c.collection,
+            c.wechatStyleTask,
+            requestedTasks,
           ) &&
           passesWechatContentSlotFilter(
             c.collection,

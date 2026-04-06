@@ -21,6 +21,7 @@ export interface WechatCleanupBlock {
   slot:
     | "title"
     | "lead"
+    | "subheading"
     | "body"
     | "caption"
     | "diversion"
@@ -38,6 +39,14 @@ export interface WechatCleanupDraft {
   articleCategory?: WechatArticleCategory;
   styleVariant?: string;
   blocks: WechatCleanupBlock[];
+  styleExtraction?: {
+    title: string[];
+    intro: string[];
+    bridge: string[];
+    ending: string[];
+    subheading: string[];
+    caption: string[];
+  };
   markdownBody?: string;
   outBaseName?: string;
   outMarkdown?: string;

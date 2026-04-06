@@ -39,7 +39,10 @@ import {
   shouldForceReadyForEditorHandoff,
   shouldRelaxXhsOverride,
 } from "./write-brief.js";
-import { MEDSCI_LITERATURE_WECHAT_GENERATION_APPEND } from "../prompts/medsci-literature-wechat.js";
+import {
+  MEDSCI_LITERATURE_WECHAT_DRAFT_APPEND,
+  MEDSCI_LITERATURE_WECHAT_POLISH_SYSTEM,
+} from "../prompts/medsci-literature-wechat.js";
 
 /** 第一跳：判断是否可成稿；若用户已授权编辑把握边界，可放行避免重复追问 */
 const CLARIFICATION_GATE_SYSTEM = `你是医学新媒体编辑流程中的「动笔前核对」环节。判断：当前材料是否已足以**在合规前提下**撰写对外稿件（科普/营销类）。
@@ -576,6 +579,41 @@ export interface ContentCreateWorkflowOptions {
   skipAlignmentGates?: boolean;
 }
 
+async function runMedsciPolishPass(
+  model: string,
+  userPayload: string,
+  title: string,
+  body: string,
+): Promise<{ title: string; body: string }> {
+  const response = await getAnthropicClient().messages.create({
+    model,
+    max_tokens: 4096,
+    system: MEDSCI_LITERATURE_WECHAT_POLISH_SYSTEM,
+    messages: [
+      {
+        role: "user",
+        content: [
+          userPayload,
+          "",
+          "【第一轮初稿】",
+          title.trim(),
+          "",
+          body.trim(),
+          "",
+          "请在不削弱第一轮表达力度的前提下，只做结构与呈现精修，并保留至少 2-4 个图注占位。",
+        ].join("\n"),
+      },
+    ],
+  });
+  const raw =
+    response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("\n") || "";
+  const cleaned = stripAssistantNoise(raw);
+  return splitGeneratedTitleAndBody(cleaned, title);
+}
+
 /**
  * 检索 → **动笔前核对** →（仅 READY）生成 → 创建飞书云文档；ASK 时只回复追问，不创建文档。
  */
@@ -783,7 +821,7 @@ export async function runContentCreateWorkflow(
 
   const generationSystem =
     medsciLiteratureWechatMode ?
-      GENERATION_SYSTEM + MEDSCI_LITERATURE_WECHAT_GENERATION_APPEND
+      GENERATION_SYSTEM + MEDSCI_LITERATURE_WECHAT_DRAFT_APPEND
     : GENERATION_SYSTEM;
 
   let body: string;
@@ -806,6 +844,21 @@ export async function runContentCreateWorkflow(
     title = split.title;
     if (!body.trim()) {
       throw new Error("模型未返回正文");
+    }
+    if (medsciLiteratureWechatMode) {
+      try {
+        const polished = await runMedsciPolishPass(model, userPayload, title, body);
+        if (polished.body.trim()) {
+          body = polished.body;
+        }
+        if (polished.title.trim()) {
+          title = polished.title;
+        }
+      } catch (polishError) {
+        const msg =
+          polishError instanceof Error ? polishError.message : String(polishError);
+        console.warn("[content-create] 梅斯二轮精修失败，保留第一轮正文:", msg);
+      }
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

@@ -41,6 +41,7 @@ export interface WechatRawRecord {
   sourceUrl?: string;
   fetchedAt?: string;
   rawHtml: string;
+  contentFormat?: "raw_html" | "clean_markdown";
 }
 
 export interface WechatOutRecord {

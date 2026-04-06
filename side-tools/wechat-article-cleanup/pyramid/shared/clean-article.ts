@@ -95,6 +95,7 @@ function isNonFigureGrayAnnotation(plain: string): boolean {
   if (/^注[：:]/.test(t)) return true;
   if (/^参考资料[：:]?/.test(t)) return true;
   if (/^撰文[：:]/.test(t)) return true;
+  if (/^撰写[：:]/.test(t)) return true;
   if (/^编辑[：:]/.test(t)) return true;
   if (/授权转载/.test(t)) return true;
   if (/梅斯学术管理员/.test(t)) return true;
@@ -133,6 +134,7 @@ function formatNonBodyMetadata(plain: string): string | null {
     return `> [文献] ${t}`;
   }
   if (/^撰文[：:]/.test(t)) return `> [署名·撰文] ${t}`;
+  if (/^撰写[：:]/.test(t)) return `> [署名·撰写] ${t}`;
   if (/^编辑[：:]/.test(t)) return `> [署名·编辑] ${t}`;
   if (/授权转载/.test(t) && !/微信bjy|微信号\d/.test(t)) {
     return `> [转载说明] ${t}`;

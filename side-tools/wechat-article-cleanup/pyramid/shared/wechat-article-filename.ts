@@ -67,7 +67,7 @@ export function renameInboxRawToOutBasename(
   outBasename: string,
 ): void {
   if (inboxBasenameNoExt === outBasename) return;
-  const extMatch = inboxFilePath.match(/\.raw\.html?$/i);
+  const extMatch = inboxFilePath.match(/(\.raw\.html?|\.md)$/i);
   const ext = extMatch?.[0] ?? ".raw.html";
   const dir = dirname(inboxFilePath);
   const nextPath = join(dir, `${outBasename}${ext}`);

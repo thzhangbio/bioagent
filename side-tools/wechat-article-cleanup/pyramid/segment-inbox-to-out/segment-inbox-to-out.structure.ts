@@ -1,4 +1,8 @@
 import { cleanWeChatArticleRaw } from "../shared/clean-article.js";
+import {
+  parseMarkdownFrontMatter,
+  renderMarkdownFrontMatter,
+} from "../shared/markdown-frontmatter.js";
 
 export interface RenderWechatMarkdownOptions {
   sourceUrl?: string;
@@ -33,6 +37,7 @@ export function extractBlocksFromMarkdown(markdown: string): Array<{
   slot:
     | "title"
     | "lead"
+    | "subheading"
     | "body"
     | "caption"
     | "diversion"
@@ -44,7 +49,26 @@ export function extractBlocksFromMarkdown(markdown: string): Array<{
   const body = markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "").trim();
   if (!body) return [];
   const blocks = body.split(/\n\n+/).map((b) => b.trim()).filter(Boolean);
+  let seenSubheading = false;
   return blocks.map((text, index) => {
+    const oneLine = text.replace(/\n+/g, " ").trim();
+    const isPlainSubheadingLike =
+      !/^>\s*/.test(oneLine) &&
+      !/^#{1,6}\s/.test(oneLine) &&
+      oneLine.length > 0 &&
+      oneLine.length <= 28 &&
+      !/[。]/.test(oneLine) &&
+      (/[:：]$/.test(oneLine) ||
+        /^[^\n]{2,20}[！!？?]$/.test(oneLine) ||
+        /“[^”]{2,16}”/.test(oneLine));
+    if (/^##\s+/.test(text)) {
+      seenSubheading = true;
+      return { slot: "subheading", text };
+    }
+    if (isPlainSubheadingLike) {
+      seenSubheading = true;
+      return { slot: "subheading", text: `## ${oneLine}` };
+    }
     if (text.startsWith("> 图注：")) return { slot: "caption", text };
     if (text.startsWith("> [导流]")) return { slot: "diversion", text };
     if (text.startsWith("> [文献]") || text.startsWith("> [参考资料]")) {
@@ -59,7 +83,22 @@ export function extractBlocksFromMarkdown(markdown: string): Array<{
     ) {
       return { slot: "footer", text };
     }
-    if (index === 0) return { slot: "lead", text };
+    if (!seenSubheading && index === 0) return { slot: "lead", text };
+    if (!seenSubheading) return { slot: "lead", text };
     return { slot: "body", text };
   });
+}
+
+export function renderWechatMarkdownFromExistingMarkdown(
+  markdown: string,
+  updates: Record<string, string | boolean | number | undefined>,
+): string {
+  const parsed = parseMarkdownFrontMatter(markdown);
+  return renderMarkdownFrontMatter(
+    {
+      ...parsed.fields,
+      ...updates,
+    },
+    parsed.body,
+  );
 }

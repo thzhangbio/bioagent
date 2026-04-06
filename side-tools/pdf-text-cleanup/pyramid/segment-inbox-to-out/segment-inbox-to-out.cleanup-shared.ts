@@ -35,6 +35,10 @@ export interface CleanupOptions {
    * 样本量 `$$_ { \\it { n } } = 5$$`、µm²、浓度 `$1 5 \\mu { \\sf g } / \\sf m \\mu$`、误识 **CD20+**（`\\textcircled{1220}`）等杂项 OCR/LaTeX。
    */
   normalizeOcrLatexMisc?: boolean;
+  /** 将残留 HTML 标签（如 `<sup>35</sup>`、`<h4>Background</h4>`）转成纯文本 */
+  normalizeResidualHtmlMarkup?: boolean;
+  /** 去掉已知 publisher boilerplate 与期刊页眉页脚残片 */
+  stripKnownBoilerplate?: boolean;
   /** 弱化常见 LaTeX/OCR 数学碎片（不保证可逆） */
   softenLatexArtifacts?: boolean;
 }
@@ -49,9 +53,125 @@ const DEFAULT_OPTS: CleanupOptions = {
   normalizeTgfBetaMarkup: true,
   normalizeImmuneMarkerLatex: true,
   normalizeOcrLatexMisc: true,
+  normalizeResidualHtmlMarkup: true,
+  stripKnownBoilerplate: true,
   /** 默认关闭：公式块形态各异，自动替换易误伤正文（如 CD31 等） */
   softenLatexArtifacts: false,
 };
+
+const SUPERSCRIPT_DIGIT_MAP: Record<string, string> = {
+  "0": "⁰",
+  "1": "¹",
+  "2": "²",
+  "3": "³",
+  "4": "⁴",
+  "5": "⁵",
+  "6": "⁶",
+  "7": "⁷",
+  "8": "⁸",
+  "9": "⁹",
+};
+
+const SUBSCRIPT_DIGIT_MAP: Record<string, string> = {
+  "0": "₀",
+  "1": "₁",
+  "2": "₂",
+  "3": "₃",
+  "4": "₄",
+  "5": "₅",
+  "6": "₆",
+  "7": "₇",
+  "8": "₈",
+  "9": "₉",
+};
+
+function digitsAndSeparatorsToUnicodeScript(
+  text: string,
+  kind: "sup" | "sub",
+): string {
+  const map = kind === "sup" ? SUPERSCRIPT_DIGIT_MAP : SUBSCRIPT_DIGIT_MAP;
+  return [...text].map((char) => map[char] ?? char).join("");
+}
+
+function stripKnownBoilerplatePhrases(text: string): string {
+  let s = text;
+
+  s = s.replace(
+    /\b[A-Z][a-z]+ et al\.,\s*20\d{2},\s*Cell Stem Cell\s+\d+,\s*\d+[–-]\d+\b/g,
+    "",
+  );
+  s = s.replace(
+    /\bCell Stem Cell\s+\d+,\s*\d+[–-]\d+(?:\.e\d+[–-]e\d+)?,\s*[A-Za-z]+\s+\d{1,2},\s*20\d{2}\s+Cell Stem Cell\b/g,
+    "",
+  );
+  s = s.replace(
+    /\bCell Stem Cell\s+\d+,\s*\d+[–-]\d+(?:\.e\d+[–-]e\d+)?,\s*[A-Za-z]+\s+\d{1,2},\s*20\d{2}\b/g,
+    "",
+  );
+  s = s.replace(
+    /\bCell Stem Cell\s+\d+,[^\n]{0,80}?20\d{2}\b/g,
+    "",
+  );
+  s = s.replace(
+    /\bnature portfolio\s*\|\s*reporting summary\s+[A-Za-z]+\s+\d{4}\b/gi,
+    "",
+  );
+  s = s.replace(
+    /\bnature portfolio\s+Corresponding author\(s\):\s*.+?Last updated by author\(s\):\s*[A-Za-z]{3}\s+\d{1,2},\s*20\d{2}\b/gi,
+    "",
+  );
+  s = s.replace(
+    /\bReprints and permissions? information is available at\s+(?:https?:\/\/)?(?:www\.)?nature\.com\/reprints\b\.?/gi,
+    "",
+  );
+  s = s.replace(
+    /\bPeer review information\s+Nature [^.]+?\.\s*/gi,
+    "",
+  );
+  s = s.replace(
+    /\bCorrespondence and requests for materials should be addressed to\s+[^.]+?\.\s*/gi,
+    "",
+  );
+  s = s.replace(
+    /\bPrimary Handling Editor:\s*[^.]+?\.\s*/gi,
+    "",
+  );
+  s = s.replace(/\bPeer reviewer reports are available\.?/gi, "");
+  s = s.replace(/[^\S\n]{2,}/g, " ");
+  s = s.replace(/[^\S\n]+([,.;:])/g, "$1");
+  return s;
+}
+
+export function normalizeResidualHtmlMarkup(text: string): string {
+  let s = text;
+
+  s = s.replace(/<h([1-6])>\s*([^<]+?)\s*<\/h\1>/gi, (_, __: string, inner: string) =>
+    `${inner.trim()}: `,
+  );
+
+  s = s.replace(/<sup>([^<]+)<\/sup>/gi, (_, inner: string) => {
+    const content = inner.trim();
+    if (/^[0-9,\s*+\-−–]+$/.test(content)) {
+      return digitsAndSeparatorsToUnicodeScript(content, "sup");
+    }
+    return `[${content}]`;
+  });
+
+  s = s.replace(/<sub>([^<]+)<\/sub>/gi, (_, inner: string) => {
+    const content = inner.trim();
+    if (/^[0-9,\s+\-−–]+$/.test(content)) {
+      return digitsAndSeparatorsToUnicodeScript(content, "sub");
+    }
+    return `_${content}`;
+  });
+
+  s = s.replace(/<\/?(?:i|b|em|strong|u|span|p)>/gi, "");
+  s = s.replace(
+    /([a-z0-9.)])(?=(Background|Methods|Findings|Interpretation|Funding):\s)/g,
+    "$1 ",
+  );
+  return s;
+}
 
 /** 整行删除：页脚、版权等（**保留**单独成行的 `https://doi.org/...` 作为文献唯一标识） */
 function shouldDropLine(
@@ -68,6 +188,26 @@ function shouldDropLine(
   if (/Elsevier Inc\./i.test(trimmed) && /2026/i.test(trimmed)) return "drop";
   if (/^Continued\s*$/i.test(trimmed)) return "drop";
   if (/^Graphical abstract\s*$/i.test(trimmed)) return "drop";
+  if (/^Check f Cell Stem Cell$/i.test(trimmed)) return "drop";
+  if (/^Cite this article as:/i.test(trimmed)) return "drop";
+  if (/^We are providing an unedited version of this manuscript/i.test(trimmed))
+    return "drop";
+  if (/^If this paper is publishing under a Transparent Peer Review model/i.test(trimmed))
+    return "drop";
+  if (/^© The Author\(s\)\s+\d{4}\./i.test(trimmed)) return "drop";
+  if (/nature portfolio\s*\|\s*reporting summary/i.test(trimmed)) return "drop";
+  if (/^Reprints and permissions? information is available at\s+(?:https?:\/\/)?(?:www\.)?nature\.com\/reprints/i.test(trimmed))
+    return "drop";
+  if (/^NaturePortfoliowish/i.test(trimmed)) return "drop";
+  if (/^Foraltatistical/i.test(trimmed)) return "drop";
+  if (/^Pleaseselectheonebel/i.test(trimmed)) return "drop";
+  if (/^Policyinformationaboutstudieswithumanparticipants/i.test(trimmed))
+    return "drop";
+  if (/^Werequirefotiooelpadsdeae/i.test(trimmed)) return "drop";
+  if (/^nature portfolio\s+/i.test(trimmed)) return "drop";
+  if (/^Policy information about availability of computer code/i.test(trimmed))
+    return "drop";
+  if (/^Policy information about availability of data/i.test(trimmed)) return "drop";
 
   /** 单独页码（正文中的编号多为「12. Author」） */
   if (/^\d{1,3}\s*$/.test(trimmed)) return "drop";
@@ -679,7 +819,14 @@ export function applyPdfHeadersFootersPagesCleanup(
   options: CleanupOptions = {},
 ): string {
   const opts = { ...DEFAULT_OPTS, ...options };
-  return applyLineFilters(raw.replace(/\r\n/g, "\n"), opts);
+  let text = raw.replace(/\r\n/g, "\n");
+  if (opts.normalizeResidualHtmlMarkup !== false) {
+    text = normalizeResidualHtmlMarkup(text);
+  }
+  if (opts.stripKnownBoilerplate !== false) {
+    text = stripKnownBoilerplatePhrases(text);
+  }
+  return applyLineFilters(text, opts);
 }
 
 export function applyPdfLayoutFlowCleanup(
@@ -707,11 +854,17 @@ export function applyPdfGenericCleanup(
 ): string {
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
+  if (opts.normalizeResidualHtmlMarkup !== false) {
+    text = normalizeResidualHtmlMarkup(text);
+  }
   if (opts.normalizeTgfBetaMarkup !== false) text = normalizeTgfBetaMarkup(text);
   if (opts.normalizeImmuneMarkerLatex !== false) {
     text = normalizeImmuneMarkerLatex(text);
   }
   if (opts.normalizeOcrLatexMisc !== false) text = normalizeOcrLatexMisc(text);
+  if (opts.stripKnownBoilerplate !== false) {
+    text = stripKnownBoilerplatePhrases(text);
+  }
   if (opts.softenLatexArtifacts) text = softenLatexArtifacts(text);
   if (opts.collapseBlankLines) text = collapseBlankLines(text);
   return text;
@@ -724,6 +877,12 @@ export function cleanPdfTextMd(
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
 
+  if (opts.normalizeResidualHtmlMarkup !== false) {
+    text = normalizeResidualHtmlMarkup(text);
+  }
+  if (opts.stripKnownBoilerplate !== false) {
+    text = stripKnownBoilerplatePhrases(text);
+  }
   text = applyLineFilters(text, opts);
 
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
@@ -741,6 +900,9 @@ export function cleanPdfTextMd(
     text = normalizeImmuneMarkerLatex(text);
   }
   if (opts.normalizeOcrLatexMisc !== false) text = normalizeOcrLatexMisc(text);
+  if (opts.stripKnownBoilerplate !== false) {
+    text = stripKnownBoilerplatePhrases(text);
+  }
   if (opts.softenLatexArtifacts) text = softenLatexArtifacts(text);
   if (opts.collapseBlankLines) text = collapseBlankLines(text);
 

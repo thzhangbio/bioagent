@@ -151,6 +151,7 @@ function extractAbstractSection(md: string): string | undefined {
   if (!m) return undefined;
   let t = m[1].trim();
   t = t.replace(/^(?:abstract|summary)\s*[:\s]*/i, "");
+  t = stripResidualHtmlText(t);
   return normalizeWhitespace(t);
 }
 
@@ -175,6 +176,25 @@ function monthNameToNum(name: string): string | null {
 
 function normalizeWhitespace(s: string): string {
   return s.replace(/\s+/g, " ").trim();
+}
+
+function stripResidualHtmlText(raw: string): string {
+  return raw
+    .replace(/<h([1-6])>\s*([^<]+?)\s*<\/h\1>/gi, (_, __: string, inner: string) =>
+      `${inner.trim()}: `,
+    )
+    .replace(/<\/?(?:i|b|em|strong|u|span|p)>/gi, "")
+    .replace(/<sub>(\d+)<\/sub>/gi, (_, digits: string) =>
+      [...digits].map((char) => "₀₁₂₃₄₅₆₇₈₉"[Number(char)] ?? char).join(""),
+    )
+    .replace(/<sup>(\d+)<\/sup>/gi, (_, digits: string) =>
+      [...digits].map((char) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(char)] ?? char).join(""),
+    )
+    .replace(/<[^>]+>/g, "")
+    .replace(
+      /([a-z0-9.)])(?=(Background|Methods|Findings|Interpretation|Funding):\s)/g,
+      "$1 ",
+    );
 }
 
 /** 对比用：弱化标点与空白差异 */
@@ -340,7 +360,7 @@ export async function fetchEuropePmcAbstractByDoi(
     const hit = json.resultList?.result?.[0];
     const raw = hit?.abstractText?.trim();
     if (!raw || raw.length < 40) return null;
-    return normalizeWhitespace(raw);
+    return normalizeWhitespace(stripResidualHtmlText(raw));
   } catch {
     return null;
   } finally {

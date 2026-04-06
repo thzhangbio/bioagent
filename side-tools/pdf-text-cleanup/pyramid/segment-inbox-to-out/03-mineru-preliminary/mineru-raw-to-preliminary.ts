@@ -27,6 +27,16 @@ function normalizeMineruSupTags(line: string): string {
   return line.replace(/<sup>(\d+)<\/sup>/g, "[$1]");
 }
 
+function normalizeMineruHtmlTags(line: string): string {
+  let s = normalizeMineruSupTags(line);
+  s = s.replace(/<sub>(\d+)<\/sub>/gi, (_, digits: string) =>
+    [...digits].map((c) => "₀₁₂₃₄₅₆₇₈₉"[Number(c)] ?? c).join(""),
+  );
+  s = s.replace(/<h([1-6])>\s*([^<]+?)\s*<\/h\1>/gi, "$2");
+  s = s.replace(/<\/?(?:i|b|em|strong|u|span|p)>/gi, "");
+  return s;
+}
+
 /**
  * 各刊 MinerU 常见刊头/占位行：压缩为「# 标题 + 必要 DOI」，减少与 Elsevier 流水线不一致时的噪声。
  */
@@ -62,7 +72,7 @@ export function mineruRawMarkdownToPreliminary(raw: string): string {
   const out: string[] = [];
 
   for (const line of lines) {
-    const normalizedLine = normalizeMineruSupTags(line);
+    const normalizedLine = normalizeMineruHtmlTags(line);
     const trimmed = normalizedLine.trim();
 
     if (/^\(legend continued on next page\)\s*$/i.test(trimmed)) continue;

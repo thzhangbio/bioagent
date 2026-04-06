@@ -28,6 +28,7 @@
     "pdf-kb-fragment-audit": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-audit.ts",
     "pdf-kb-fragment-list": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-list.ts",
     "pdf-kb-fragment-apply-inplace": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-apply-inplace.ts",
+    "pdf-kb-generic-cleanup-apply-inplace": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/07-cleanup-generic/cleanup-apply-inplace.ts",
     "pdf-kb-fragment-fixtures": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-fixtures-check.ts",
     "pdf-archive-inbox": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode inbox-only",
     "pdf-archive-out": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode out-only",

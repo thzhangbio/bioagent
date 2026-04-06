@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-04-06T00:16:13.837Z",
+  "mode": "inbox-only",
+  "outArchiveDest": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/archive/ingested-out/20260406-081613",
+  "inboxArchiveDest": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/archive/processed-mineru/20260406-081613",
+  "outTargets": [],
+  "inboxTargets": [
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+depression-but-not-anxiety-is-associated-with-epigenetic+10.1038_s41380-026-03588-2.json",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+depression-but-not-anxiety-is-associated-with-epigenetic+10.1038_s41380-026-03588-2.md",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+evidence-of-monkeypox-virus-clade-iib-lineage-a-2-2-in-t+10.1038_s41591-026-04256-2.json",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+evidence-of-monkeypox-virus-clade-iib-lineage-a-2-2-in-t+10.1038_s41591-026-04256-2.md",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+exome-sequencing-enables-molecular-diagnosis-in-10-of-ea+10.1016_j.ebiom.2026.106209.json",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+exome-sequencing-enables-molecular-diagnosis-in-10-of-ea+10.1016_j.ebiom.2026.106209.md",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+inhibition-of-adipocyte-runx1-2-enhances-adipose-tissue-+10.1038_s41467-026-71266-6.json",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052255+inhibition-of-adipocyte-runx1-2-enhances-adipose-tissue-+10.1038_s41467-026-71266-6.md",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052256+pre-adaptation-of-stem-cell-derived-islet-organoids-to-h+10.1016_j.stem.2026.03.004.json",
+    "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/inbox/202604052256+pre-adaptation-of-stem-cell-derived-islet-organoids-to-h+10.1016_j.stem.2026.03.004.md"
+  ],
+  "notes": [
+    "00-archive-trigger: resolved archive mode and source targets.",
+    "01-target-paths: resolved archive destination folders.",
+    "02-idempotency: destination paths are conflict-free.",
+    "03-move-execute: skipped out move in inbox-only mode.",
+    "04-inbox-archive-sidecar: archived inbox source files."
+  ]
+}

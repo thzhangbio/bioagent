@@ -893,6 +893,30 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
     }
   }
 
+  m = x.match(/^([35])\s*\^\s*\{\s*\\prime\s*\}\s*$/i);
+  if (m) return `${m[1]}′`;
+
+  m = x.match(/^\^\s*\{\s*([0-9,\-#\s]+)\s*\}\s*$/);
+  if (m) return `^${m[1].replace(/\s+/g, "")}`;
+  m = x.match(/^\^\s*\{\s*([0-9,\-\\#\s]+)\s*\}\s*$/);
+  if (m) return `^${m[1].replace(/\s+/g, "")}`;
+  m = x.match(/^\^\s*\{\s*([0-9a-zA-Z.\s]+)\s*\}\s*$/);
+  if (m) return `^${collapseSpacedChars(m[1])}`;
+
+  m = x.match(/^\\times\s*([\d.]+)\s*$/i);
+  if (m) return `×${m[1]}`;
+  m = x.match(/^\\times\s*([\d.]+)\s*\/\s*([\d.]+)\s*$/i);
+  if (m) return `×${m[1]}/${m[2]}`;
+
+  m = x.match(/^=\s*([\d.]+)\s*$/);
+  if (m) return `= ${m[1]}`;
+
+  m = x.match(/^([A-Za-z])\s*$/);
+  if (m) return m[1];
+
+  m = x.match(/^q\s*=\s*([\d.]+)\s*$/i);
+  if (m) return `q = ${m[1]}`;
+
   m = x.match(/^([\d.]+)\s*~?\s*\\mu\s*\\?\s*[Ll]\s*;?\s*$/);
   if (m) return `${m[1]} μL`;
 
@@ -909,6 +933,8 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
     /^([\d.]+)\s*\\mathrm\s*\{\s*~?\s*h\s*\}\s*;?\s*$/i,
   );
   if (m) return `${m[1]} h`;
+  m = x.match(/^([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*h\s*$/i);
+  if (m) return `${m[1]}-${m[2]} h`;
 
   m = x.match(
     /^([\d.]+)\s*\\mathsf\s*\{\s*c\s*m\s*\}\s*\^\s*\{\s*(\d+)\s*\}\s*$/,
@@ -936,9 +962,25 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
 
   m = x.match(/^([\d.]+)\s*\{\s*-\s*\}\s*([\d.]+)\s*\\%\s*$/);
   if (m) return `${m[1]}-${m[2]}%`;
+  m = x.match(/^([\d.]+)\s*-\s*([\d.]+)\s*\\%\s*$/);
+  if (m) return `${m[1]}-${m[2]}%`;
 
   m = x.match(/^>\s*([\d.]+)\s*\\mathsf\s*\{\s*m\s*M\s*\}\s*;?\s*$/i);
   if (m) return `> ${m[1]} mM`;
+
+  m = x.match(/^_+\s*\{\s*2\s*\}\s*$/);
+  if (m) return "₂";
+
+  m = x.match(/^\\mathrm\s*\{\s*CO\s*\}\s*_\s*\{\s*2\s*\}\s*$/i);
+  if (m) return "CO₂";
+
+  m = x.match(/^([+-]?[\d.]+)\s*~?\s*\{\s*\}\s*\^\s*\{\s*\\circ\s*\}\s*C\s*$/i);
+  if (m) return `${m[1]}°C`;
+
+  m = x.match(/^([+-]?[\d.]+)\s*\^\s*\{\s*\\circ\s*\}\s*C\s*$/i);
+  if (m) return `${m[1]}°C`;
+  m = x.match(/^([+-]?\d+)\s*~?\s*\^\s*\{\s*\\circ\s*\}\s*C\s*$/i);
+  if (m) return `${m[1]}°C`;
 
   m = x.match(
     /^\{\s*\\sf\s*H\s*\}\s*_\s*\{\s*2\s*\}\s*\{\s*\\sf\s*[O0]\s*\}\s*_\s*\{\s*2\s*\}\s*$/,
@@ -1037,6 +1079,20 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
 
   m = x.match(/^\\mathrm\s*\{\s*S\s*L\s*E\s*\^\s*\{\s*([0-9,\s-]+)\s*\}\s*\}\s*$/);
   if (m) return `SLE^${m[1].replace(/\s+/g, "")}`;
+  m = x.match(/^\\mathrm\s*\{\s*F\s*D\s*R\s*\}\s*=\s*([\d.]+)\s*$/i);
+  if (m) return `FDR = ${m[1]}`;
+  m = x.match(
+    /^\\mathrm\s*\{\s*W\s*H\s*\}\s*10\s*x\s*\{\s*\\cdot\s*\}\s*H\s*\/\s*22\)\s*\\triangleq\s*([\d.]+)\s*~\s*\\mathrm\s*\{\s*m\s*m\s*\}\s*\^\s*\{\s*2\s*\}\s*\)\s*$/i,
+  );
+  if (m) return `WH 10x·H/22 ≜ ${m[1]} mm²)`;
+
+  m = x.match(/^\\log\s*_\s*\{?\s*([210])\s*\}?\s*$/i);
+  if (m) return `log${m[1]}`;
+
+  m = x.match(
+    /^\\log\s*([210])\s*\(\s*\\mathrm\s*\{\s*([A-Za-z0-9]+)\s*\}\s*\+\s*([\d.]+)\s*\)\s*$/i,
+  );
+  if (m) return `log${m[1]} (${m[2]} + ${m[3]})`;
 
   m = x.match(
     /^\\mathsf\s*\{\s*G\s*C\s*G\s*\}\s*\^\s*\{\s*\+\s*\}\s*\\mathrm\s*\{\s*~\s*\\pmb\s*~\s*\{\s*\\alpha\s*\}\s*~\s*\}\s*$/i,
@@ -1142,12 +1198,34 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
   if (m) return `${m[1]} min`;
   m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*~\s*nm\s*\}\s*$/i);
   if (m) return `${m[1]} nm`;
+  m = x.match(/^([\d.]+)\s*~\s*\\mathrm\s*\{\s*m\s*m\s*\}\s*\^\s*\{\s*2\s*\}\s*$/i);
+  if (m) return `${m[1]} mm²`;
   m = x.match(/^([\d.]+)\s*~\s*\\mathrm\s*\{\s*\{\s*n\s*g\s*\/\s*m\s*L\s*\}\s*\}\s*$/i);
   if (m) return `${m[1]} ng/mL`;
   m = x.match(/^\(\s*([\d.]+)\s*\\mathsf\s*\{\s*n\s*m\s*\}\s*\)\s*$/i);
   if (m) return `(${m[1]} nm)`;
+  m = x.match(/^\(\s*([\d.]+)\s*\\mathrm\s*\{\s*n\s*m\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]} nm)`;
+  m = x.match(/^\(\s*([\d.]+)\s*-\s*([\d.]+)\s*\\mathrm\s*\{\s*n\s*m\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]}-${m[2]} nm)`;
+  m = x.match(/^([\d.]+)\s*\{\s*\\bf\s*M\s*\}\s*$/i);
+  if (m) return `${m[1]} M`;
+  m = x.match(/^([\d.]+)\s*\\mathrm\s*\{\s*-\s*\}\s*\\mu\s*m\s*$/i);
+  if (m) return `${m[1]}-μm`;
+  m = x.match(/^\(\s*([\d.]+)\s*\\times\s*([\d.]+)\s*\\mathrm\s*\{\s*m\s*i\s*n\s*\}\s*\)\s*$/i);
+  if (m) return `(${m[1]}×${m[2]} min)`;
+  m = x.match(/^\(\s*Q\s*\)\s*$/i);
+  if (m) return "(Q)";
+  m = x.match(/^\[\s*\\mathrm\s*\{\s*S\s*D\s*\}\s*\\pm\s*([\d.]+)\s*\]\s*$/i);
+  if (m) return `[SD ± ${m[1]}]`;
+  m = x.match(/^\(\s*\\mathrm\s*\{\s*S\s*D\s*\}\s*\)\s*\\pm\s*([\d.]+)\s*\]\s*$/i);
+  if (m) return `(SD ± ${m[1]}]`;
   m = x.match(/^\\scriptstyle\s*n\s*=\s*(\d+)\s*$/i);
   if (m) return `n = ${m[1]}`;
+  m = x.match(/^\\scriptstyle\s*p\s*=\s*([\d.]+)\s*$/i);
+  if (m) return `p = ${m[1]}`;
+  m = x.match(/^\\scriptstyle\s*n\s*=\s*([\d\s/]+)\s*$/i);
+  if (m) return `n = ${m[1].replace(/\s+/g, "")}`;
   m = x.match(
     /^\\begin\s*\{\s*array\s*\}\s*\{\s*[a-z]\s*\}\s*\{\s*n\s*=\s*(\d+)\s*\}\s*\\end\s*\{\s*array\s*\}\s*$/i,
   );
@@ -1158,6 +1236,8 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
   if (m) return `n = ${m[1]},`;
   m = x.match(/^n\s*=\s*(\d+)\s*_\s*\{\s*\\cdot\s*\}\s*$/i);
   if (m) return `n = ${m[1]}`;
+  m = x.match(/^n\s*\{\s*=\s*\}\s*([\d/,\s]+)\s*([,;])?\s*$/i);
+  if (m) return `n = ${m[1].replace(/\s+/g, "")}${m[2] ?? ""}`;
   m = x.match(/^\\mathsf\s*\{\s*Z\s*n\s*2\s*\+\s*\}\s*$/i);
   if (m) return "Zn2+";
   m = x.match(/^\\complement\s*a\s*2\s*\+\s*$/i);
@@ -1169,6 +1249,29 @@ function tryParenAndStatFragmentsToPlain(inner: string): string | null {
 
   m = x.match(/^Z\s*n\s*S\s*O\s*_\s*\{\s*4\s*\}\s*$/i);
   if (m) return "ZnSO₄";
+
+  m = x.match(/^\\mathrm\s*\{\s*C\s*D\s*([0-9]+)\s*\^\s*\{\s*\+\s*\}\s*\}\s*$/i);
+  if (m) return `CD${m[1]}+`;
+  m = x.match(/^\\mathrm\s*\{\s*C\s*D\s*([0-9]+)\s*\+\s*\}\s*$/i);
+  if (m) return `CD${m[1]}+`;
+  m = x.match(/^\\mathrm\s*\{\s*C\s*D\s*\}\s*([0-9]+)\s*\+\s*([A-Za-z])?\s*$/i);
+  if (m) return `CD${m[1]}+${m[2] ?? ""}`;
+  m = x.match(/^\\mathrm\s*\{\s*C\s*D\s*\}\s*([0-9]+)\s*\^\s*\{\s*\+\s*\}\s*([A-Za-z])\s*$/i);
+  if (m) return `CD${m[1]}+${m[2]}`;
+  m = x.match(/^\\mathrm\s*\{\s*C\s*D\s*([0-9]+)\s*\+\s*([A-Za-z])\s*\}\s*$/i);
+  if (m) return `CD${m[1]}+${m[2]}`;
+  m = x.match(/^\\mathrm\s*\{\s*\(\s*C\s*D\s*([0-9]+)\s*\^\s*\{\s*\+\s*\}\s*\}\s*$/i);
+  if (m) return `(CD${m[1]}+`;
+  m = x.match(/^\\mathrm\s*\{\s*K\s*i\s*\}\s*([0-9]+)\s*\+\s*$/i);
+  if (m) return `Ki${m[1]}+`;
+  m = x.match(/^E\s*D\s*A\s*2\s*R$/i);
+  if (m) return "EDA2R";
+  m = x.match(/^\\mathrm\s*\{\s*x\s*d\s*\}\s*0\s*7\s*0\s*1\s*0\s*3\s*\@\s*$/i);
+  if (m) return "xd070103@";
+  m = x.match(/^\\mathbf\s*\{\s*\\nabla\s*\}\s*\\cdot\s*\\mathbf\s*\{\s*\\alpha\s*\}\s*\\propto\s*$/i);
+  if (m) return "∇·α ∝";
+  m = x.match(/^([A-Za-z])\s*x\s*([A-Za-z])$/);
+  if (m) return `${m[1]}×${m[2]}`;
 
   m = x.match(
     /^W\s*\{\s*\\sf\s*S\s*\}\s*\^\s*\{\s*\+\s*\}\s*N\s*\{\s*\\sf\s*K\s*\}\s*\\times\s*6\.1\s*\^\s*\{\s*\+\s*\}\s*\\\s*\\beta\s*$/i,
@@ -1485,6 +1588,31 @@ export function normalizeMineruInlineLatex(text: string): string {
 
   /** 短 `$…$` 内 OCR 数字/小数点、字体嵌套、括号统计式（先于其它按全文写的公式规则） */
   s = normalizeShortInlineDollarMath(s);
+
+  s = s.replace(/\$\s*_\s*2\s*\$/g, "₂");
+  s = s.replace(/\$\s*\\log\s*_\s*\{\s*10\s*\}\s*\$/gi, "log10");
+  s = s.replace(
+    /\$\s*\\log\s*2\s*\(\s*\\mathrm\s*\{\s*T\s*M\s*M\s*\}\s*\+\s*1\s*\)\s*\$/gi,
+    "log2 (TMM + 1)",
+  );
+  s = s.replace(/\$\s*\\scriptstyle\s*p\s*=\s*([\d.]+)\s*\$/gi, "p = $1");
+  s = s.replace(
+    /\$\s*\\scriptstyle\s*n\s*=\s*([\d\s/]+)\s*\$/gi,
+    (_, raw: string) => `n = ${raw.replace(/\s+/g, "")}`,
+  );
+  s = s.replace(
+    /\$\s*n\s*\{\s*=\s*\}\s*(\d+)\s*_\s*\{\s*\\mathrm\s*\{\s*~\s*,\s*~\s*\}\s*\}\s*\$/gi,
+    "n = $1",
+  );
+  s = s.replace(/\$\s*\(\s*\+\s*\/\s*-\s*\$/g, "(+/-");
+  s = s.replace(
+    /\$\s*\(\s*\\mathrm\s*\{\s*AB\s*\}\s*\)\s*\+\s*\\mathrm\s*\{\s*MO\s*\}\s*\$/gi,
+    "(AB) + MO",
+  );
+  s = s.replace(
+    /reviewer_p\s*xd\s*0\s*7\s*0\s*1\s*0\s*3\s*@\s*ebi\.ac\.uk/gi,
+    "reviewer_pxd070103@ebi.ac.uk",
+  );
 
   s = s.replace(/\$\s*(\d+)\s*\\\s*%\s*\$/g, "$1%");
   s = s.replace(

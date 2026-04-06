@@ -18,6 +18,7 @@
 - `09-formula-fragments/fragment-apply-inplace.ts`
 - `09-formula-fragments/fragment-fixtures.ts`
 - `09-formula-fragments/fragment-fixtures-check.ts`
+- `09-formula-fragments/FRAGMENT-HANDBOOK.md`
 
 这些工具仍位于侧车根目录，但它们服务的核心规则层就是本段的 `09-formula-fragments`。
 

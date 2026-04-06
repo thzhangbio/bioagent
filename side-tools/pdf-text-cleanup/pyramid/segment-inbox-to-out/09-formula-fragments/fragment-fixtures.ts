@@ -214,4 +214,80 @@ export const KB_FRAGMENT_FIXTURES: KbFragmentFixture[] = [
     input: "${ \\mathrm { c . 1303 C { > } T } }$",
     expected: "c.1303 C>T",
   },
+  {
+    input: "$5^{\\prime}$",
+    expected: "5′",
+  },
+  {
+    input: "$3^{\\prime}$",
+    expected: "3′",
+  },
+  {
+    input: "$\\times 200$",
+    expected: "×200",
+  },
+  {
+    input: "$\\mathrm{CO}_{2}$",
+    expected: "CO₂",
+  },
+  {
+    input: "$_2$",
+    expected: "₂",
+  },
+  {
+    input: "$\\mathrm { C D 45 ^ { + } }$",
+    expected: "CD45+",
+  },
+  {
+    input: "$4 ~ { } ^ { \\circ } C$",
+    expected: "4°C",
+  },
+  {
+    input: "$\\log 2 ( \\mathrm { T M M } + 1)$",
+    expected: "log2 (TMM + 1)",
+  },
+  {
+    input: "$\\scriptstyle p = 0.046$",
+    expected: "p = 0.046",
+  },
+  {
+    input: "$n { = } 37 _ { \\mathrm { ~ , ~ } }$",
+    expected: "n = 37",
+  },
+  {
+    input: "$- 80 ~ ^ { \\circ } C$",
+    expected: "-80°C",
+  },
+  {
+    input: "$7 \\mathrm { - } \\mu m$",
+    expected: "7-μm",
+  },
+  {
+    input: "$( 2 \\times 5 \\mathrm { m i n } )$",
+    expected: "(2×5 min)",
+  },
+  {
+    input: "$\\mathrm { F D R } = 0.0013$",
+    expected: "FDR = 0.0013",
+  },
+  {
+    input: "$( 500 \\mathrm { n m } )$",
+    expected: "(500 nm)",
+  },
+  {
+    input: "$( 60 - 70 \\mathrm { n m } )$",
+    expected: "(60-70 nm)",
+  },
+  {
+    input: "$\\scriptstyle n = 8 / 44$",
+    expected: "n = 8/44",
+  },
+  {
+    input: "$E D A 2 R$",
+    expected: "EDA2R",
+  },
+  {
+    input: "$\\log_{10}$",
+    expected: "log10",
+  },
 ];

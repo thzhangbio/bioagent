@@ -4,6 +4,29 @@
 
 const MD_IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)\s*$/;
 
+function digitStringToUnicodeSuperscript(digits: string): string {
+  return [...digits]
+    .map((c) => "⁰¹²³⁴⁵⁶⁷⁸⁹"[Number(c)] ?? c)
+    .join("");
+}
+
+function normalizeMineruSupTags(line: string): string {
+  const trimmed = line.trim();
+  const affiliationLike =
+    /^<sup>\d+<\/sup>[A-Z][^\n]{8,}$/.test(trimmed) &&
+    /university|hospital|department|institute|center|centre|clinic|medizin|germany|china|school/i.test(
+      trimmed,
+    );
+
+  if (affiliationLike) {
+    return line.replace(/<sup>(\d+)<\/sup>/g, (_, digits: string) =>
+      digitStringToUnicodeSuperscript(digits),
+    );
+  }
+
+  return line.replace(/<sup>(\d+)<\/sup>/g, "[$1]");
+}
+
 /**
  * 各刊 MinerU 常见刊头/占位行：压缩为「# 标题 + 必要 DOI」，减少与 Elsevier 流水线不一致时的噪声。
  */
@@ -39,7 +62,8 @@ export function mineruRawMarkdownToPreliminary(raw: string): string {
   const out: string[] = [];
 
   for (const line of lines) {
-    const trimmed = line.trim();
+    const normalizedLine = normalizeMineruSupTags(line);
+    const trimmed = normalizedLine.trim();
 
     if (/^\(legend continued on next page\)\s*$/i.test(trimmed)) continue;
 
@@ -48,13 +72,13 @@ export function mineruRawMarkdownToPreliminary(raw: string): string {
       continue;
     }
 
-    const hm = line.match(/^(#{1,6})\s+(.*)$/);
+    const hm = normalizedLine.match(/^(#{1,6})\s+(.*)$/);
     if (hm) {
       out.push(trimmed);
       continue;
     }
 
-    out.push(line);
+    out.push(normalizedLine);
   }
 
   return out.join("\n");

@@ -271,6 +271,8 @@ export function cleanWeChatArticleRaw(
     stripFooterPatterns?: boolean;
     /** 由 `fetchWechatEngagementStats` 填入（需 `--fetch-stats` + Cookie）；可留空，后续按 `kb_wechat_id` 补录 */
     engagement?: WechatEngagementMetrics;
+    /** 额外写入 YAML 的字段（显式阶段元数据） */
+    extraYamlFields?: Record<string, string | boolean | number | undefined>;
   },
 ): string {
   const inner = extractJsContentHtml(raw);
@@ -291,7 +293,11 @@ export function cleanWeChatArticleRaw(
     .trim();
 
   const wx = extractWechatArticleMeta(raw);
-  const wechatStyleVariant = inferWechatStyleVariant(wx.mp_name);
+  const explicitStyleVariant =
+    typeof meta?.extraYamlFields?.wechat_style_variant === "string" ?
+      meta.extraYamlFields.wechat_style_variant
+    : undefined;
+  const wechatStyleVariant = explicitStyleVariant ?? inferWechatStyleVariant(wx.mp_name);
   const kbWechatId = computeKbWechatId(raw, {
     sourceUrl: meta?.sourceUrl,
     slugHint: meta?.slugHint,
@@ -317,6 +323,17 @@ export function cleanWeChatArticleRaw(
   }
   if (meta?.engagement) {
     pushEngagementYaml(headerLines, meta.engagement);
+  }
+  if (meta?.extraYamlFields) {
+    for (const [key, value] of Object.entries(meta.extraYamlFields)) {
+      if (value === undefined) continue;
+      if (key === "wechat_style_variant" && explicitStyleVariant) continue;
+      if (typeof value === "string") {
+        headerLines.push(`${key}: ${yamlDoubleQuotedScalar(value)}`);
+      } else {
+        headerLines.push(`${key}: ${String(value)}`);
+      }
+    }
   }
   headerLines.push("---", "");
 

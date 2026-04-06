@@ -34,10 +34,12 @@
     "pdf-archive-inbox": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode inbox-only",
     "pdf-archive-out": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode out-only",
     "pdf-archive-legacy-flat": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/legacy-flat-archive/legacy-flat-archive.ts",
-    "wechat-article-pipeline": "tsx side-tools/wechat-article-cleanup/pipeline.ts",
-    "wechat-article-clean": "tsx side-tools/wechat-article-cleanup/cli.ts",
-    "wechat-article-archive-inbox": "tsx side-tools/wechat-article-cleanup/archive-inbox.ts",
-    "wechat-article-archive-out": "tsx side-tools/wechat-article-cleanup/archive-out.ts"
+    "wechat-article-pipeline": "tsx side-tools/wechat-article-cleanup/pyramid/wechat-article-cleanup.ts",
+    "wechat-article-clean": "tsx side-tools/wechat-article-cleanup/pyramid/tools/wechat-article-clean/wechat-article-clean.ts",
+    "wechat-article-out-to-knowledge": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-knowledge/segment-out-to-knowledge.ts",
+    "wechat-article-out-to-archive": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts",
+    "wechat-article-archive-inbox": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode inbox-only",
+    "wechat-article-archive-out": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode out-only"
   },
   "keywords": [
     "feishu",

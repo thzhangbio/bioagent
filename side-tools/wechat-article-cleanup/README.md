@@ -2,6 +2,15 @@
 
 与主项目解耦：**`links.txt`** → **`inbox/`** 原始 HTML → **`out/`** 清洗 Markdown → **`archive/`** 分两类归档。
 
+当前主实现已迁入 **`pyramid/`**：
+
+- 段Ⅰ：`pyramid/segment-links-to-inbox/`
+- 段Ⅱ：`pyramid/segment-inbox-to-out/`
+- 段Ⅲ：`pyramid/segment-out-to-knowledge/`
+- 段Ⅳ：`pyramid/segment-out-to-archive/`
+
+旧入口脚本（`pipeline.ts`、`cli.ts`、`archive-*.ts`）现仅作兼容转调，不再承载主实现。
+
 ## 梅斯学术 vs 良医汇
 
 - **梅斯学术**（及非「良医汇」账号）：**正常**抓取 → `inbox` → 清洗 → `out`；YAML 中 `wechat_style_variant: medsci` 由启发式写入（见 `clean-article.ts`）。
@@ -21,6 +30,7 @@
 | `wechat-kb-id.ts` | 计算 **`kb_wechat_id`**：灌库与后续补数据时的稳定唯一键（见下节） |
 | `appmsg-stats.ts` | 可选：通过 `getappmsgext` 拉取 **阅读 / 点赞 / 分享 / 评论 / 收藏** 等互动数（需 Cookie，见下节） |
 | `archive/` | 两类子目录，见下节 |
+| `pyramid/` | 主实现区：按 `links -> inbox -> out -> knowledge -> archive` 金字塔式组织 |
 
 ### `kb_wechat_id`（知识库主键，类比文献 DOI）
 
@@ -51,6 +61,17 @@
 | `published_at_cn` | 东八区可读时间，与微信界面一致便于对照 |
 
 另含 `url`、`fetchedAt`（抓取侧）；正文内 **`[导流]`** 等非正文标记见 `clean-article.ts` / 合规与预期一节。
+
+### 新增显式治理字段
+
+本次重构后，清洗成品会显式写入：
+
+| 字段 | 含义 |
+|------|------|
+| `wechat_source_profile` | 公众号来源线，如 `medsci` / `liangyi_hui` / `generic_wechat` |
+| `wechat_article_category` | 文章类别线，如 `literature_digest` / `conference_news` / `activity_promo` 等 |
+
+这两个字段用于后续按公众号、按内容类别分别细化清洗规则与入库策略。
 
 ### 互动数据（可选，`--fetch-stats`）
 
@@ -101,6 +122,8 @@
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html` | 单篇清洗到 `out/xxx.md` |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html --strip-footer` | 单篇清洗并裁壳子尾部（`--` 后为传给脚本的参数） |
 | `pnpm run wechat-article-clean -- inbox/xxx.raw.html --fetch-stats` | 单篇清洗并写入互动数据（需 `WECHAT_MP_COOKIE`） |
+| `pnpm run wechat-article-out-to-knowledge` | 将 `out/*.md` 送入统一知识库导入器（`wechat_style`） |
+| `pnpm run wechat-article-out-to-archive -- --mode out-only` | 归档 `out/*.md` |
 
 ## 合规与预期
 

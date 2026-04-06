@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>一个lncRNA，悄悄决定血管能不能&quot;生长&quot;——LINC00607如何调控FLT1剪接与抗血管生成</title>
+  <style>
+    :root {
+      --page-bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --title-color: rgba(0, 0, 0, 0.9);
+      --body-color: #595959;
+      --meta-color: #8c8c8c;
+      --accent: #3573b9;
+      --line: #e8e8e8;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      --content-width: 720px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(53,115,185,.08), transparent 24%),
+        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
+      color: var(--body-color);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .article {
+      max-width: var(--content-width);
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 36px 28px 48px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--meta-color);
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+
+    .brand-badge {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(53,115,185,.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .article-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--title-color);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--meta-color);
+    }
+
+    .hero-divider {
+      height: 1px;
+      margin: 0 0 24px;
+      background: linear-gradient(90deg, rgba(53,115,185,.18), rgba(53,115,185,0));
+    }
+
+    .article-paragraph,
+    .article-list,
+    .article-reference p {
+      margin: 0 8px 24px;
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: 0.5px;
+      color: var(--body-color);
+      text-align: justify;
+    }
+
+    .article-paragraph strong,
+    .article-list strong,
+    .article-reference strong {
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .section-title {
+      margin: 34px 8px 18px;
+      font-size: 21px;
+      line-height: 1.5;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      margin: 28px 8px 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .article-list {
+      padding-left: 1.4em;
+    }
+
+    .article-list li {
+      margin-bottom: 10px;
+    }
+
+    .article-reference {
+      margin: 34px 8px 0;
+      padding: 18px 18px 2px;
+      border-left: 4px solid rgba(53,115,185,.38);
+      background: linear-gradient(180deg, rgba(53,115,185,.06), rgba(53,115,185,.02));
+      border-radius: 0 14px 14px 0;
+    }
+
+    .article-reference p:first-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin: 28px 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fcfcfc;
+    }
+
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .article-table th,
+    .article-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.7;
+      vertical-align: top;
+    }
+
+    .article-table th {
+      background: rgba(53,115,185,.07);
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin: 36px 8px 0;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(53,115,185,.22);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--meta-color);
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 20px 12px 48px; }
+      .article { padding: 24px 16px 36px; border-radius: 18px; }
+      .article-title { font-size: 26px; }
+      .section-title { font-size: 20px; }
+      .subsection-title { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <article class="article">
+      <div class="brand">
+        <span class="brand-badge">梅斯学术风格</span>
+        <span>基于真实微信样式复刻生成</span>
+      </div>
+      <h1 class="article-title">一个lncRNA，悄悄决定血管能不能&quot;生长&quot;——LINC00607如何调控FLT1剪接与抗血管生成</h1>
+      <div class="meta">
+        <span>来源：文献知识库内容生成</span>
+        <span>版式参考：梅斯学术微信公众号</span>
+      </div>
+      <div class="hero-divider"></div>
+      <p class="article-paragraph">血管生长，没那么简单 肿瘤生长离不开血管，心血管疾病离不开血管，妊娠高血压也离不开血管。 控制血管生长（血管新生）的关键分子之一，是大家耳熟能详的 VEGF-A。而 VEGF-A 的受体之一 FLT1（VEGFR1），却有一个鲜为人知的&quot;分身&quot;——可溶性 sFLT1。 sFLT1 不锚定在细胞膜上，而是漂浮在细胞外，充当 VEGF 的&quot;诱饵受体&quot;：它能大量吸附 VEGF-A，让真正的信号传不下去，从而抑制血管生长。 这个&quot;诱饵&quot;是怎么产生的？一篇来自法兰克福歌德大学等多中心团队的最新研究给出了新答案——一条长链非编码 RNA（lncRNA），LINC00607，正在幕后调控这一切。</p>
+<h2 class="section-title">一次意外发现：敲除 LINC00607，血管新生能力下降</h2>
+<p class="article-paragraph">LINC00607 是一条在内皮细胞中高度富集的 lncRNA。此前研究已知，它通过与染色质重塑蛋白 BRG1 相互作用、促进 ERG 介导的基因转录，来维持人内皮细胞的血管新生能力。 研究团队利用已发表的 RNA-seq 数据，对 LentiCRISPR 介导的 LINC00607 敲除（KO）人脐静脉内皮细胞（HUVEC）进行了 JunctionSeq 分析，重点关注差异剪接转录本的丰度变化。</p>
+<h3 class="subsection-title">结果令人意外</h3>
+<ul class="article-list"><li>LINC00607 KO 导致超过 1221 个外显子的差异使用；</li><li>其中，FLT1 的外显子 13 和外显子 15 的差异表达具有最高统计显著性，位居所有外显子对之首。</li></ul>
+<p class="article-paragraph">这意味着，LINC00607 的缺失，直接影响了 FLT1 基因的可变剪接模式。</p>
+<h2 class="section-title">关键机制：外显子 15 的&quot;偷偷插入&quot;</h2>
+<h3 class="subsection-title">FLT1 基因有两种主要异构体</h3>
+<ul class="article-list"><li>膜结合型 FLT1：正常跨膜表达，参与血管新生信号传导；</li><li>可溶性 sFLT1：外显子 13、14 正常剪接，但内含子 14 中编码的&quot;替代外显子 15&quot;被纳入，替代后续外显子，形成终止密码子和多聚腺苷酸化信号，产生截短的非膜结合型蛋白，即 sFLT1。</li></ul>
+<p class="article-paragraph">sFLT1 作为游离的 VEGF 清道夫受体，会大量吸附 VEGF，从而抑制血管新生。</p>
+<h3 class="subsection-title">研究证实，在 LINC00607 KO 的 HUVEC 中</h3>
+<ul class="article-list"><li>代表两种异构体的外显子 14 表达降低；</li><li>仅存在于 sFLT1 的外显子 14-15 表达升高；</li><li>siRNA 介导的 LINC00607 敲低，同样复现了 sFLT1 的增加。</li></ul>
+<h3 class="subsection-title">此外，研究还发现</h3>
+<ul class="article-list"><li>缺氧条件下（24h、48h），HUVEC 中 LINC00607 表达上升，sFLT1 表达下降——两者呈负相关；</li><li>内皮细胞密度增加（模拟静息态）时，sFLT1 水平下降，而 LINC00607 表达被诱导。</li></ul>
+<p class="article-paragraph">这些数据共同指向一个结论：LINC00607 抑制 sFLT1 的产生；LINC00607 缺失，则会促进 sFLT1 的形成。</p>
+<h2 class="section-title">功能验证：sFLT1 堆积，是血管出芽减弱的&quot;幕后黑手&quot;</h2>
+<p class="article-paragraph">研究团队此前已证明，LINC00607 KO 会抑制 VEGF 介导的内皮细胞出芽。那么，这种抑制是否正是通过 sFLT1 的增多来实现的？ 为检验这一假设，研究人员在有无 sFLT1 阻断抗体的条件下，分别进行球形体出芽（spheroid sprouting）实验。</p>
+<h3 class="subsection-title">结果清晰</h3>
+<ul class="article-list"><li>LINC00607 KO 显著减弱了 VEGF-A 介导的内皮出芽；</li><li>在加入 sFLT1 阻断抗体后，血管新生功能得到恢复。</li></ul>
+<p class="article-paragraph">这表明，LINC00607 缺失导致的血管新生减弱，其核心机制正是 sFLT1 的过量生成，进而&quot;拦截&quot;了 VEGF 信号。</p>
+<h2 class="section-title">分子机制：LINC00607 通过 BRG1 依赖方式与 U2 snRNA 协作调控剪接</h2>
+<p class="article-paragraph">sFLT1 增多，是因为转录本稳定性升高，还是剪接本身发生了改变？ 研究人员用转录抑制剂 Actinomycin D 处理 HUVEC，观察 sFLT1 外显子 14/15 的水平变化。结果显示，在对照组和 LINC00607 缺失组中，sFLT1 外显子 14/15 的表达模式相似，均表现为下降。这说明 LINC00607 并不影响 sFLT1 转录本的稳定性，sFLT1 的积累是剪接层面的改变。</p>
+<h3 class="subsection-title">进一步机制探索揭示</h3>
+<ul class="article-list"><li>研究团队此前已证明 LINC00607 与 SWI/SNF 染色质重塑复合物（通过 BRG1 pulldown）存在互作；</li><li>使用 PROTAC AU-15330 降解 BRG1，可同样导致 sFLT1 的积累，提示BRG1 依赖的机制参与其中；</li><li>RNA pulldown 实验显示，LINC00607 和 U2 snRNA 均与 FLT1 内含子 14/外显子 15 的 5' 剪接位点（e15-5'）相互作用，与前一个剪接位点（e14-3'）的结合则弱得多，与更上游的剪接位点无显著结合。</li></ul>
+<p class="article-paragraph">这些结果表明，LINC00607 可能作为染色质状态与转录后剪接加工之间的桥接分子，协同 U2 snRNA 以 BRG1 依赖的方式调控 FLT1 的可变剪接。</p>
+<h2 class="section-title">治疗启示：剪接阻断吗啉环寡核苷酸，能否&quot;撬动&quot;这个靶点？</h2>
+<p class="article-paragraph">顺着这条机制链，研究团队进一步设计了针对内含子 14-外显子 15 剪接位点的吗啉环寡核苷酸（MO e15-5'），以阻断 sFLT1 的生成。 生物素标记的 RNA pulldown 实验证实，该 MO 靶向的剪接位点正是 LINC00607 和 U2 snRNA 结合的位置。功能实验进一步显示：</p>
+<ul class="article-list"><li>MO e15-5' 完全阻断了 sFLT1 的产生；</li><li>同时促进了 VEGF-A 介导的血管新生出芽；</li><li>在耐受性方面，MO 处理未增加细胞凋亡。</li></ul>
+<p class="article-paragraph">这一结果提示，靶向 FLT1 可变剪接位点，可能是一种干预病理性血管状态的潜在策略。</p>
+<h2 class="section-title">走向疾病：子痫前期的一角</h2>
+<p class="article-paragraph">研究并未止步于细胞层面，还将视角延伸至子痫前期（preeclampsia）。 子痫前期是一种严重的妊娠期多系统疾病，其核心特征之一正是 sFLT1 的过量产生，伴随促血管生成因子 PIGF（胎盘生长因子）水平下降，导致血管功能失衡。</p>
+<h3 class="subsection-title">研究发现</h3>
+<ul class="article-list"><li>在 LINC00607 KO 的 HUVEC 中，PIGF、KDR、VEGF-A、TGFB1、TGFBR1 表达下降，ENG 表达升高——这一表达谱与子痫前期的已知描述高度吻合；</li><li>在滋养层细胞模型 JEG-3 中，siRNA 敲低 LINC00607 同样导致 sFLT1 表达升高；</li><li>RNAscope 图像显示，子痫前期患者胎盘组织中 LINC00607 表达减少。</li></ul>
+<p class="article-paragraph">eQTL 分析则提示，FLT1 和 LINC00607 附近的共同 SNP 对两者转录方向的调控保持一致，这一遗传学数据进一步支持了两者之间存在协同调控关系的假设。 研究作者指出，LINC00607 在子痫前期滋养层外细胞中的表达呈非显著性下调趋势，LINC00607 与子痫前期之间的确切关系仍有待更深入的探索。</p>
+<h2 class="section-title">小结</h2>
+<h3 class="subsection-title">这项研究系统揭示了 lncRNA LINC00607 在内皮细胞可变剪接调控中的新角色</h3>
+<p class="article-paragraph">&lt;lark-table rows=&quot;6&quot; cols=&quot;2&quot; header-row=&quot;true&quot; column-widths=&quot;350,350&quot;&gt;</p>
+<p class="article-paragraph">&lt;lark-tr&gt; &lt;lark-td&gt; 层面 &lt;/lark-td&gt; &lt;lark-td&gt; 关键发现 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;lark-tr&gt; &lt;lark-td&gt; 剪接调控 &lt;/lark-td&gt; &lt;lark-td&gt; LINC00607 KO 导致 FLT1 替代外显子 15 纳入，促进 sFLT1 生成 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;lark-tr&gt; &lt;lark-td&gt; 功能影响 &lt;/lark-td&gt; &lt;lark-td&gt; sFLT1 积累使 VEGF 信号受抑，血管新生能力下降 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;lark-tr&gt; &lt;lark-td&gt; 分子机制 &lt;/lark-td&gt; &lt;lark-td&gt; LINC00607 以 BRG1 依赖方式与 U2 snRNA 协同调控 e15-5' 剪接位点 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;lark-tr&gt; &lt;lark-td&gt; 治疗潜力 &lt;/lark-td&gt; &lt;lark-td&gt; 靶向该剪接位点的 MO 可完全阻断 sFLT1，恢复血管新生 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;lark-tr&gt; &lt;lark-td&gt; 疾病关联 &lt;/lark-td&gt; &lt;lark-td&gt; LINC00607-sFLT1 轴与子痫前期的血管失衡特征存在关联 &lt;/lark-td&gt; &lt;/lark-tr&gt; &lt;/lark-table&gt;</p>
+<p class="article-paragraph">LINC00607 因此被定位为一个连接染色质状态与转录后剪接的调控枢纽，其在病理性血管新生（包括肿瘤血管生成和妊娠相关血管疾病）中的潜在意义，值得持续关注。</p>
+<div class="article-reference"><p>[参考资料]</p><p>[文献] [1] Lam F, Warwick T, Oo JA, Kruger AY, Kreis NN, Diagel A, et al. LINC00607 facilitates endothelial VEGF-A receptor FLT1 splicing. Mol Ther. 2026 Apr. doi:10.1016/j.ymthe.2026.03.038.</p></div>
+      <div class="footer-note">
+        本 HTML 为本地高保真版式交付，用于补足飞书 docx 在复杂公众号样式复现上的限制。
+      </div>
+    </article>
+  </main>
+</body>
+</html>

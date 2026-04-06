@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>全外显子测序，让10%的儿童狼疮找到了&quot;真凶&quot;</title>
+  <style>
+    :root {
+      --page-bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --title-color: rgba(0, 0, 0, 0.9);
+      --body-color: #595959;
+      --meta-color: #8c8c8c;
+      --accent: #3573b9;
+      --line: #e8e8e8;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      --content-width: 720px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(53,115,185,.08), transparent 24%),
+        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
+      color: var(--body-color);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .article {
+      max-width: var(--content-width);
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 36px 28px 48px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--meta-color);
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+
+    .brand-badge {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(53,115,185,.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .article-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--title-color);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--meta-color);
+    }
+
+    .hero-divider {
+      height: 1px;
+      margin: 0 0 24px;
+      background: linear-gradient(90deg, rgba(53,115,185,.18), rgba(53,115,185,0));
+    }
+
+    .article-paragraph,
+    .article-list,
+    .article-reference p {
+      margin: 0 8px 24px;
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: 0.5px;
+      color: var(--body-color);
+      text-align: justify;
+    }
+
+    .article-paragraph strong,
+    .article-list strong,
+    .article-reference strong {
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .section-title {
+      margin: 34px 8px 18px;
+      font-size: 21px;
+      line-height: 1.5;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      margin: 28px 8px 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .article-list {
+      padding-left: 1.4em;
+    }
+
+    .article-list li {
+      margin-bottom: 10px;
+    }
+
+    .article-reference {
+      margin: 34px 8px 0;
+      padding: 18px 18px 2px;
+      border-left: 4px solid rgba(53,115,185,.38);
+      background: linear-gradient(180deg, rgba(53,115,185,.06), rgba(53,115,185,.02));
+      border-radius: 0 14px 14px 0;
+    }
+
+    .article-reference p:first-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin: 28px 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fcfcfc;
+    }
+
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .article-table th,
+    .article-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.7;
+      vertical-align: top;
+    }
+
+    .article-table th {
+      background: rgba(53,115,185,.07);
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin: 36px 8px 0;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(53,115,185,.22);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--meta-color);
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 20px 12px 48px; }
+      .article { padding: 24px 16px 36px; border-radius: 18px; }
+      .article-title { font-size: 26px; }
+      .section-title { font-size: 20px; }
+      .subsection-title { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <article class="article">
+      <div class="brand">
+        <span class="brand-badge">梅斯学术风格</span>
+        <span>基于真实微信样式复刻生成</span>
+      </div>
+      <h1 class="article-title">全外显子测序，让10%的儿童狼疮找到了&quot;真凶&quot;</h1>
+      <div class="meta">
+        <span>来源：文献知识库内容生成</span>
+        <span>版式参考：梅斯学术微信公众号</span>
+      </div>
+      <div class="hero-divider"></div>
+      <p class="article-paragraph">孩子确诊狼疮，真正的病因你找对了吗？系统性红斑狼疮（SLE），这个名字对许多临床医生来说并不陌生。然而，当它发生在孩子身上——尤其是5岁以前就起病的孩子——背后的故事，往往远比我们想象的复杂。近期，一项迄今为止规模最大的儿童起病SLE（jSLE）全外显子测序研究正式发表。研究团队对172名先证者及其可获取的家庭成员（共263人）进行了全外显子测序，结果揭示：至少10%的儿童狼疮，其背后是一个可被精准识别的单基因致病原因。这个数字，正在重塑我们对儿童狼疮病因学的认知。</p>
+<h2 class="section-title">10%，不是终点，可能只是起点</h2>
+<p class="article-paragraph">在此之前，针对未经严格筛选的jSLE队列，靶向基因panel检测已识别出约7%的单基因病因，主要涉及补体缺陷、核酸感应及适应性免疫通路。而这项最新研究，将诊断率提升至10%——在172名先证者中，17例无亲缘关系的患者获得了明确的分子诊断，变异被判定为致病性或可能致病性，且与临床表型高度吻合。研究者明确指出，这一10%的数字可能仍是保守估计。原因在于：许多与疾病相关的基因尚未被发现，未来技术的进步将进一步提升检测能力。换句话说，随着基因组医学的持续推进，这个比例还有上升空间。</p>
+<h2 class="section-title">哪些孩子更可能是&quot;单基因狼疮&quot;？</h2>
+<p class="article-paragraph">并非所有儿童狼疮患者都需要第一时间启动全外显子测序。研究数据提示，以下两类患者的单基因病因检出率显著更高：</p>
+<ul class="article-list"><li>极早发病者（&lt;5岁起病）：诊断率高达33%</li><li>伴有综合征表现者：诊断率达到40%在所有获得明确遗传诊断的患者中，极早发病和综合征型分别占阳性病例的29%和35%。值得注意的是，在本研究中，获得分子诊断的患者平均发病年龄为7.70岁，略低于未确诊组的9.95岁，但这一差异未达统计学显著性（p=0.101）。此外，研究结果也打破了一个直觉上的假设：家族史本身，并不预示较高的阳性发现率。 这一发现与部分其他研究存在差异，研究者认为，这可能与不同队列的近亲婚配率差异有关。</li></ul>
+<h2 class="section-title">它不是一种病，而是一群病</h2>
+<p class="article-paragraph">这项研究最具突破性的洞见之一，来自对疾病本质的重新定义。研究者指出，儿童起病的SLE并非单一疾病实体，而是一系列遗传机制各异、但共同呈现系统性自身免疫临床表型的疾病谱。在基因层面，它们背后涉及的致病通路也超出了传统认知范围。本研究在分析中纳入了三套计算机模拟（in silico）基因panel，但仍发现了4个不在这些panel中的新致病基因：DOCK11、PTPN2、MAN1B1、ETV6。此外，研究还鉴定出3个新型候选基因，包括涉及JAK-STAT调控通路的SOCS1和PTPN2，以及参与细胞骨架动力学的DOCK11和ETV6。这一发现有力说明：固定的靶向panel存在天然局限，全基因组覆盖策略才能更完整地捕捉单基因狼疮的全貌。</p>
+<h2 class="section-title">为什么分子诊断对儿童狼疮如此重要？</h2>
+<p class="article-paragraph">给一个孩子的狼疮找到&quot;基因真凶&quot;，意义并不止于满足好奇心。研究者特别强调：遗传诊断可以直接指导靶向治疗方案的选择。不同的单基因致病机制，对应不同的治疗靶点，这使得精准干预成为可能——例如JAK-STAT通路异常的患者，可能对JAK抑制剂有更好的响应。因此，研究团队明确呼吁：将全面的基因检测纳入jSLE的标准诊疗流程，这不仅有望改变个体患者的临床管理路径，也将深化我们对这类疾病生物学机制的整体认识。</p>
+<h2 class="section-title">研究方法一览</h2>
+<p class="article-paragraph">本研究对172名先证者及其可获取的家庭成员（共263人，包含202名狼疮患者）进行了全外显子测序。其中大多数先证者接受了单例测序（n=118），35人以三人组方式完成测序，18人以二人组方式进行，另有1个多重家系参与。样本采用Illumina平台测序，使用多种捕获试剂盒，序列比对基于hg19参考基因组，变异识别使用GATK流程，注释由巴黎大学及里昂大学医院生物信息平台完成。入组标准以发病年龄为核心——患者均为18岁以前起病。临床表现与既往报道的儿童SLE队列相似，器官受累比例较高。</p>
+<h2 class="section-title">结语</h2>
+<p class="article-paragraph">这项迄今规模最大的jSLE全外显子测序研究告诉我们一件事：当一个孩子被诊断为狼疮，我们可能还没有真正找到病因。10%的单基因确诊率，以及在极早发病和综合征型患者中超过三分之一的检出比例，正是推动基因检测走进jSLE临床常规的有力证据。随着更多疾病相关基因不断被发现、测序技术持续迭代，这一比例还将继续攀升。未来，精准的遗传诊断或许将成为儿童狼疮诊疗中不可或缺的一环。</p>
+<h2 class="section-title">本文内容基于已发表学术研究，仅供医学专业人士参考，不构成诊疗建议。</h2>
+<div class="article-reference"><p>[参考资料][文献] [1] Tusseau M, Khaldi-Plassart S, Labalme A, Mathieu AL, Riller Q, Tran TA, et al. Exome sequencing enables molecular diagnosis in 10% of early-onset or familial systemic lupus erythematosus cases. eBioMedicine. 2026 Apr;126:106209. doi:10.1016/j.ebiom.2026.106209.</p></div>
+      <div class="footer-note">
+        本 HTML 为本地高保真版式交付，用于补足飞书 docx 在复杂公众号样式复现上的限制。
+      </div>
+    </article>
+  </main>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>全外显子测序，让10%的儿童狼疮找到了&quot;真凶&quot;</title>
+  <style>
+    :root {
+      --page-bg: #f4f4f4;
+      --paper: #ffffff;
+      --text: #595959;
+      --strong: rgba(0, 0, 0, 0.9);
+      --blue: #3573b9;
+      --meta: #8c8c8c;
+      --line: #ececec;
+      --shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+    .wx-page {
+      width: min(100%, 720px);
+      margin: 0 auto;
+      background: var(--paper);
+      min-height: 100vh;
+      box-shadow: var(--shadow);
+      padding: 24px 14px 48px;
+    }
+    .wx-header {
+      width: min(100%, 677px);
+      margin: 0 auto 22px;
+    }
+    .wx-account {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 26px;
+      font-size: 13px;
+      color: var(--meta);
+      width: min(100%, 677px);
+      flex-wrap: wrap;
+    }
+    .wx-original {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(53,115,185,.1);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .wx-name {
+      color: var(--blue);
+      font-weight: 600;
+    }
+    .wechat-title {
+      width: min(100%, 677px);
+      margin: 0 auto 12px;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--strong);
+    }
+    .wx-time {
+      width: min(100%, 677px);
+      margin: 0 auto 26px;
+      color: var(--meta);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .wx-author {
+      color: #9a9a9a;
+    }
+    .wx-content {
+      width: min(100%, 677px);
+      margin: 0 auto;
+    }
+    .wechat-p,
+    .wechat-list,
+    .wechat-reference p {
+      margin: 0 8px 24px;
+      line-height: 1.75em;
+      text-align: justify;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+    .wechat-p strong,
+    .wechat-list strong,
+    .wechat-reference strong {
+      font-weight: 700;
+      color: var(--strong);
+    }
+    .wechat-lead .wechat-p:first-child {
+      margin-top: 6px;
+    }
+    .wechat-section-pair {
+      margin: 28px 0 20px;
+    }
+    .wechat-section-top,
+    .wechat-section-bottom {
+      margin: 0 8px;
+      text-align: center;
+      color: var(--blue);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .wechat-section-top {
+      font-size: 15px;
+      line-height: 1.75em;
+    }
+    .wechat-section-bottom {
+      margin-top: 4px;
+      font-size: 16px;
+      line-height: 1.75em;
+    }
+    .wechat-list {
+      padding-left: 1.5em;
+    }
+    .wechat-list li {
+      margin-bottom: 10px;
+    }
+    .wechat-table-wrap {
+      margin: 28px 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .wechat-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+    .wechat-table th,
+    .wechat-table td {
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: left;
+      vertical-align: top;
+      color: var(--text);
+    }
+    .wechat-table th {
+      color: var(--strong);
+      background: #fafcff;
+    }
+    .wechat-reference {
+      margin: 34px 8px 0;
+      padding: 18px 18px 20px;
+      background: #f3f3f3;
+      border-radius: 0;
+    }
+    .wechat-reference p {
+      margin-bottom: 10px;
+      color: #707070;
+      text-align: left;
+    }
+    .wechat-reference p:first-child {
+      color: #7a7a7a;
+      font-weight: 400;
+    }
+    .wx-foot {
+      width: min(100%, 677px);
+      margin: 34px auto 0;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(53,115,185,.22);
+      color: var(--meta);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    @media (max-width: 720px) {
+      .wx-page {
+        width: 100%;
+        box-shadow: none;
+        padding: 20px 8px 40px;
+      }
+      .wechat-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wx-page">
+    <header class="wx-header">
+      <h1 class="wechat-title">全外显子测序，让10%的儿童狼疮找到了&quot;真凶&quot;</h1>
+      <div class="wx-account">
+        <span class="wx-original">原创</span>
+        <span class="wx-author">文献知识库生成</span>
+        <span class="wx-name">梅斯学术</span>
+        <span>2026年4月6日</span>
+      </div>
+    </header>
+    <article class="wx-content">
+      <section class="wechat-lead">
+        <p class="wechat-p">孩子确诊狼疮，真正的病因你找对了吗？系统性红斑狼疮（SLE），这个名字对许多临床医生来说并不陌生。然而，当它发生在孩子身上——尤其是5岁以前就起病的孩子——背后的故事，往往远比我们想象的复杂。近期，一项迄今为止规模最大的儿童起病SLE（jSLE）全外显子测序研究正式发表。研究团队对172名先证者及其可获取的家庭成员（共263人）进行了全外显子测序，结果揭示：至少10%的儿童狼疮，其背后是一个可被精准识别的单基因致病原因。这个数字，正在重塑我们对儿童狼疮病因学的认知。</p>
+      </section>
+      <section class="wechat-section-pair"><p class="wechat-section-top">10%，不是终点，可能只是起点</p></section>
+<p class="wechat-p">在此之前，针对未经严格筛选的jSLE队列，靶向基因panel检测已识别出约7%的单基因病因，主要涉及补体缺陷、核酸感应及适应性免疫通路。而这项最新研究，将诊断率提升至10%——在172名先证者中，17例无亲缘关系的患者获得了明确的分子诊断，变异被判定为致病性或可能致病性，且与临床表型高度吻合。研究者明确指出，这一10%的数字可能仍是保守估计。原因在于：许多与疾病相关的基因尚未被发现，未来技术的进步将进一步提升检测能力。换句话说，随着基因组医学的持续推进，这个比例还有上升空间。</p>
+<section class="wechat-section-pair"><p class="wechat-section-top">哪些孩子更可能是&quot;单基因狼疮&quot;？</p></section>
+<p class="wechat-p">并非所有儿童狼疮患者都需要第一时间启动全外显子测序。研究数据提示，以下两类患者的单基因病因检出率显著更高：</p>
+<ul class="wechat-list"><li>极早发病者（&lt;5岁起病）：诊断率高达33%</li><li>伴有综合征表现者：诊断率达到40%在所有获得明确遗传诊断的患者中，极早发病和综合征型分别占阳性病例的29%和35%。值得注意的是，在本研究中，获得分子诊断的患者平均发病年龄为7.70岁，略低于未确诊组的9.95岁，但这一差异未达统计学显著性（p=0.101）。此外，研究结果也打破了一个直觉上的假设：家族史本身，并不预示较高的阳性发现率。 这一发现与部分其他研究存在差异，研究者认为，这可能与不同队列的近亲婚配率差异有关。</li></ul>
+<section class="wechat-section-pair"><p class="wechat-section-top">它不是一种病，而是一群病</p></section>
+<p class="wechat-p">这项研究最具突破性的洞见之一，来自对疾病本质的重新定义。研究者指出，儿童起病的SLE并非单一疾病实体，而是一系列遗传机制各异、但共同呈现系统性自身免疫临床表型的疾病谱。在基因层面，它们背后涉及的致病通路也超出了传统认知范围。本研究在分析中纳入了三套计算机模拟（in silico）基因panel，但仍发现了4个不在这些panel中的新致病基因：<em>DOCK11</em>、<em>PTPN2</em>、<em>MAN1B1</em>、<em>ETV6</em>。此外，研究还鉴定出3个新型候选基因，包括涉及JAK-STAT调控通路的<em>SOCS1</em>和<em>PTPN2</em>，以及参与细胞骨架动力学的<em>DOCK11</em>和<em>ETV6</em>。这一发现有力说明：固定的靶向panel存在天然局限，全基因组覆盖策略才能更完整地捕捉单基因狼疮的全貌。</p>
+<section class="wechat-section-pair"><p class="wechat-section-top">为什么分子诊断对儿童狼疮如此重要？</p></section>
+<p class="wechat-p">给一个孩子的狼疮找到&quot;基因真凶&quot;，意义并不止于满足好奇心。研究者特别强调：遗传诊断可以直接指导靶向治疗方案的选择。不同的单基因致病机制，对应不同的治疗靶点，这使得精准干预成为可能——例如JAK-STAT通路异常的患者，可能对JAK抑制剂有更好的响应。因此，研究团队明确呼吁：将全面的基因检测纳入jSLE的标准诊疗流程，这不仅有望改变个体患者的临床管理路径，也将深化我们对这类疾病生物学机制的整体认识。</p>
+<section class="wechat-section-pair"><p class="wechat-section-top">研究方法一览</p></section>
+<p class="wechat-p">本研究对172名先证者及其可获取的家庭成员（共263人，包含202名狼疮患者）进行了全外显子测序。其中大多数先证者接受了单例测序（n=118），35人以三人组方式完成测序，18人以二人组方式进行，另有1个多重家系参与。样本采用Illumina平台测序，使用多种捕获试剂盒，序列比对基于hg19参考基因组，变异识别使用GATK流程，注释由巴黎大学及里昂大学医院生物信息平台完成。入组标准以发病年龄为核心——患者均为18岁以前起病。临床表现与既往报道的儿童SLE队列相似，器官受累比例较高。</p>
+<section class="wechat-section-pair"><p class="wechat-section-top">结语</p></section>
+<p class="wechat-p">这项迄今规模最大的jSLE全外显子测序研究告诉我们一件事：当一个孩子被诊断为狼疮，我们可能还没有真正找到病因。10%的单基因确诊率，以及在极早发病和综合征型患者中超过三分之一的检出比例，正是推动基因检测走进jSLE临床常规的有力证据。随着更多疾病相关基因不断被发现、测序技术持续迭代，这一比例还将继续攀升。未来，精准的遗传诊断或许将成为儿童狼疮诊疗中不可或缺的一环。</p>
+<section class="wechat-section-pair"><p class="wechat-section-top">本文内容基于已发表学术研究，仅供医学专业人士参考，不构成诊疗建议。</p></section>
+      <section class="wechat-reference"><p>参考资料：</p><p>[1] Tusseau M, Khaldi-Plassart S, Labalme A, Mathieu AL, Riller Q, Tran TA, et al. Exome sequencing enables molecular diagnosis in 10% of early-onset or familial systemic lupus erythematosus cases. eBioMedicine. 2026 Apr;126:106209. doi:10.1016/j.ebiom.2026.106209.</p></section>
+    </article>
+    <footer class="wx-foot">
+      本地 HTML 精修版，目标是更接近真实梅斯学术微信单页的阅读节奏、标题样式与正文密度。
+    </footer>
+  </main>
+</body>
+</html>

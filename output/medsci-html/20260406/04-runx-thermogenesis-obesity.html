@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>脂肪组织&quot;产热开关&quot;被发现！抑制RUNX1/2，或能对抗肥胖与代谢紊乱</title>
+  <style>
+    :root {
+      --page-bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --title-color: rgba(0, 0, 0, 0.9);
+      --body-color: #595959;
+      --meta-color: #8c8c8c;
+      --accent: #3573b9;
+      --line: #e8e8e8;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      --content-width: 720px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(53,115,185,.08), transparent 24%),
+        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
+      color: var(--body-color);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .article {
+      max-width: var(--content-width);
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 36px 28px 48px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--meta-color);
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+
+    .brand-badge {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(53,115,185,.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .article-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--title-color);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--meta-color);
+    }
+
+    .hero-divider {
+      height: 1px;
+      margin: 0 0 24px;
+      background: linear-gradient(90deg, rgba(53,115,185,.18), rgba(53,115,185,0));
+    }
+
+    .article-paragraph,
+    .article-list,
+    .article-reference p {
+      margin: 0 8px 24px;
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: 0.5px;
+      color: var(--body-color);
+      text-align: justify;
+    }
+
+    .article-paragraph strong,
+    .article-list strong,
+    .article-reference strong {
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .section-title {
+      margin: 34px 8px 18px;
+      font-size: 21px;
+      line-height: 1.5;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      margin: 28px 8px 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .article-list {
+      padding-left: 1.4em;
+    }
+
+    .article-list li {
+      margin-bottom: 10px;
+    }
+
+    .article-reference {
+      margin: 34px 8px 0;
+      padding: 18px 18px 2px;
+      border-left: 4px solid rgba(53,115,185,.38);
+      background: linear-gradient(180deg, rgba(53,115,185,.06), rgba(53,115,185,.02));
+      border-radius: 0 14px 14px 0;
+    }
+
+    .article-reference p:first-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin: 28px 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fcfcfc;
+    }
+
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .article-table th,
+    .article-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.7;
+      vertical-align: top;
+    }
+
+    .article-table th {
+      background: rgba(53,115,185,.07);
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin: 36px 8px 0;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(53,115,185,.22);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--meta-color);
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 20px 12px 48px; }
+      .article { padding: 24px 16px 36px; border-radius: 18px; }
+      .article-title { font-size: 26px; }
+      .section-title { font-size: 20px; }
+      .subsection-title { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <article class="article">
+      <div class="brand">
+        <span class="brand-badge">梅斯学术风格</span>
+        <span>基于真实微信样式复刻生成</span>
+      </div>
+      <h1 class="article-title">脂肪组织&quot;产热开关&quot;被发现！抑制RUNX1/2，或能对抗肥胖与代谢紊乱</h1>
+      <div class="meta">
+        <span>来源：文献知识库内容生成</span>
+        <span>版式参考：梅斯学术微信公众号</span>
+      </div>
+      <div class="hero-divider"></div>
+      <h2 class="section-title">导读：RUNX1和RUNX2长期以来以&quot;骨骼发育调控因子&quot;和&quot;造血分化主控因子&quot;的身份为人熟知，却鲜有人关注它们在脂肪组织中的角色。来自中山大学、广州国家实验室等机构的研究团队近期发表了一项重要发现——脂肪细胞中的RUNX1/2竟是产热程序的&quot;转录抑制阀&quot;，而药理学抑制这两个因子，可激活脂肪产热、改善全身能量代谢。</h2>
+<h2 class="section-title">背景：RUNX蛋白，不只是&quot;骨骼与血液&quot;的故事</h2>
+<p class="article-paragraph">说起RUNX2，多数人首先想到的是成骨分化与骨骼发育；而RUNX1则是造血系统分化不可或缺的主调控因子。然而，这两个转录因子在脂肪细胞命运决定中究竟扮演什么角色，长期以来几乎是一片空白。广州国家实验室、中山大学中山医学院等团队的研究人员在期刊发表了题为《Inhibition of adipocyte RUNX1/2 enhances adipose tissue thermogenesis through distinct mechanisms》的研究成果，系统揭示了RUNX1/2作为产热性脂肪细胞激活&quot;转录刹车&quot;的新功能，并提示其具有成为代谢疾病治疗靶点的潜力。</p>
+<h2 class="section-title">核心发现一：RUNX1/2是产热基因程序的&quot;转录压制者&quot;</h2>
+<p class="article-paragraph">研究团队通过多维度实验手段，包括腺相关病毒（AAV）介导的过表达与敲低、脂肪细胞特异性敲除小鼠模型，以及产热脂肪细胞特异性敲除模型，在体内外一致地确认：RUNX1和RUNX2是适应性产热的抑制因子。</p>
+<ul class="article-list"><li>在体外，过表达RUNX1/2显著抑制棕色前体脂肪细胞的分化，脂滴积累减少，甘油三酯含量下降，早期及全能脂肪分化标志基因（Dlk1、Ly6a、Cebpd、Pparg2、Adipoq等）表达全面降低，主脂肪分化调控因子PPARγ的蛋白水平也明显减少。</li><li>转录组分析与基因集富集分析（GSEA）显示，RUNX1/2过表达后，有氧呼吸、产热以及氧化磷酸化相关信号通路均显著受到抑制。</li><li>在体内，AAV介导的RUNX1/2在棕色脂肪组织（BAT）或腹股沟白色脂肪组织（iWAT）中的过表达，均导致UCP1表达下降、冷耐受能力受损，以及β3肾上腺素能刺激后耗氧量与能量消耗减少；而AAV-Cre介导的iWAT局部RUNX1敲低则产生相反效果。这一系列正反两面的证据，共同勾勒出RUNX1/2作为脂肪产热&quot;制动阀&quot;的功能图谱。</li></ul>
+<h2 class="section-title">核心发现二：脂肪特异性敲除RUNX1/2，促进米色脂肪形成</h2>
+<p class="article-paragraph">研究团队进一步构建了脂肪细胞特异性RUNX1敲除（AKO）和RUNX2敲除（UKO）小鼠，在冷暴露条件下，两种模型的iWAT均呈现出增强的产热基因表达程序，提示白色脂肪组织向米色化（browning）方向转变。值得注意的是，两者对全身代谢的影响并不完全相同：RUNX1缺失在改善葡萄糖代谢方面具有独特优势，而这一效应在RUNX2敲除小鼠中并不突出。此外，数据还显示，RUNX1/2 AKO小鼠在接受CL316,243（β3肾上腺素激动剂）处理后，能量消耗的增幅明显大于UKO小鼠。研究者推测，这可能与Adipoq-Cre驱动的高效重组效率有关——其可同时在Ucp1阳性和Ucp1阴性脂肪细胞中实现RUNX1/2缺失，从而产生更为全面的产热表型。</p>
+<h2 class="section-title">核心发现三：RUNX1与RUNX2通过不同机制调控产热</h2>
+<h3 class="subsection-title">尽管RUNX1与RUNX2在结构上高度相似，均可与核心结合因子CBFβ形成复合体调控基因表达，但研究发现二者调控产热的机制存在差异</h3>
+<ul class="article-list"><li>RUNX1的缺失可能通过HDAC1介导的表观遗传重塑促进白色脂肪棕色化；</li><li>RUNX2的缺失则可能依赖凝聚体（condensate）依赖性的转录调控机制发挥作用。同时，同时双敲除RUNX1和RUNX2所产生的促产热效应，比单独敲除任意一个更为显著，提示二者在产热基因程序调控中存在一定程度的冗余机制。研究者也坦承了当前的局限性：RUNX1/2在成熟BAT脂肪细胞中表达水平较低，因此在BAT中未能观察到产热基因的显著上调；而由于RUNX1/2在PDGFRα表达的间充质细胞中具有重要功能，利用PDGFRα-Cre构建前脂肪细胞特异性敲除模型目前仍不可行。</li></ul>
+<h2 class="section-title">核心发现四：药理学抑制RUNX1/2，在体内激活产热、改善代谢</h2>
+<p class="article-paragraph">基于上述遗传学证据，研究团队进一步验证了RUNX1/2作为药物靶点的转化潜力。</p>
+<ul class="article-list"><li>在体外，使用小分子抑制剂RO5-3335（靶向RUNX1）和CADD522（靶向RUNX2）处理分化的棕色脂肪细胞，两者均显著上调了UCP1的mRNA和蛋白水平，氧耗速率（OCR）分析也提示线粒体功能得到改善。</li><li>在体内，对小鼠给予RO5-3335或CADD522处理一周后，在冷暴露条件下，两组小鼠的核心体温均显著高于对照组，存活率也明显提升。</li><li>产热关键基因Ucp1、Pgc1a、Ebf2的表达在药物处理组中均得到上调；组织学分析进一步提示脂肪组织产热激活。这一结果表明，药理学手段抑制RUNX1/2在功能上能够模拟遗传敲除的促产热效应，为后续开发靶向代谢疾病的小分子药物提供了概念验证。</li></ul>
+<h2 class="section-title">研究意义与展望</h2>
+<p class="article-paragraph">综合来看，这项研究将RUNX1和RUNX2定位为脂肪产热的新型转录抑制因子，并揭示了二者通过不同分子机制分别调控脂肪棕色化的路径。正如研究团队在讨论中所指出的：RUNX1/2的表达在热刺激下动态下调，且与肥胖程度及不良代谢表型呈正相关。这一规律提示，在肥胖状态下RUNX1/2的异常高表达，可能是产热功能受损的重要原因之一。此外，RUNX1与RUNX2在葡萄糖代谢、胰岛素敏感性等方面的差异化调控效应，也为未来开发精准化代谢治疗策略——针对不同代谢表型选择性地靶向RUNX1或RUNX2——提供了理论依据。研究者同时指出，未来采用RUNX1/RUNX2双敲除模型的研究，将有助于更明确地阐明二者在饮食诱导产热（DIT）相关代谢效应中的贡献。</p>
+<div class="article-reference"><p>[参考资料][文献] [1] Wang C, He N, Wang S, Lei M, Yao J, Tang Y, et al. Inhibition of adipocyte RUNX1/2 enhances adipose tissue thermogenesis through distinct mechanisms. Nat Commun. 2026 Apr 2. doi:10.1038/s41467-026-71266-6.</p></div>
+      <div class="footer-note">
+        本 HTML 为本地高保真版式交付，用于补足飞书 docx 在复杂公众号样式复现上的限制。
+      </div>
+    </article>
+  </main>
+</body>
+</html>

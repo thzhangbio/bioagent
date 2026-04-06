@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>胰腺癌基质&quot;内鬼&quot;曝光：肌成纤维细胞是如何封锁抗肿瘤免疫的？</title>
+  <style>
+    :root {
+      --page-bg: #f4f4f4;
+      --card-bg: #ffffff;
+      --title-color: rgba(0, 0, 0, 0.9);
+      --body-color: #595959;
+      --meta-color: #8c8c8c;
+      --accent: #3573b9;
+      --line: #e8e8e8;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      --content-width: 720px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(53,115,185,.08), transparent 24%),
+        linear-gradient(180deg, #fafafa 0%, var(--page-bg) 100%);
+      color: var(--body-color);
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    }
+
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .article {
+      max-width: var(--content-width);
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 36px 28px 48px;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--meta-color);
+      font-size: 14px;
+      letter-spacing: .02em;
+    }
+
+    .brand-badge {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(53,115,185,.1);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .article-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+      line-height: 1.4;
+      font-weight: 500;
+      color: var(--title-color);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--meta-color);
+    }
+
+    .hero-divider {
+      height: 1px;
+      margin: 0 0 24px;
+      background: linear-gradient(90deg, rgba(53,115,185,.18), rgba(53,115,185,0));
+    }
+
+    .article-paragraph,
+    .article-list,
+    .article-reference p {
+      margin: 0 8px 24px;
+      font-size: 15px;
+      line-height: 1.75;
+      letter-spacing: 0.5px;
+      color: var(--body-color);
+      text-align: justify;
+    }
+
+    .article-paragraph strong,
+    .article-list strong,
+    .article-reference strong {
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .section-title {
+      margin: 34px 8px 18px;
+      font-size: 21px;
+      line-height: 1.5;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .subsection-title {
+      margin: 28px 8px 16px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .article-list {
+      padding-left: 1.4em;
+    }
+
+    .article-list li {
+      margin-bottom: 10px;
+    }
+
+    .article-reference {
+      margin: 34px 8px 0;
+      padding: 18px 18px 2px;
+      border-left: 4px solid rgba(53,115,185,.38);
+      background: linear-gradient(180deg, rgba(53,115,185,.06), rgba(53,115,185,.02));
+      border-radius: 0 14px 14px 0;
+    }
+
+    .article-reference p:first-child {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      margin: 28px 8px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fcfcfc;
+    }
+
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    .article-table th,
+    .article-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.7;
+      vertical-align: top;
+    }
+
+    .article-table th {
+      background: rgba(53,115,185,.07);
+      color: var(--title-color);
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin: 36px 8px 0;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(53,115,185,.22);
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--meta-color);
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 20px 12px 48px; }
+      .article { padding: 24px 16px 36px; border-radius: 18px; }
+      .article-title { font-size: 26px; }
+      .section-title { font-size: 20px; }
+      .subsection-title { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <article class="article">
+      <div class="brand">
+        <span class="brand-badge">梅斯学术风格</span>
+        <span>基于真实微信样式复刻生成</span>
+      </div>
+      <h1 class="article-title">胰腺癌基质&quot;内鬼&quot;曝光：肌成纤维细胞是如何封锁抗肿瘤免疫的？</h1>
+      <div class="meta">
+        <span>来源：文献知识库内容生成</span>
+        <span>版式参考：梅斯学术微信公众号</span>
+      </div>
+      <div class="hero-divider"></div>
+      <p class="article-paragraph">发表于 Cancer Cell 的这项新研究，从机制层面揭示了胰腺癌免疫&quot;冷漠&quot;的一把关键锁。</p>
+<h2 class="section-title">为什么胰腺癌这么难治？</h2>
+<p class="article-paragraph">胰腺导管腺癌（PDAC）是预后最差的实体肿瘤之一，五年生存率长期徘徊在个位数。让它难治的原因，除了发现晚、易转移，还有一道几乎无解的屏障——致密的促纤维增生性间质。 这道间质不仅是物理障碍，更是一个高度免疫抑制的微环境。肿瘤内几乎见不到有组织的免疫反应，免疫检查点抑制剂在这里也几乎&quot;无处着力&quot;。 问题是：间质为什么会把免疫细胞挡在门外？ 近期发表于 Cancer Cell 的一项研究，由俄亥俄州立大学等团队联合完成，给出了一个重要的机制性答案。</p>
+<h2 class="section-title">TLS：肿瘤里的&quot;免疫基地&quot;</h2>
+<p class="article-paragraph">要理解这项研究，先要认识一个结构——三级淋巴结构（TLS，Tertiary Lymphoid Structures）。 TLS是在慢性炎症或肿瘤微环境中异位形成的类淋巴组织，能够在肿瘤局部组织T细胞和B细胞的协同免疫应答。研究表明，肿瘤内存在TLS的患者，对免疫检查点抑制剂的响应率更高，预后也更好。 然而，绝大多数PDAC患者的肿瘤内缺乏TLS。这究竟是为什么？</p>
+<h2 class="section-title">主角登场：肿瘤相关成纤维细胞（CAF）</h2>
+<p class="article-paragraph">研究团队将目光聚焦在肿瘤相关成纤维细胞（CAF）上——这是PDAC间质的核心细胞成分，决定着间质的&quot;个性&quot;。</p>
+<h3 class="subsection-title">CAF并非一种细胞，而是一个功能高度可塑的群体，其中两种亚型在本研究中尤为关键</h3>
+<ul class="article-list"><li>myCAF（肌成纤维细胞样CAF）：由TGFβ驱动分化，是PDAC间质中的主导亚型，与免疫抑制密切相关；</li><li>rCAF（网状CAF）：类似淋巴结中负责组织淋巴组织的成纤维网状细胞（FRC），能通过分泌CCL19、CCL21、CXCL13等趋化因子，招募T细胞和B细胞，促进TLS形成。</li></ul>
+<p class="article-paragraph">研究者提出的核心问题是：myCAF的主导地位，是否正是rCAF无法发育、TLS无法形成的根本原因？</p>
+<h2 class="section-title">关键发现一：LTBR激动能诱导早期TLS，但响应因肿瘤而异</h2>
+<p class="article-paragraph">研究团队利用基因工程小鼠PDAC模型（KPC系列），发现给予淋巴毒素β受体（LTBR）激动剂（αLTBR）后，部分肿瘤中可诱导出早期TLS聚集体（E-TLS）。 但这种响应在不同肿瘤模型之间存在显著差异——有的肿瘤对αLTBR治疗敏感（TLS许可型），有的则几乎没有响应（TLS抵抗型）。 关键线索在于：响应差异与肿瘤基线的CAF表型密切相关。</p>
+<h2 class="section-title">关键发现二：TGFβ是拮抗rCAF分化的&quot;刹车&quot;</h2>
+<p class="article-paragraph">研究团队在体外原代成纤维细胞实验中，系统探索了TNFR/LTBR信号与TGFβ信号之间的关系。</p>
+<h3 class="subsection-title">结果显示</h3>
+<ul class="article-list"><li>TNFα单独处理或αLTBR单独处理，均可上调rCAF标志物VCAM-1；TNFα与αLTBR联合处理效果更强；</li><li>TNFα和αLTBR联合处理还可上调PDGFRα，同时下调PDGFRβ，并促进Cxcl13和Ccl19的转录与蛋白分泌；</li><li>相反，TGFβ1预处理可抑制VCAM-1、PDGFRα和LTBR的表达，并上调PDGFRβ；</li><li>最重要的是，TGFβ1预处理完全阻断了αLTBR介导的rCAF分化相关基因上调，也消除了CXCL13和CCL19的分泌。</li></ul>
+<p class="article-paragraph">这意味着：TGFβ信号通路通过主动压制rCAF分化程序，使成纤维细胞&quot;锁定&quot;在myCAF状态，从而阻止TLS相关趋化因子的产生。 值得注意的是，使用TLS许可型和抵抗型肿瘤细胞条件培养液与初始成纤维细胞共培养，并不能重现上述差异——提示肿瘤细胞的旁分泌信号并非CAF分化差异的主要原因。</p>
+<h2 class="section-title">关键发现三：解除TGFβR1信号，rCAF&quot;获释&quot;</h2>
+<p class="article-paragraph">既然TGFβ是myCAF锁定rCAF分化的关键，那么阻断TGFβ信号能否&quot;解锁&quot;rCAF？</p>
+<h3 class="subsection-title">研究团队采用两种策略在TLS抵抗型肿瘤中验证</h3>
+<h3 class="subsection-title">策略一：TGFβR1抑制剂（TGFβR1i）联合αLTBR</h3>
+<p class="article-paragraph">联合治疗使CAF中Ccl19、Ccl21a、Cxcl13显著上调，rCAF比例增加、myCAF比例下降；与此同时，肿瘤内CD4+ T细胞、CD8+ T细胞和CD19+ B细胞密度升高，E-TLS形成增多，肿瘤控制效果增强。</p>
+<h3 class="subsection-title">策略二：CAF条件性TGFβR1（Alk5）基因敲除小鼠</h3>
+<p class="article-paragraph">成纤维细胞特异性敲除TGFβR1同样使TLS抵抗型肿瘤获得更好的控制。在CAF-Alk5 KO小鼠中给予αLTBR，可显著上调CAF中VCAM1表达，富集rCAF亚群，同时减少myCAF，且肿瘤中T细胞和B细胞浸润增加。 这些体内数据共同证明：解除myCAF的TGFβ转录程序，可使LTBR激动有效地将CAF重编程为rCAF，从而促进淋巴细胞归巢与肿瘤控制。</p>
+<h2 class="section-title">关键发现四：rCAF在人PDAC中毗邻TLS分布</h2>
+<p class="article-paragraph">研究团队进一步在人PDAC肿瘤组织中分析了rCAF的空间分布，发现rCAF亚群在空间位置上与TLS紧密毗邻——这与结直肠癌、乳腺癌、肺癌等其他瘤种中rCAF/CCL19+ CAF紧邻TLS分布的报道相吻合，提示这一机制具有跨瘤种的普适性。</p>
+<h2 class="section-title">治疗启示：不只是&quot;封堵TGFβ&quot;</h2>
+<p class="article-paragraph">过去，TGFβ阻断剂在转移性PDAC患者中的临床试验疗效欠佳，这是领域内的一大困境。</p>
+<h3 class="subsection-title">本研究提出了一条更为精准的组合策略</h3>
+<p class="article-paragraph">在阻断TGFβR1（解除myCAF对rCAF的压制）的同时，联合给予LTBR激动剂（主动驱动CAF向rCAF重编程），从而系统性地重塑肿瘤微环境，促进TLS形成，增强T细胞依赖的肿瘤杀伤。 研究者同时指出，rCAF的富集程度、TLS数量/大小以及CXCL13等趋化因子的表达，可作为这一治疗策略的组织学与分子生物标志物，具有潜在的临床转化价值。 此外，鉴于TGFβ信号是跨瘤种免疫治疗失败的最强预测因子之一，而TLS的存在与免疫检查点抑制剂的疗效提升高度相关，未来探索LTBR激动剂与ICB联合方案的潜力，同样值得期待。</p>
+<h2 class="section-title">小结</h2>
+<h3 class="subsection-title">这项研究系统揭示了PDAC免疫&quot;冷漠&quot;的一条重要机制链</h3>
+<p class="article-paragraph">TGFβ → myCAF主导 → rCAF分化受阻 → TLS无法形成 → 淋巴细胞浸润不足 → 免疫逃逸 而打破这条链的策略，不是单纯地&quot;堵&quot;，而是&quot;解锁+激活&quot;并举——为PDAC这一长期缺乏有效免疫治疗手段的癌种，提供了新的机制依据与治疗思路。</p>
+<h2 class="section-title">原文：Kirschstein E, et al. Myofibroblast programming blocks differentiation of TLS-organizing fibroblastic reticular cells in pancreatic cancer. Cancer Cell, 2026. https://doi.org/10.1016/j.ccell.2026.03.004</h2>
+<div class="article-reference"><p>[参考资料]</p><p>[文献] [1] Kirschstein E, Harder O, Krull J, Sikorski M, Khanal S, Mack M, et al. Myofibroblast programming blocks differentiation of TLS-organizing fibroblastic reticular cells in pancreatic cancer. Cancer Cell. 2026 Mar. doi:10.1016/j.ccell.2026.03.004.</p></div>
+      <div class="footer-note">
+        本 HTML 为本地高保真版式交付，用于补足飞书 docx 在复杂公众号样式复现上的限制。
+      </div>
+    </article>
+  </main>
+</body>
+</html>

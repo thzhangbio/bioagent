@@ -26,6 +26,7 @@
     "pdf-kb-inbox-to-out": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/segment-inbox-to-out.ts",
     "pdf-kb-out-to-knowledge": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-knowledge/segment-out-to-knowledge.ts",
     "pdf-kb-out-to-archive": "tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts",
+    "pdf-kb-archive": "tsx side-tools/pdf-text-cleanup/pyramid/tools/pdf-kb-archive/pdf-kb-archive.ts",
     "pdf-kb-fragment-audit": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-audit.ts",
     "pdf-kb-fragment-list": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-list.ts",
     "pdf-kb-fragment-apply-inplace": "tsx side-tools/pdf-text-cleanup/pyramid/segment-inbox-to-out/09-formula-fragments/fragment-apply-inplace.ts",

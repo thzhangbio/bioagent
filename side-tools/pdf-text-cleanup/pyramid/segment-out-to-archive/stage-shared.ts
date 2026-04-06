@@ -15,6 +15,7 @@ export interface SegmentOutToArchiveOptions {
   cwd: string;
   invokedFromCli: boolean;
   mode?: "all" | "out-only" | "inbox-only";
+  outSelection?: "manifest-first" | "current-only";
   force?: boolean;
   outDir?: string;
   inboxDir?: string;

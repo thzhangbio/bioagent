@@ -25,7 +25,32 @@
 
 ## 命令入口
 
+- `pnpm run pdf-kb-archive`
 - `pnpm run pdf-kb-out-to-archive`
 - `pnpm run pdf-archive-out`
 - `pnpm run pdf-archive-inbox`
 - `pnpm run pdf-archive-legacy-flat`
+
+## 推荐默认入口
+
+如果用户的意思是“把 `pdf-text-cleanup` 当前内容全部归档”，推荐直接执行：
+
+```bash
+pnpm run pdf-kb-archive
+```
+
+这条命令等价于：
+
+- `mode=all`
+- `out-selection=current-only`
+
+也就是：
+
+1. 归档当前 `out/*.kb.md`
+2. 归档当前 `inbox/*.md/.json`
+3. 写审计日志
+
+而 `segment-out-to-archive.ts` 本身仍保留更细的内部能力：
+
+- `--mode all|out-only|inbox-only`
+- `--out-selection manifest-first|current-only`

@@ -40,7 +40,14 @@ export async function runSegmentOutToArchive(
 function printHelp(): void {
   console.log("段Ⅲ总控：segment-out-to-archive");
   console.log(
-    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts [--mode all|out-only|inbox-only] [--force]",
+    "用法: pnpm exec tsx side-tools/pdf-text-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts [--mode all|out-only|inbox-only] [--out-selection manifest-first|current-only] [--force]",
+  );
+  console.log("");
+  console.log(
+    "--out-selection manifest-first: 优先按 out/.archive-ready.json 归档；manifest 失效项会自动跳过并尝试按 DOI 匹配当前文件。",
+  );
+  console.log(
+    "--out-selection current-only: 直接归档当前 out/*.kb.md，适合“把当前文件夹内容全部归档”。",
   );
 }
 

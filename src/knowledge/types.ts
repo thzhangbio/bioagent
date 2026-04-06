@@ -18,7 +18,7 @@ export type WechatStyleVariant = "liangyi_hui" | "medsci";
 
 /**
  * 微信成稿内向量槽位：正文 / 图注 / 导流 / 参考文献区 / 署名 / 文末运营与转载等。
- * 见 `wechat-segments.ts` 与 `scripts/ingest-wechat.ts`。
+ * 见 `tools/knowledge-importer` 中的微信风格入库逻辑。
  */
 export type WechatContentSlot =
   | "body"
@@ -31,6 +31,8 @@ export type WechatContentSlot =
 export interface TextChunk {
   id: string;
   collection: KnowledgeCollection;
+  /** 导入器侧稳定主键：文献通常为 DOI，微信通常为 kb_wechat_id */
+  sourceId?: string;
   /** 仓库内相对路径，便于追溯 */
   sourcePath: string;
   /** 人类可读来源，如「公司名-职位名」或论文短标题 */
@@ -50,6 +52,8 @@ export interface TextChunk {
   wechatContentSlot?: WechatContentSlot;
   /** 仅 `wechat_style`：与清洗稿 YAML `kb_wechat_id` 一致 */
   kbWechatId?: string;
+  /** 可选：章节/段落语义，如 abstract / results / methods */
+  sectionType?: string;
 }
 
 export interface StoredVectorChunk extends TextChunk {

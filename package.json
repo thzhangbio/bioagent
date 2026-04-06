@@ -18,6 +18,7 @@
     "ingest:all": "pnpm run ingest:presets && pnpm run ingest:jobs",
     "search:rag": "tsx scripts/search-rag.ts",
     "report:explicit-state": "tsx scripts/report-explicit-state.ts",
+    "knowledge-import": "tsx tools/knowledge-importer/cli/knowledge-import.ts",
     "refresh:chat-docx-index": "tsx scripts/refresh-chat-docx-index.ts",
     "search:jobs": "tsx scripts/search-job-posts.ts",
     "pdf-cleanup": "tsx side-tools/pdf-text-cleanup/pyramid/tools/pdf-cleanup/pdf-cleanup.ts",

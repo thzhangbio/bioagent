@@ -1,10 +1,6 @@
-import { chunkText } from "./chunk.js";
-import type { WechatContentSlot } from "./types.js";
+import { chunkText } from "../../../../src/knowledge/chunk.js";
+import type { WechatContentSlot } from "../../../../src/knowledge/types.js";
 
-/**
- * 将微信公众号清洗稿（无 front matter）按块分类为槽位，供 `wechat_style` 灌库。
- * 与 `clean-article.ts` 产出的 `> [属性]` 标记一致。
- */
 export function classifyWechatBlock(block: string): WechatContentSlot {
   const firstLine = block.split("\n")[0]?.trim() ?? "";
   if (/^>\s*图注/.test(firstLine)) return "caption";
@@ -29,7 +25,6 @@ export interface WechatSegment {
   text: string;
 }
 
-/** 按空行分段，再逐块分类（顺序与原文一致） */
 export function segmentWechatBody(markdownBody: string): WechatSegment[] {
   const trimmed = markdownBody.replace(/\r\n/g, "\n").trim();
   if (!trimmed) return [];
@@ -40,7 +35,6 @@ export function segmentWechatBody(markdownBody: string): WechatSegment[] {
   }));
 }
 
-/** 简单 YAML：单行 `key: value`，value 可为双引号字符串 */
 export function parseSimpleYamlFrontMatter(
   yamlBlock: string,
 ): Record<string, string> {
@@ -74,9 +68,6 @@ export function splitMarkdownFrontMatter(raw: string): {
   };
 }
 
-/**
- * 每段再按长度切块；同一槽位多条向量共享 slot。
- */
 export function segmentsToChunkTexts(
   segments: WechatSegment[],
 ): { slot: WechatContentSlot; text: string }[] {

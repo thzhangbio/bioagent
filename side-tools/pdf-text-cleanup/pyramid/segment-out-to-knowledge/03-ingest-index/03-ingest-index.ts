@@ -16,16 +16,29 @@ export const segmentOutToKnowledge03IngestIndexStage: SegmentOutToKnowledgeStage
         );
       }
 
-      const result = spawnSync("pnpm", ["run", "ingest:literature"], {
+      const result = spawnSync(
+        "pnpm",
+        [
+          "run",
+          "knowledge-import",
+          "--",
+          "run",
+          "--source",
+          "literature_kb",
+          "--input",
+          context.knowledgeDirPath ?? "",
+          "--collection",
+          "literature",
+          "--mode",
+          "replace-collection",
+        ],
+        {
         cwd: context.options.cwd,
         stdio: "inherit",
-        env: {
-          ...process.env,
-          LITERATURE_INBOX: context.knowledgeDirPath,
         },
-      });
+      );
       if (result.status !== 0) {
-        throw new Error(`ingest:literature 失败，退出码 ${result.status ?? "unknown"}`);
+        throw new Error(`knowledge-import literature_kb 失败，退出码 ${result.status ?? "unknown"}`);
       }
 
       return appendSegmentOutToKnowledgeNote(

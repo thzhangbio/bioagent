@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:29:00.297Z"
+wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
 published_at: "2026-02-20T12:10:22.000Z"
 published_at_cn: "2026年2月20日 20:10"
 ---
@@ -27,20 +27,16 @@ published_at_cn: "2026年2月20日 20:10"
 > [风格·引入-3] 这项研究表明，黑米中富含的α-亚麻酸（ALA）和11,14-二十碳二烯酸（EDA）是一对“黄金搭档”，它们能通过协同作用，激活GPR120受体，进而启动下游Gαi1-mTORC1信号通路，促进大脑中淀粉样斑块相关小胶质细胞/巨噬细胞对β-淀粉样蛋白的吞噬清除，从而在阿尔茨海默病小鼠模型中显著改善认知功能并延长其寿命。
 
 ### 承接
-> [风格·承接] （未提取到稳定片段）
+> [风格·承接-1] 那么，它们合体后，到底在脑子里干了些什么？
 
 ### 小标题
 > [风格·小标题-1] 单打独斗不行，“黄金搭档”才无敌
-> [风格·小标题-2] 黑米里到底有什么宝贝？
-> [风格·小标题-3] 那么，它们合体后，到底在脑子里干了些什么？
-> [风格·小标题-4] 大脑“垃圾”被清除
+> [风格·小标题-2] 大脑“垃圾”被清除
 
 ### 图注
-> [风格·图注-1] DOI：10.1038/s43587-025-01028-4
-> [风格·图注-2] 黑米饮食中富集的ALA和EDA对AD模型小鼠认知功能的挽救作用
-> [风格·图注-3] ALA和EDA与GPR120结合并激活其功能
-> [风格·图注-4] ALA和EDA通过激活GPR120–Gαi1–mTORC1通路，增强PAMAs的吞噬能力
-> [风格·图注-5] [1]He, A., Wang, Y., Shen, Y. et al. Allosteric activation of a cell-type-specific GPR120 inhibits amyloid pathology of Alzheimer’s disease. Nat Aging6, 181–199 (2026). https://doi.org/10.1038/s43587-025-01028-4
+> [风格·图注-1] 黑米饮食中富集的ALA和EDA对AD模型小鼠认知功能的挽救作用
+> [风格·图注-2] ALA和EDA与GPR120结合并激活其功能
+> [风格·图注-3] ALA和EDA通过激活GPR120–Gαi1–mTORC1通路，增强PAMAs的吞噬能力
 
 ### 结尾
 > [风格·结尾-1] 当然，我们也要保持理性的期待。这项研究目前是在小鼠模型上取得的突破，距离转化为人类的临床药物还有很长的路要走。

@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:29:00.297Z"
+wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
 published_at: "2026-04-03T12:10:13.000Z"
 published_at_cn: "2026年4月3日 20:10"
 ---
@@ -32,13 +32,7 @@ published_at_cn: "2026年4月3日 20:10"
 ### 小标题
 > [风格·小标题-1] 一、研究背景
 > [风格·小标题-2] 二、方法与结果
-> [风格·小标题-3] 1.研究设计：48例IBD患者的12周干预
-> [风格·小标题-4] 2.Ig结合菌群的转变：IgA增加，IgG减少
-> [风格·小标题-5] 3.维生素D选择性富集特定菌群
-> [风格·小标题-6] 4.BAFF信号通路激活
-> [风格·小标题-7] 5.BCR/TCR组库重塑
-> [风格·小标题-8] 6.α4β7+调节性免疫细胞诱导
-> [风格·小标题-9] 三、总结
+> [风格·小标题-3] 三、总结
 
 ### 图注
 > [风格·图注-1] 标题

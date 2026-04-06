@@ -18,9 +18,22 @@ function stripCaptionPrefix(text: string): string {
 }
 
 function isValidCaptionSample(text: string): boolean {
-  return !/^(撰文|撰写|编辑|授权转载|梅斯学术管理员|备注学术转载|参考资料)/.test(
-    text,
-  );
+  if (
+    /^(撰文|撰写|编辑|授权转载|梅斯学术管理员|备注学术转载|参考资料)/.test(
+      text,
+    )
+  ) {
+    return false;
+  }
+  if (/^\[\d+\]\s*[A-Z]/.test(text)) return false;
+  if (/https?:\/\//i.test(text)) return false;
+  if (
+    /\b(?:doi|PMID|PMCID)\b\s*[:.]/i.test(text) ||
+    /\b(?:JAMA|Nature|Science|Cell|BMJ|Lancet|N Engl J Med)\b/i.test(text)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 function isSubstantiveParagraph(text: string): boolean {
@@ -42,6 +55,22 @@ function isBridgeSentence(text: string): boolean {
   return /(真正的问题在于|但问题在于|那么|换句话说|说白了|不止如此|更值得注意的是|这意味着|总结而言便是|既然|懂了吧|需要注意的是|也就是说|值得注意的是)/.test(
     text,
   );
+}
+
+function isWeakSubheading(text: string): boolean {
+  const t = text.trim();
+  if (!t) return true;
+  if (/^[>#[\-\d]/.test(t)) return true;
+  if (/[。；]/.test(t)) return true;
+  if (
+    /^(那么|比如|此外|另外|然而|于是|研究表明|研究发现|多项临床研究证实|这项研究发现|这意味着|也就是说|换句话说|总结而言便是|值得注意的是)/.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+  if (/[？?]$/.test(t)) return true;
+  return false;
 }
 
 function collectBodyParagraphs(blocks: WechatCleanupBlock[]): string[] {
@@ -103,7 +132,7 @@ export function extractWechatStyleSlots(input: {
     intro,
     bridge: Array.from(bridgeSet).slice(0, 12),
     ending,
-    subheading: subheadings,
+    subheading: subheadings.filter((item) => !isWeakSubheading(item)),
     caption: captions,
   };
 }

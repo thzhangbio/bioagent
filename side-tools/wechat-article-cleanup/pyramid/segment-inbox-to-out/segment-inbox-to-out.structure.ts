@@ -52,15 +52,25 @@ export function extractBlocksFromMarkdown(markdown: string): Array<{
   let seenSubheading = false;
   return blocks.map((text, index) => {
     const oneLine = text.replace(/\n+/g, " ").trim();
+    const looksLikeReference =
+      /^>\s*图注：\s*\[\d+\]\s*[A-Z]/.test(text) ||
+      /^>\s*图注：\s*https?:\/\//i.test(text) ||
+      /^>\s*图注：.*\b(?:doi|PMID|PMCID)\b/i.test(text) ||
+      /^>\s*图注：.*\b(?:JAMA|Nature|Science|Cell|BMJ|Lancet|N Engl J Med)\b/i.test(text);
     const isPlainSubheadingLike =
       !/^>\s*/.test(oneLine) &&
       !/^#{1,6}\s/.test(oneLine) &&
       oneLine.length > 0 &&
-      oneLine.length <= 28 &&
+      oneLine.length <= 32 &&
       !/[。]/.test(oneLine) &&
+      !/[？?]$/.test(oneLine) &&
+      !/^(那么|比如|此外|另外|然而|于是|研究表明|研究发现|多项临床研究证实|这项研究发现|这意味着|也就是说|换句话说|总结而言便是|值得注意的是)/.test(
+        oneLine,
+      ) &&
       (/[:：]$/.test(oneLine) ||
-        /^[^\n]{2,20}[！!？?]$/.test(oneLine) ||
-        /“[^”]{2,16}”/.test(oneLine));
+        /^[^\n]{2,20}[！!]$/.test(oneLine) ||
+        /“[^”]{2,16}”/.test(oneLine) ||
+        !/[，,：:]/.test(oneLine));
     if (/^##\s+/.test(text)) {
       seenSubheading = true;
       return { slot: "subheading", text };
@@ -69,7 +79,12 @@ export function extractBlocksFromMarkdown(markdown: string): Array<{
       seenSubheading = true;
       return { slot: "subheading", text: `## ${oneLine}` };
     }
-    if (text.startsWith("> 图注：")) return { slot: "caption", text };
+    if (text.startsWith("> 图注：")) {
+      if (looksLikeReference) {
+        return { slot: "references", text: text.replace(/^>\s*图注：\s*/, "> [文献] ") };
+      }
+      return { slot: "caption", text };
+    }
     if (text.startsWith("> [导流]")) return { slot: "diversion", text };
     if (text.startsWith("> [文献]") || text.startsWith("> [参考资料]")) {
       return { slot: "references", text };

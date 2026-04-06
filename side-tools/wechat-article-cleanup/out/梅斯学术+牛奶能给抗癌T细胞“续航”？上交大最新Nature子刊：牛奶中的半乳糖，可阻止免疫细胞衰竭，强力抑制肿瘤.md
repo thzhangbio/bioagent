@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:29:00.298Z"
+wechat_style_slot_extracted_at: "2026-04-06T12:46:13.543Z"
 published_at: "2025-10-20T12:10:31.000Z"
 published_at_cn: "2025年10月20日 20:10"
 ---
@@ -33,13 +33,11 @@ published_at_cn: "2025年10月20日 20:10"
 > [风格·小标题-2] mTORC1信号轴“熄火”
 
 ### 图注
-> [风格·图注-1] DOI：10.1038/s41556-025-01716-8
-> [风格·图注-2] 饮食来源的半乳糖在体内增强抗肿瘤T细胞免疫
-> [风格·图注-3] 饮食半乳糖对肿瘤浸润CD8+T细胞的影响
-> [风格·图注-4] 饮食半乳糖通过IGFBP-1促进抗肿瘤CD8+T细胞免疫的机制
-> [风格·图注-5] 循环半乳糖重新编程肝细胞的代谢
-> [风格·图注-6] 血浆中IGFBP-1水平升高与癌症患者中改善的T细胞反应之间的相关性
-> [风格·图注-7] [1]Du, X., Li, W., Li, G.et al. Diet-derived galactose reprograms hepatocytes to prevent T cell exhaustion and elicit antitumour immunity. Nat Cell Biol27, 1357–1366 (2025). https://doi.org/10.1038/s41556-025-01716-8
+> [风格·图注-1] 饮食来源的半乳糖在体内增强抗肿瘤T细胞免疫
+> [风格·图注-2] 饮食半乳糖对肿瘤浸润CD8+T细胞的影响
+> [风格·图注-3] 饮食半乳糖通过IGFBP-1促进抗肿瘤CD8+T细胞免疫的机制
+> [风格·图注-4] 循环半乳糖重新编程肝细胞的代谢
+> [风格·图注-5] 血浆中IGFBP-1水平升高与癌症患者中改善的T细胞反应之间的相关性
 
 ### 结尾
 > [风格·结尾-1] 总体而言，这项研究揭示，日常饮食中的成分，远不止是能量与物质的供给，更是身体内部信息网络的调节者。尽管研究人员强调，这并非鼓励人们盲目大量摄入半乳糖，但它无疑为“食疗”赋予了全新的科学内涵，也为开发“吃出来的免疫力”提供了激动人心的前瞻视角。在未来，我们或许不仅能通过药物调动免疫系统，还能通过精准的营养干预，为身体的抗癌战士提供最坚实的后盾。

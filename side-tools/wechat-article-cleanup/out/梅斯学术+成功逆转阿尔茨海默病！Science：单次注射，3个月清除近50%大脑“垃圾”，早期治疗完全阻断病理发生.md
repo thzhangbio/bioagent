@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:29:00.297Z"
+wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
 published_at: "2026-03-16T12:10:20.000Z"
 published_at_cn: "2026年3月16日 20:10"
 ---
@@ -35,13 +35,11 @@ published_at_cn: "2026年3月16日 20:10"
 > [风格·小标题-2] 给星形胶质细胞装上四种“GPS”
 > [风格·小标题-3] 一场“大脑清洁战”
 > [风格·小标题-4] 被重塑的“大脑免疫微环境”
-> [风格·小标题-5] 为何行为未见改善？
 
 ### 图注
-> [风格·图注-1] DOI：10.1126/science.ads3972
-> [风格·图注-2] 星形胶质细胞靶向Aβ的CAR设计与体外验证
-> [风格·图注-3] 星形胶质细胞CAR体内晚期干预效果
-> [风格·图注-4] 星形胶质细胞CAR体内早期干预效果
+> [风格·图注-1] 星形胶质细胞靶向Aβ的CAR设计与体外验证
+> [风格·图注-2] 星形胶质细胞CAR体内晚期干预效果
+> [风格·图注-3] 星形胶质细胞CAR体内早期干预效果
 
 ### 结尾
 > [风格·结尾-1] 总的来说，这项研究首次证明了，通过一次性、非侵入性的静脉注射，将携带抗淀粉样蛋白嵌合抗原受体的基因工程病毒递送到大脑，改造常驻的星形胶质细胞，使其能够持久、高效清除淀粉样蛋白斑块，这一策略在阿尔茨海默病小鼠模型中是可行的。

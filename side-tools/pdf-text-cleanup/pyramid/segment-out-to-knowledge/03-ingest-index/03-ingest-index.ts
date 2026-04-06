@@ -30,7 +30,7 @@ export const segmentOutToKnowledge03IngestIndexStage: SegmentOutToKnowledgeStage
           "--collection",
           "literature",
           "--mode",
-          "replace-collection",
+          "upsert-by-source-id",
         ],
         {
         cwd: context.options.cwd,

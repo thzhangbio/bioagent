@@ -11,7 +11,7 @@ async function main(): Promise<void> {
     source: "literature_kb",
     input,
     collection: "literature",
-    mode: "replace-collection",
+    mode: "upsert-by-source-id",
   });
 
   console.log(`文献入库完成：${context.normalizedDocumentCount ?? 0} 个文档，${context.chunkRecordCount ?? 0} 个块`);

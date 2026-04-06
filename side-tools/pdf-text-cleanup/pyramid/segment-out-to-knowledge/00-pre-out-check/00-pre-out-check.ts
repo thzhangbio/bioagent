@@ -51,7 +51,7 @@ export const segmentOutToKnowledge00PreOutCheckStage: SegmentOutToKnowledgeStage
         throw new Error(`out 目录不存在: ${outDirPath}`);
       }
 
-      const outFiles: SegmentOutToKnowledgeFileRecord[] = readdirSync(outDirPath)
+      const scannedFiles: SegmentOutToKnowledgeFileRecord[] = readdirSync(outDirPath)
         .filter((file) => file.endsWith(".kb.md"))
         .sort()
         .map((fileName) => {
@@ -64,6 +64,15 @@ export const segmentOutToKnowledge00PreOutCheckStage: SegmentOutToKnowledgeStage
             slug: slugFromKbMarkdown(raw, fileName),
           };
         });
+
+      const dedupedByIdentity = new Map<string, SegmentOutToKnowledgeFileRecord>();
+      for (const file of scannedFiles) {
+        const identity = file.doi || file.slug || file.fileName;
+        dedupedByIdentity.set(identity, file);
+      }
+      const outFiles = [...dedupedByIdentity.values()].sort((a, b) =>
+        a.fileName.localeCompare(b.fileName),
+      );
 
       if (outFiles.length === 0) {
         throw new Error(`out/ 下无可入库的 .kb.md: ${outDirPath}`);
@@ -87,4 +96,3 @@ export const segmentOutToKnowledge00PreOutCheckStage: SegmentOutToKnowledgeStage
       );
     },
   };
-

@@ -28,6 +28,8 @@ export type WechatContentSlot =
   | "byline"
   | "footer";
 
+export type SectionPriority = "high" | "normal" | "low";
+
 export interface TextChunk {
   id: string;
   collection: KnowledgeCollection;
@@ -54,6 +56,8 @@ export interface TextChunk {
   kbWechatId?: string;
   /** 可选：章节/段落语义，如 abstract / results / methods */
   sectionType?: string;
+  /** 可选：导入器侧章节优先级，用于入库与检索差异化 */
+  sectionPriority?: SectionPriority;
 }
 
 export interface StoredVectorChunk extends TextChunk {

@@ -44,6 +44,8 @@ function toTextChunk(context: KnowledgeImporterContext, record: ImportChunkRecor
       : undefined,
     kbWechatId: typeof meta.kbWechatId === "string" ? meta.kbWechatId : undefined,
     sectionType: typeof meta.sectionType === "string" ? meta.sectionType : undefined,
+    sectionPriority:
+      typeof meta.sectionPriority === "string" ? (meta.sectionPriority as TextChunk["sectionPriority"]) : undefined,
   };
 }
 

@@ -1,4 +1,5 @@
 import { chunkText } from "../../../../src/knowledge/chunk.js";
+import type { SectionPriority } from "../../../../src/knowledge/types.js";
 import {
   idSafeKbWechatId,
   sanitizeWechatFileKey,
@@ -18,19 +19,69 @@ interface LiteratureSection {
   text: string;
 }
 
+interface LiteratureSectionPolicy {
+  keep: boolean;
+  priority: SectionPriority;
+}
+
 function classifyLiteratureSection(heading?: string): string {
   const normalized = (heading || "").toLowerCase();
   if (!normalized) return "front_matter";
+  if (
+    normalized.includes("pre-proof") ||
+    normalized === "authors" ||
+    normalized === "correspondence" ||
+    normalized === "in brief"
+  ) {
+    return "front_matter";
+  }
   if (normalized.includes("abstract")) return "abstract";
   if (normalized.includes("introduction")) return "introduction";
   if (normalized.includes("result")) return "results";
   if (normalized.includes("discussion")) return "discussion";
+  if (normalized.includes("conclusion")) return "discussion";
   if (normalized.includes("method")) return "methods";
   if (normalized.includes("reference")) return "references";
   if (normalized.includes("declaration") || normalized.includes("conflict")) {
     return "declarations";
   }
   return "unknown";
+}
+
+function isLikelyPreproofFrontMatter(text: string): boolean {
+  const normalized = text.toLowerCase();
+  return [
+    "journal pre-proof",
+    "please cite this article",
+    "sharing policy",
+    "accepted manuscript",
+    "version of record",
+    "received date:",
+    "accepted date:",
+    "pii:",
+    "to appear in:",
+  ].some((marker) => normalized.includes(marker));
+}
+
+function resolveLiteratureSectionPolicy(section: LiteratureSection): LiteratureSectionPolicy {
+  switch (section.sectionType) {
+    case "abstract":
+    case "results":
+    case "discussion":
+      return { keep: true, priority: "high" };
+    case "introduction":
+    case "methods":
+    case "unknown":
+      return { keep: true, priority: "normal" };
+    case "references":
+    case "declarations":
+      return { keep: false, priority: "low" };
+    case "front_matter":
+      if (isLikelyPreproofFrontMatter(section.text) || section.text.trim().length < 400) {
+        return { keep: false, priority: "low" };
+      }
+      return { keep: true, priority: "low" };
+  }
 }
 
 function splitLiteratureSections(body: string): LiteratureSection[] {
@@ -73,6 +124,10 @@ function chunkLiteratureDocument(doc: ImportDocument): ImportChunkRecord[] {
   const records: ImportChunkRecord[] = [];
 
   sections.forEach((section, sectionIndex) => {
+    const policy = resolveLiteratureSectionPolicy(section);
+    if (!policy.keep) {
+      return;
+    }
     const parts = chunkText(section.text, { chunkSize: 1200, overlap: 150 });
     parts.forEach((text, chunkIndex) => {
       const absoluteChunkIndex = records.length;
@@ -88,6 +143,7 @@ function chunkLiteratureDocument(doc: ImportDocument): ImportChunkRecord[] {
         metadata: {
           ...doc.metadata,
           sectionType: section.sectionType,
+          sectionPriority: policy.priority,
           sectionHeading: section.heading,
           chunkStrategy: "literature-section-aware",
         },

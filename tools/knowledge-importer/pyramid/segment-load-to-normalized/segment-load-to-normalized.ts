@@ -180,8 +180,8 @@ function listMarkdownFiles(inputPath: string, matcher?: (file: string) => boolea
 function loadLiteratureDocuments(context: KnowledgeImporterContext): ImportDocument[] {
   const inputPath = resolveInputPath(context);
   if (!inputPath) throw new Error("literature_kb 缺少输入目录");
-  const files = listMarkdownFiles(inputPath);
-  return files.map((fileName) => {
+  const files = listMarkdownFiles(inputPath, (file) => file.endsWith(".kb.md"));
+  const docs = files.map((fileName) => {
     const sourcePath = resolve(inputPath, fileName);
     const raw = readFileSync(sourcePath, "utf-8");
     const baseName = basename(fileName, ".md");
@@ -207,6 +207,11 @@ function loadLiteratureDocuments(context: KnowledgeImporterContext): ImportDocum
       },
     };
   });
+  const deduped = new Map<string, ImportDocument>();
+  for (const doc of docs) {
+    deduped.set(doc.sourceId, doc);
+  }
+  return [...deduped.values()].sort((a, b) => a.sourceId.localeCompare(b.sourceId));
 }
 
 function resolveWechatVariant(front: Record<string, string>, sideMeta: Record<string, unknown> | null): string {

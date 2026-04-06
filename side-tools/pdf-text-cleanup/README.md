@@ -21,7 +21,7 @@ MinerU 导出的论文 **`.md` + 可选 `.json`** → 清洗为 **`*.kb.md`**，
 |------|------|
 | `pnpm run pdf-kb-pipeline -- --raw-md <原始.md> [--json <.json>] [--out <路径>]` | 生成 KB 终稿 |
 | `pnpm run pdf-kb-inbox-to-out -- --raw-md <原始.md> [--json <.json>] [--out <路径>]` | 直接运行段Ⅰ总控 |
-| `pnpm run pdf-kb-out-to-knowledge [-- --out-dir <路径> --knowledge-dir <路径>]` | 运行段Ⅱ：copy → ingest → verify → 标记可归档 |
+| `pnpm run pdf-kb-out-to-knowledge [-- --out-dir <路径> --knowledge-dir <路径>]` | 运行段Ⅱ：copy → ingest → verify → 标记可归档（当前文献默认按 `sourceId` 增量 upsert） |
 | `pnpm run pdf-kb-out-to-archive [-- --mode all\|out-only\|inbox-only]` | 运行段Ⅲ：归档 out / inbox 并写审计日志 |
 | `pnpm run pdf-kb-fragment-list` | 列出短 `$…$` 全量清单（默认内层 ≤100 字符）→ `out/kb-fragment-list.md` |
 | `pnpm run pdf-kb-fragment-audit` | 清洗**之后**扫描 `out/*.kb.md` 短 `$…$`，生成 `out/kb-fragment-audit.md`（未解析 = 待补规则） |
@@ -36,7 +36,7 @@ MinerU 导出的论文 **`.md` + 可选 `.json`** → 清洗为 **`*.kb.md`**，
 
 1. 跑 pipeline 得到 **`out/*.kb.md`** → 校对。  
 2. 确认后 **`pdf-archive-inbox`**（若使用 **`inbox/`** 放 MinerU 源）。  
-3. 复制 kb 至 **`data/knowledge/literature-inbox/`** → **`ingest:literature`**。  
+3. 复制 kb 至 **`data/knowledge/literature-inbox/`** → **`ingest:literature`**（按 DOI / `sourceId` 增量 upsert）。  
 4. 入库成功后 **`pdf-archive-out`**，腾空 **`out/`**。
 
 在新架构下，也可直接使用：

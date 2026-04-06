@@ -6,6 +6,7 @@ import { DEFAULT_RAG_STORE_PATH } from "./paths.js";
 import { loadVectorStore, searchVectorStore, type SearchHit } from "./vector-file-store.js";
 import type {
   KnowledgeCollection,
+  SectionPriority,
   WechatContentSlot,
   WechatStyleVariant,
 } from "./types.js";
@@ -48,6 +49,21 @@ function passesWechatContentSlotFilter(
   if (!requested?.length) return true;
   const effective = slot ?? "body";
   return requested.includes(effective);
+}
+
+function boostScoreForSectionPriority(
+  collection: KnowledgeCollection,
+  priority: SectionPriority | undefined,
+): number {
+  if (collection !== "literature") return 0;
+  switch (priority) {
+    case "high":
+      return 0.03;
+    case "low":
+      return -0.02;
+    default:
+      return 0;
+  }
 }
 
 /**
@@ -98,5 +114,13 @@ export async function retrieve(
       );
   const subStore = { ...store, chunks };
   const [qvec] = await embedTexts(client, [query]);
-  return searchVectorStore(subStore, qvec, options.topK);
+  const hits = searchVectorStore(subStore, qvec, Math.max(options.topK * 3, options.topK));
+  const rescored = hits.map((hit) => ({
+    ...hit,
+    score:
+      hit.score +
+      boostScoreForSectionPriority(hit.chunk.collection, hit.chunk.sectionPriority),
+  }));
+  rescored.sort((a, b) => b.score - a.score);
+  return rescored.slice(0, options.topK);
 }

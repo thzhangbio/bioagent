@@ -37,8 +37,14 @@ export interface CleanupOptions {
   normalizeOcrLatexMisc?: boolean;
   /** 将残留 HTML 标签（如 `<sup>35</sup>`、`<h4>Background</h4>`）转成纯文本 */
   normalizeResidualHtmlMarkup?: boolean;
+  /** 将 `&lt;`、`&gt;`、`&amp;` 等常见 HTML 实体转回纯文本 */
+  decodeHtmlEntities?: boolean;
   /** 去掉已知 publisher boilerplate 与期刊页眉页脚残片 */
   stripKnownBoilerplate?: boolean;
+  /** 删除明显低价值、噪声占比过高的附录模板区块 */
+  stripLowValueAppendixSections?: boolean;
+  /** 规整超长 `[表格]` 行，减轻跨页续表与实体污染 */
+  normalizeTableLikeBlocks?: boolean;
   /** 弱化常见 LaTeX/OCR 数学碎片（不保证可逆） */
   softenLatexArtifacts?: boolean;
 }
@@ -54,7 +60,10 @@ const DEFAULT_OPTS: CleanupOptions = {
   normalizeImmuneMarkerLatex: true,
   normalizeOcrLatexMisc: true,
   normalizeResidualHtmlMarkup: true,
+  decodeHtmlEntities: true,
   stripKnownBoilerplate: true,
+  stripLowValueAppendixSections: true,
+  normalizeTableLikeBlocks: true,
   /** 默认关闭：公式块形态各异，自动替换易误伤正文（如 CD31 等） */
   softenLatexArtifacts: false,
 };
@@ -142,6 +151,91 @@ function stripKnownBoilerplatePhrases(text: string): string {
   return s;
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&#x27;|&#39;/gi, "'")
+    .replace(/&quot;/gi, '"');
+}
+
+function stripLowValueAppendixSections(text: string): string {
+  let s = text;
+
+  s = s.replace(
+    /^#\s*Reporting Summary\s*\n[\s\S]*$/im,
+    "",
+  );
+
+  s = s.replace(
+    /^#\s*STAR★METHODS\s*\n[\s\S]*?(?=^#\s*EXPERIMENTAL MODEL AND STUDY PARTICIPANT DETAILS\b|\Z)/im,
+    "",
+  );
+
+  s = s.replace(
+    /^#\s*KEY RESOURCES TABLE\s*\n[\s\S]*?(?=^#\s*EXPERIMENTAL MODEL AND STUDY PARTICIPANT DETAILS\b|\Z)/im,
+    "",
+  );
+
+  return s;
+}
+
+function normalizeTableLikeBlocks(text: string): string {
+  return text
+    .split(/\r?\n/)
+    .map((line) => {
+      if (!line.startsWith("[表格]")) return line;
+      let s = line;
+      s = s
+        .replace(/\(Continued on next page\)/gi, "")
+        .replace(/\(Continued from previous page\)/gi, "")
+        .replace(/\(Table\s+\d+\s+continues on next page\)/gi, "")
+        .replace(/\s{2,}/g, " ");
+      if (s.length > 1200) {
+        s = s.replace(/\s+(BCIM\d+\s+\|)/g, "\n- $1");
+        s = s.replace(/\s+(Pt\d+\s+\|)/g, "\n- $1");
+      }
+      return s.trimEnd();
+    })
+    .join("\n");
+}
+
+function stripLikelyLineNumberNoise(text: string): string {
+  return text
+    .split(/\r?\n/)
+    .map((line) =>
+      line
+        .replace(/^#\s*\d{2,4}\s+/, "# ")
+        .replace(/^\d{3,4}\s+/, ""),
+    )
+    .join("\n");
+}
+
+function stripShortPanelNoiseLines(text: string): string {
+  return text
+    .split(/\r?\n/)
+    .filter((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return true;
+      if (/^kb(?:\s+[a-z])*$/i.test(trimmed)) return false;
+      if (
+        trimmed.length <= 50 &&
+        /^(?:[A-Za-z]|\(\w+\)|\d+)(?:\s+(?:[A-Za-z]|\(\w+\)|\d+)){3,}$/.test(trimmed)
+      )
+        return false;
+      if (
+        trimmed.length <= 80 &&
+        /\(kDa\)/i.test(trimmed) &&
+        /(?:\b[A-Za-z]\b.*){3,}/.test(trimmed)
+      )
+        return false;
+      return true;
+    })
+    .join("\n");
+}
+
 export function normalizeResidualHtmlMarkup(text: string): string {
   let s = text;
 
@@ -187,6 +281,8 @@ function shouldDropLine(
   if (/^All rights are reserved/i.test(trimmed)) return "drop";
   if (/Elsevier Inc\./i.test(trimmed) && /2026/i.test(trimmed)) return "drop";
   if (/^Continued\s*$/i.test(trimmed)) return "drop";
+  if (/^\(Continued on next page\)$/i.test(trimmed)) return "drop";
+  if (/^\(Continued from previous page\)$/i.test(trimmed)) return "drop";
   if (/^Graphical abstract\s*$/i.test(trimmed)) return "drop";
   if (/^Check f Cell Stem Cell$/i.test(trimmed)) return "drop";
   if (/^Cite this article as:/i.test(trimmed)) return "drop";
@@ -208,6 +304,19 @@ function shouldDropLine(
   if (/^Policy information about availability of computer code/i.test(trimmed))
     return "drop";
   if (/^Policy information about availability of data/i.test(trimmed)) return "drop";
+  if (/^(?:Tel\.|Fax\.|Email:|Short title:)/i.test(trimmed)) return "drop";
+  if (/^kb(?:\s+[a-z])*$/i.test(trimmed)) return "drop";
+  if (
+    trimmed.length <= 50 &&
+    /^(?:[A-Za-z]|\(\w+\)|\d+)(?:\s+(?:[A-Za-z]|\(\w+\)|\d+)){3,}$/.test(trimmed)
+  )
+    return "drop";
+  if (
+    trimmed.length <= 80 &&
+    /\(kDa\)/i.test(trimmed) &&
+    /(?:\b[A-Za-z]\b.*){3,}/.test(trimmed)
+  )
+    return "drop";
 
   /** 单独页码（正文中的编号多为「12. Author」） */
   if (/^\d{1,3}\s*$/.test(trimmed)) return "drop";
@@ -820,12 +929,23 @@ export function applyPdfHeadersFootersPagesCleanup(
 ): string {
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
+  if (opts.decodeHtmlEntities !== false) {
+    text = decodeHtmlEntities(text);
+  }
   if (opts.normalizeResidualHtmlMarkup !== false) {
     text = normalizeResidualHtmlMarkup(text);
   }
   if (opts.stripKnownBoilerplate !== false) {
     text = stripKnownBoilerplatePhrases(text);
   }
+  if (opts.stripLowValueAppendixSections !== false) {
+    text = stripLowValueAppendixSections(text);
+  }
+  if (opts.normalizeTableLikeBlocks !== false) {
+    text = normalizeTableLikeBlocks(text);
+  }
+  text = stripLikelyLineNumberNoise(text);
+  text = stripShortPanelNoiseLines(text);
   return applyLineFilters(text, opts);
 }
 
@@ -835,10 +955,15 @@ export function applyPdfLayoutFlowCleanup(
 ): string {
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
+  if (opts.decodeHtmlEntities !== false) {
+    text = decodeHtmlEntities(text);
+  }
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
   if (opts.mergeInlinePdfHyphenation !== false) {
     text = mergeInlinePdfHyphenation(text);
   }
+  text = stripLikelyLineNumberNoise(text);
+  text = stripShortPanelNoiseLines(text);
   if (opts.mergeSoftLineBreaks !== false) {
     text = mergeSoftLineBreaksAndSpaceParagraphs(
       text,
@@ -854,9 +979,20 @@ export function applyPdfGenericCleanup(
 ): string {
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
+  if (opts.decodeHtmlEntities !== false) {
+    text = decodeHtmlEntities(text);
+  }
   if (opts.normalizeResidualHtmlMarkup !== false) {
     text = normalizeResidualHtmlMarkup(text);
   }
+  if (opts.stripLowValueAppendixSections !== false) {
+    text = stripLowValueAppendixSections(text);
+  }
+  if (opts.normalizeTableLikeBlocks !== false) {
+    text = normalizeTableLikeBlocks(text);
+  }
+  text = stripLikelyLineNumberNoise(text);
+  text = stripShortPanelNoiseLines(text);
   if (opts.normalizeTgfBetaMarkup !== false) text = normalizeTgfBetaMarkup(text);
   if (opts.normalizeImmuneMarkerLatex !== false) {
     text = normalizeImmuneMarkerLatex(text);
@@ -877,12 +1013,23 @@ export function cleanPdfTextMd(
   const opts = { ...DEFAULT_OPTS, ...options };
   let text = raw.replace(/\r\n/g, "\n");
 
+  if (opts.decodeHtmlEntities !== false) {
+    text = decodeHtmlEntities(text);
+  }
   if (opts.normalizeResidualHtmlMarkup !== false) {
     text = normalizeResidualHtmlMarkup(text);
   }
   if (opts.stripKnownBoilerplate !== false) {
     text = stripKnownBoilerplatePhrases(text);
   }
+  if (opts.stripLowValueAppendixSections !== false) {
+    text = stripLowValueAppendixSections(text);
+  }
+  if (opts.normalizeTableLikeBlocks !== false) {
+    text = normalizeTableLikeBlocks(text);
+  }
+  text = stripLikelyLineNumberNoise(text);
+  text = stripShortPanelNoiseLines(text);
   text = applyLineFilters(text, opts);
 
   if (opts.mergeHyphenation) text = mergeHyphenation(text);
@@ -903,6 +1050,7 @@ export function cleanPdfTextMd(
   if (opts.stripKnownBoilerplate !== false) {
     text = stripKnownBoilerplatePhrases(text);
   }
+  text = stripShortPanelNoiseLines(text);
   if (opts.softenLatexArtifacts) text = softenLatexArtifacts(text);
   if (opts.collapseBlankLines) text = collapseBlankLines(text);
 

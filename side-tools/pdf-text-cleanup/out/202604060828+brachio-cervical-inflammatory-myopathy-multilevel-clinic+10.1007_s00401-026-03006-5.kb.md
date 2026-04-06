@@ -73,7 +73,59 @@ Categorical variables were reported as counts and percentages and compared using
 
 The study included 26 patients from centers in Berlin, Halle/Saale, Düsseldorf, Barcelona, Antwerp, Créteil, and Rome, all with biopsy-confrmed BCIM. The clinical and demographic data of the cohort are summarized in Table 1. The cohort was predominantly female (88%), with a mean age at diagnosis of 51 years [SD ± 15.0]. Median delay from symptom onset to biopsy was 26 months [IQR 10.75–57]. Systemic sclerosis overlap was present in 35% of patients. Clinically, patients commonly presented with upper limb weakness (100%), dropped head syndrome (62%), facial weakness (54%), dysphagia (46%), myalgia (46%), and lower limb weakness (54%), especially involving proximal lower limb muscles. Upper limb weakness often followed a proximal-to-distal gradient, was frequently asymmetric, and included forearm extensors and bilateral scapulae alatae. Where documented, respiratory complications were attributable to neuromuscular respiratory weakness rather than interstitial lung disease; however, respiratory assessments were not standardized across centers, precluding systematic analysis. All patients aphic, clinical, and paraclinical data of the 26 BCIM patients inclu
 
-[表格] Patient | Sex | Age | CK (×/ULN) | ANA titer | Antibodies (Blot) | Treatment | Dropped head | Dysphagia | Facial weakness | Lower extremity involvement | Overlap | Treatment response BCIM1 | F | 48 | 10× | 1:2560 | Negative | Steroids, MTX, IVIG, RTX | No | Yes | Yes | Yes | SSc, RP | Yes, partial BCIM2 | F | 66 | &lt;ULN | 1:160 | VGCC+, RF+ | Steroids | No | No | No | No | RA | n/a BCIM3 | F | 28 | n/a | n/a | n/a | Steroids, MTX | No | No | No | No | No | n/a BCIM4 | F | 20 | &lt;ULN | neg | Negative | Steroids, MTX | No | No | No | Yes | No | Yes BCIM5 | F | 57 | &lt;ULN | 1:3200 | AchR+, PMScl100/75+, Ro52+ | Steroids | Yes | Yes | Yes | Yes | SSc | No BCIM6 | F | 50 | &lt;ULN | 1:160 | SRP± | Steroids | No | No | No | Yes | SS BCIM7 | F | 58 | 14× | neg | Negative | Steroids | No | No | No | Yes | No | Yes, partial BCIM8 | M | 52 | 2× | 1:640 | MDA5± | Steroids, IVIG | No | No | No | No | RA | n/a BCIM9 | M | 81 | 1.5× | neg | RF+ | Steroids | Yes | No | Yes | Yes | RA | n/a BCIM10 | F | 71 | 1.5× | 1:320 | Ro52+ | Steroids, IVIG, MTX | Yes | No | No | No | SS | n/a BCIM11 | F | 57 | 2× | n/a | AChR+, Ro52+ | Steroids | Yes | No | No | Yes | No | Yes, partial BCIM12 | M | 52 | 14× | 1:640 | Negative | Steroids, cyclophosphamide | Yes | Yes | Yes | Yes | SSc | n/a BCIM13 | F | 58 | 3× | 1:160 | Negative | Steroids | Yes | No | Yes | No | No | Yes BCIM14 | F | 59 | 3× | 1:160 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | Yes | Yes | No | Yes, partial BCIM15 | F | 62 | 3× | 1:160 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | Yes | No | No | Yes BCIM16 | F | 37 | 4× | 1:1280 | n/a | Steroids, azathioprine | Yes | Yes | Yes | No | HT, RP | Yes, partial BCIM17 | F | 62 | 3-6× | 1:320 | AchR+ | Steroids | Yes | Yes | Yes | No | No | Yes, partial BCIM18 | F | 40 | 2.5× | 1:80 | SS-A+, RNP+ | Steroids | Yes | No | Yes | No | SSc, RP | Yes, partial BCIM19 | F | 61 | 17× | 1:320 | Th/To+ | Steroids, azathioprine, IVIG, cyclophosphamide, RTX, cyclosporine | Yes | Yes | Yes | Yes | SSc | No BCIM20 | F | 39 | 21× | 1:320 | PM-Scl+, Ku+ | Steroids, MTX, AZA, MMF, TKI | No | No | Yes | Yes | SSc | Yes BCIM21 | F | 26 | 4× | 1:160 | Anti-centromere+ | Steroids, MTX, IVIG, RTX | No | No | Yes | No | SSc | Yes, partial BCIM22 | F | 44 | 10× | 1:1280 | Ro52+ | steroids, AZA, IVIG, MMF | Yes | Yes | No | Yes | SSc | Yes, partial BCIM23 | F | 66 | 4× | 1:160 | Negative | Steroids, IVIG, Cyclosporin, MMF | Yes | Yes | Yes | Yes | SSc | Yes, partial BCIM24 | F | 24 | 13× | neg | Negative | Steroids, MTX | No | No | No | No | No | n/a BCIM25 | F | 57 | 3× | 1:1280 | AchR+, anti-PM/Scl+ | Steroids, RTX, IVIG | Yes | Yes | No | No | No | Yes, partial BCIM26 | F | 62 | 3× | 1:1280 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | No | Yes | No | Yes, partial e shown at the individual patie received corticosteroids; 65% required additional immunosuppressive agents, and 38% had undergone more than three immunomodulatory treatments. Partial response was achieved in 46% and full clinical remission in 15%. Three patients received rituximab as third-line therapy after inadequate response to corticosteroids and additional immunosuppressive agents. All were classifed as clinically stable (partial response) after rituximab initiation. Follow-up duration after rituximab exposure was heterogeneous and limited, precluding conclusions regarding long-term efcacy or relapse prevention. In patients with residual weakness, and where muscle magnetic resonance
+[表格] Patient | Sex | Age | CK (×/ULN) | ANA titer | Antibodies (Blot) | Treatment | Dropped head | Dysphagia | Facial weakness | Lower extremity involvement | Overlap | Treatment response
+
+- BCIM1 | F | 48 | 10× | 1:2560 | Negative | Steroids, MTX, IVIG, RTX | No | Yes | Yes | Yes | SSc, RP | Yes, partial
+
+- BCIM2 | F | 66 | <ULN | 1:160 | VGCC+, RF+ | Steroids | No | No | No | No | RA | n/a
+
+- BCIM3 | F | 28 | n/a | n/a | n/a | Steroids, MTX | No | No | No | No | No | n/a
+
+- BCIM4 | F | 20 | <ULN | neg | Negative | Steroids, MTX | No | No | No | Yes | No | Yes
+
+- BCIM5 | F | 57 | <ULN | 1:3200 | AchR+, PMScl100/75+, Ro52+ | Steroids | Yes | Yes | Yes | Yes | SSc | No
+
+- BCIM6 | F | 50 | <ULN | 1:160 | SRP± | Steroids | No | No | No | Yes | SS
+
+- BCIM7 | F | 58 | 14× | neg | Negative | Steroids | No | No | No | Yes | No | Yes, partial
+
+- BCIM8 | M | 52 | 2× | 1:640 | MDA5± | Steroids, IVIG | No | No | No | No | RA | n/a
+
+- BCIM9 | M | 81 | 1.5× | neg | RF+ | Steroids | Yes | No | Yes | Yes | RA | n/a
+
+- BCIM10 | F | 71 | 1.5× | 1:320 | Ro52+ | Steroids, IVIG, MTX | Yes | No | No | No | SS | n/a
+
+- BCIM11 | F | 57 | 2× | n/a | AChR+, Ro52+ | Steroids | Yes | No | No | Yes | No | Yes, partial
+
+- BCIM12 | M | 52 | 14× | 1:640 | Negative | Steroids, cyclophosphamide | Yes | Yes | Yes | Yes | SSc | n/a
+
+- BCIM13 | F | 58 | 3× | 1:160 | Negative | Steroids | Yes | No | Yes | No | No | Yes
+
+- BCIM14 | F | 59 | 3× | 1:160 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | Yes | Yes | No | Yes, partial
+
+- BCIM15 | F | 62 | 3× | 1:160 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | Yes | No | No | Yes
+
+- BCIM16 | F | 37 | 4× | 1:1280 | n/a | Steroids, azathioprine | Yes | Yes | Yes | No | HT, RP | Yes, partial
+
+- BCIM17 | F | 62 | 3-6× | 1:320 | AchR+ | Steroids | Yes | Yes | Yes | No | No | Yes, partial
+
+- BCIM18 | F | 40 | 2.5× | 1:80 | SS-A+, RNP+ | Steroids | Yes | No | Yes | No | SSc, RP | Yes, partial
+
+- BCIM19 | F | 61 | 17× | 1:320 | Th/To+ | Steroids, azathioprine, IVIG, cyclophosphamide, RTX, cyclosporine | Yes | Yes | Yes | Yes | SSc | No
+
+- BCIM20 | F | 39 | 21× | 1:320 | PM-Scl+, Ku+ | Steroids, MTX, AZA, MMF, TKI | No | No | Yes | Yes | SSc | Yes
+
+- BCIM21 | F | 26 | 4× | 1:160 | Anti-centromere+ | Steroids, MTX, IVIG, RTX | No | No | Yes | No | SSc | Yes, partial
+
+- BCIM22 | F | 44 | 10× | 1:1280 | Ro52+ | steroids, AZA, IVIG, MMF | Yes | Yes | No | Yes | SSc | Yes, partial
+
+- BCIM23 | F | 66 | 4× | 1:160 | Negative | Steroids, IVIG, Cyclosporin, MMF | Yes | Yes | Yes | Yes | SSc | Yes, partial
+
+- BCIM24 | F | 24 | 13× | neg | Negative | Steroids, MTX | No | No | No | No | No | n/a
+
+- BCIM25 | F | 57 | 3× | 1:1280 | AchR+, anti-PM/Scl+ | Steroids, RTX, IVIG | Yes | Yes | No | No | No | Yes, partial
+
+- BCIM26 | F | 62 | 3× | 1:1280 | AchR+ | Steroids, IVIG, azathioprine | Yes | Yes | No | Yes | No | Yes, partial e shown at the individual patie received corticosteroids; 65% required additional immunosuppressive agents, and 38% had undergone more than three immunomodulatory treatments. Partial response was achieved in 46% and full clinical remission in 15%. Three patients received rituximab as third-line therapy after inadequate response to corticosteroids and additional immunosuppressive agents. All were classifed as clinically stable (partial response) after rituximab initiation. Follow-up duration after rituximab exposure was heterogeneous and limited, precluding conclusions regarding long-term efcacy or relapse prevention. In patients with residual weakness, and where muscle magnetic resonance
 
 Fig. 1 General histopathological features of BCIM. a Atrophic◂ myofbers with variable fber size displaying dense endomysial infltrates including a round B-cell cluster (arrow) with compartmentalization (bright center and darker densely clustering smaller B cells in its periphery; arrowhead). Note the absence of specifcally atrophic fbers in the perifascicular areas. Gömöri trichrome; b endomysial fbrosis is detectable with carmine-red positive fbrous streaks (arrows). EvG preparation. c Absence of COX-negative myofbers. COX-SDH enzyme histochemistry. d Mild perimysial fragmentation with alkaline phosphatase-positive reddish material (arrow) and presence of regenerating small myofbers (variable reddish). Alkaline phosphatase enzyme histochemical preparation. e Numerous predominantly small and round ‘regenerating’ myofbers. CD56 immunohistochemistry. f Numerous brown phagocytes in the endomysium and admixed with the B-cell cluster (dotted line). In areas containing B-cell clusters, the endothelial cell layer of small vessels shows NSE positivity (arrows), a feature commonly observed in tertiary lymphoid structures. Non-specifc esterase enzyme histochemical preparation. All images: original magnifcation ×200; scale bar represents 100 μm imaging (MRI) was available, MRI showed evidence of fatty-fbrotic tissue replacement in afected skeletal muscle groups.
 

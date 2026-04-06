@@ -317,27 +317,7 @@ The authors declare no competing interests.
 
 During the preparation of this work, the authors used DeepSeek and ChatGPT to improve language and readability. After using these tools, the authors reviewed and edited the content as needed and take full responsibility for the content of the publication.
 
-# STAR★METHODS
-
-Detailed methods are provided in the online version of this paper and include the following: • KEY RESOURCES TABLE • EXPERIMENTAL MODEL AND STUDY PARTICIPANT DETAILS ○ Animals ○ Cell lines ○ Human samples
-
-METHOD DETAILS
-
-○ Maintenance of hESCs ○ Generation and identification of SLC30A8-/- AD-B and HuES8 hESC lines ○ hESC-islet differentiation ○ Library construction and NGS sequencing ○ scRNA-seq data analysis ○ snATAC-seq data analysis ○ Transcription factor activity analysis ○ Immunocytochemistry analysis ○ Reactive oxygen species (ROS) measurement ○ Mitochondrial analysis ○ Oxygen consumption rate (OCR) assays ○ Quantitative RT-PCR analysis ○ Western blot ○ Calcium imaging ○ Transmission electron microscopy ○ Insulin secretion assays ○ Proinsulin to C-peptide conversion analysis ○ Flow cytometry ○ In vitro ischemia simulations ○ 7-AAD viability staining ○ SC-islet live imaging ○ Cell transfection ○ TUNEL staining • QUANTIFICATION AND STATISTICAL ANALYSIS • ADDITIONAL RESOURCES
-
-# SUPPLEMENTAL INFORMATION
-
-Supplemental information can be found online at https://doi.org/10.1016/j.stem.2026.03.004.
-
-Received: March 31, 2025 Revised: January 9, 2026 Accepted: March 5, 2026 Published: April 2, 2026
-
-# REFERENCES
-
-1. Genitsaridi, I., Salpea, P., Salim, A., Sajjadi, S.F., Tomic, D., James, S., Thirunavukkarasu, S., Issaka, A., Chen, L., Basit, A., et al. (2025). 11th edition of the IDF Diabetes Atlas: global, regional, and national diabetes prevalence estimates for 2024 and projections for 2050. Lancet Diabetes Endocrinol. 14,149–156. https://doi.org/10.1016/S2213-8587(25)00299-2.
-
-2. Pagliuca, F.W., Millman, J.R., Gu¨ rtler, M., Segel, M., Van Dervort, A., Ryu, J.H., Peterson, Q.P., Greiner, D., and Melton, D.A. (2014). Generation of functional human pancreatic beta cells in vitro. Cell 159,428–439. https://doi.org/10.1016/j.cell.2014.09.040.
-
-3. Rezania, A., Bruin, J.E., Arora, P., Rubin, A., Batushansky, I., Asadi, A., O’Dwyer, S., Quiskamp, N., Mojibian, M., Albrecht, T., et al. (2014). Reversal of diabetes with insulin-producing cells derived in vitro from human pluripotent stem cells. Nat. Biotechnol. 32, 1121–1133. https://doi.org/10.1038/nbt.3033.
+zania, A., Bruin, J.E., Arora, P., Rubin, A., Batushansky, I., Asadi, A., O’Dwyer, S., Quiskamp, N., Mojibian, M., Albrecht, T., et al. (2014). Reversal of diabetes with insulin-producing cells derived in vitro from human pluripotent stem cells. Nat. Biotechnol. 32, 1121–1133. https://doi.org/10.1038/nbt.3033.
 
 4. Hua, H., Wang, Y., Wang, X., Wang, S., Zhou, Y., Liu, Y., Liang, Z., Ren, H., Lu, S., Wu, S., et al. (2024). Remodeling ceramide homeostasis promotes functional maturation of human pluripotent stem cell-derived beta cells..04.010.
 
@@ -587,25 +567,19 @@ Radic. Biol. Med. 52,160–166. https://doi.org/10.1016/j.freeradbiomed.2011.10.
 
 124. Ccommittee; N.C.C.C.M.C.M., and Consortium, N.C. (2014). Purified Human Pancreatic Islets (PHPI) Master Production Batch Record: A Standard Operating Procedure of the NIH Clinical Islet Transplantation Consortium. CellR4 Repair Replace Regen. Reprogram. 2, e891.
 
-# STAR★METHODS
-
-# KEY RESOURCES TABLE
-
-[表格] REAGENT or RESOURCE | SOURCE | IDENTIFIER Antibodies Rabbit anti-Glucagon | Cell Signaling Technology | Cat#2760S; RRID: AB_659831 Goat anti-Somatostatin | Santa Cruz Biotechnology | Cat#sc-7819; RRID: AB_2302603
+z Biotechnology | Cat#sc-7819; RRID: AB_2302603
 
 Mouse anti-NKX6.1 | DSHB | Cat; RRID: AB_532379 Rat anti-C-peptide | DSHB | Cat#GN-ID4; RRID: AB_2255626 Rabbit anti-SYT13 | Abcepta | Cat#AP5482a; RRID: AB_10816916 Rabbit anti-CD31 | Abcam | Cat#ab28364; RRID: AB_726362
 
-Mouse anti-insulin | Sigma-Aldrich | Cat#I2018; RRID: AB_260137 Goat anti-PDX1 | R&amp;D Systems | Cat; RRID: AB_355257 Rabbit Anti-AMPKα, phospho (Thr172) | Cell Signaling Technology | Cat#2535; RRID: AB_331250 Anti-AMPKα | Cell Signaling Technology | Cat#2532; RRID: AB_330331
+Mouse anti-insulin | Sigma-Aldrich | Cat#I2018; RRID: AB_260137 Goat anti-PDX1 | R&D Systems | Cat; RRID: AB_355257 Rabbit Anti-AMPKα, phospho (Thr172) | Cell Signaling Technology | Cat#2535; RRID: AB_331250 Anti-AMPKα | Cell Signaling Technology | Cat#2532; RRID: AB_330331
 
-Mouse anti-β-actin (8H10D10) Mouse mAb | Cell Signaling Technology | Cat#3700; RRID: AB_2242334 Rabbit Anti-Phospho-HSP90α (Thr5/7) | Cell Signaling Technology | Cat#3488; RRID: AB_2120902 Rabbit anti- HSP90 (C45G5) | Cell Signaling Technology | Cat#4877; RRID: AB_2233307 Rabbit anti-HIF-1α [EP1215Y] | Abcam | Cat#ab51608; RRID: AB_880418 Rat anti-VEGFA | R&amp;D Systems | Cat#AF564; RRID: AB_2212821 Rabbit anti-NKX6.1 | Abcam | Cat#ab221549; RRID: AB_2754979 Rabbit anti-MafA | Novus | Cat#NB400-137; RRID: AB_10002142 Rabbit anti-ISL1 | Selleck | Cat#F1691; RRID: AB_3720237 Rabbit anti-PC1/3 antibody | Abcam | Cat#ab220363; RRID: AB_3076249 Rabbit anti-PDX1 | Abcam | Cat#ab219207; RRID: AB_2891187
+Mouse anti-β-actin (8H10D10) Mouse mAb | Cell Signaling Technology | Cat#3700; RRID: AB_2242334 Rabbit Anti-Phospho-HSP90α (Thr5/7) | Cell Signaling Technology | Cat#3488; RRID: AB_2120902 Rabbit anti- HSP90 (C45G5) | Cell Signaling Technology | Cat#4877; RRID: AB_2233307 Rabbit anti-HIF-1α [EP1215Y] | Abcam | Cat#ab51608; RRID: AB_880418 Rat anti-VEGFA | R&D Systems | Cat#AF564; RRID: AB_2212821 Rabbit anti-NKX6.1 | Abcam | Cat#ab221549; RRID: AB_2754979 Rabbit anti-MafA | Novus | Cat#NB400-137; RRID: AB_10002142 Rabbit anti-ISL1 | Selleck | Cat#F1691; RRID: AB_3720237 Rabbit anti-PC1/3 antibody | Abcam | Cat#ab220363; RRID: AB_3076249 Rabbit anti-PDX1 | Abcam | Cat#ab219207; RRID: AB_2891187
 
 Mouse anti-STEM121 | Takara Bio | Cat#Y40410; RRID: AB_2801314 Rabbit anti-TOM20 | ProteinTech | Cat#11802-1-AP; RRID: AB_2207530 AMPK alpha 1/2 Rabbit mAb | Abclonal | Cat; RRID: AB_3720345 Rabbit anti-HIF-1α | Selleck | Cat#F0101; RRID: AB_3720293 Rabbit anti-ZnT8 (Slc30A8 Polyclonal Antibody) | Thermo Fisher Scientific | Cat#PA5-103252; RRID: AB_2852615 YSFluorTM 488 Donkey Anti-Rat IgG (H+L) | Yeasen | Cat#34406ES60; RRID: AB_2920547 YSFluorTM 647 Donkey Anti-Rat IgG (H+L) | Yeasen | Cat#34413ES60; RRID: AB_3717296 Alexa Fluor 647-conjugated Goat Anti-Rabbit IgG (H+L) | ABclonal | Cat#AS060; RRID: AB_2768330 YSFluorTM594 Donkey Anti-Rabbit IgG (H+L) | Yeasen | Cat#34212ES60; RRID: AB_2920875 YSFluorTM594 Donkey Anti-Mouse IgG(H+L) | Yeasen | Cat#34112ES60; RRID: AB_3661960 Alexa Fluor 647-AffiniPure Donkey Anti-Rabbit IgG | Jackson ImmunoResearch Labs | Cat#711-605-152; RRID: AB_2492288 Alexa Fluor 647 AffiniPure Donkey Anti-Mouse IgG (H+L) | Jackson ImmunoResearch Labs | Cat#715-605-150; RRID: AB_2340862 Donkey Anti-Goat IgG Secondary Antibody, Alexa Flour 647 Conjugated | Bioss | Cat#bs0924D-AF647; RRID: AB_10923338 Biological samples
 
 Human primary islets | The First Affiliated Hospital of the Naval Medical University | N/A Chemicals, peptides, and recombinant proteins D-Glucose | Sigma-Aldrich | Cat#G7021 ZnSO4 | Sigma-Aldrich | Cat#Z0251 KCl | Sigma-Aldrich | Cat#P5405 H2O2 | Sigma-Aldrich | Cat # 323381
 
-(Continued on next page)
-
-[表格] REAGENT or RESOURCE | SOURCE | IDENTIFIER STZ | Yeasen | Cat#60256ES60 Palmitic acid | Sigma-Aldrich | Cat#P0500 DMSO | Sigma-Aldrich | Cat#D8418 SU6656 | Selleck | Cat#S7774 Tween80 | Beyotime | Cat#ST2789 ZnPTO | Sigma-Aldrich | Cat#H6377 Ascorbic acid | Sigma-Aldrich | Cat#A4544 Chir99021 | Selleck | Cat#S1263 BMP4 | R&amp;D Systems | Cat#314-BP-01M bFGF | R&amp;D Systems | Cat#233-FB-010/CF Activin A | R&amp;D Systems | Cat#338-AC-01M/CF FGF-10 | R&amp;D Systems | Cat#345-FG-025 Wnt3a | Novoprotein | Cat#C22R SANT1 | Selleck | Cat#S7092 Retinoic acid | Sigma-Aldrich | Cat#R2625 NOGGIN | Novoprotein | Cat#CB89 Alk5i-II | Selleck | Cat#S7223 LDN193189 | Sigma-Aldrich | Cat#SML0559 hEGF | Novoprotein | Cat#C029 T3 (Triiodothyronine) | Selleck | Cat#S5726 Trolox | Selleck | Cat#S3665 Bemcentinib (R428) | Selleck | Cat#S2841 γ-secretase inhibitor XX | EMD Millipore | Cat # 565789 MCDB131 | Sigma-Aldrich | Cat#M8537 DMEM | Gibco | Cat#10313039 RPMI 1640 | Gibco | Cat#22400105 Fetal bovine serum (FBS) | PAN Seratech | Cat#ST30-3302 Y-27632 | MedChemExpress | Cat#HY-10071 TrypLE | Gibco | Cat#12604013 Matrigel | Corning | Cat # 354277 Donkey serum | Jackson ImmunoResearch | Cat#017-000-121 L-Glutamine | Gibco | Cat#25030081 Bovine serum albumin (BSA) | Proliant | Cat#69100 Dorsomorphin (DS) | MedChemExpress | Cat # 866405-64-3 Lificiguat (YC-1) | Selleck | Cat#S7958 Linoleic acid | Sigma-Aldrich | Cat#L1376 Stearic Acid | Sigma-Aldrich | Cat#S4751
+[表格] REAGENT or RESOURCE | SOURCE | IDENTIFIER STZ | Yeasen | Cat#60256ES60 Palmitic acid | Sigma-Aldrich | Cat#P0500 DMSO | Sigma-Aldrich | Cat#D8418 SU6656 | Selleck | Cat#S7774 Tween80 | Beyotime | Cat#ST2789 ZnPTO | Sigma-Aldrich | Cat#H6377 Ascorbic acid | Sigma-Aldrich | Cat#A4544 Chir99021 | Selleck | Cat#S1263 BMP4 | R&D Systems | Cat#314-BP-01M bFGF | R&D Systems | Cat#233-FB-010/CF Activin A | R&D Systems | Cat#338-AC-01M/CF FGF-10 | R&D Systems | Cat#345-FG-025 Wnt3a | Novoprotein | Cat#C22R SANT1 | Selleck | Cat#S7092 Retinoic acid | Sigma-Aldrich | Cat#R2625 NOGGIN | Novoprotein | Cat#CB89 Alk5i-II | Selleck | Cat#S7223 LDN193189 | Sigma-Aldrich | Cat#SML0559 hEGF | Novoprotein | Cat#C029 T3 (Triiodothyronine) | Selleck | Cat#S5726 Trolox | Selleck | Cat#S3665 Bemcentinib (R428) | Selleck | Cat#S2841 γ-secretase inhibitor XX | EMD Millipore | Cat # 565789 MCDB131 | Sigma-Aldrich | Cat#M8537 DMEM | Gibco | Cat#10313039 RPMI 1640 | Gibco | Cat#22400105 Fetal bovine serum (FBS) | PAN Seratech | Cat#ST30-3302 Y-27632 | MedChemExpress | Cat#HY-10071 TrypLE | Gibco | Cat#12604013 Matrigel | Corning | Cat # 354277 Donkey serum | Jackson ImmunoResearch | Cat#017-000-121 L-Glutamine | Gibco | Cat#25030081 Bovine serum albumin (BSA) | Proliant | Cat#69100 Dorsomorphin (DS) | MedChemExpress | Cat # 866405-64-3 Lificiguat (YC-1) | Selleck | Cat#S7958 Linoleic acid | Sigma-Aldrich | Cat#L1376 Stearic Acid | Sigma-Aldrich | Cat#S4751
 
 Critical commercial assays
 
@@ -616,8 +590,6 @@ Human proinsulin ELISA kit | Mercodia | Cat#1118-1-10
 Human ultrasensitive C-peptide ELISA kit | Mercodia | Cat#0111-1-10
 
 Human insulin ELISAkit | ALPCO | Cat#80-INSHUU-E10 Ultrasensitive insulin ELISA | ALPCO | Cat#80-INSHUU-E01.1 KAPA Express Extract Kits | KAPA Biosystems | Cat#KK7101 Annexin V-YSFluor™ 647/PI Apoptosis Detection Kit | Yeasen | Cat#40304ES60 TRNzol Universal | TIANGEN | Cat#DP424 Mitochondrial membrane potential assay kit with JC-1 | Beyotime | Cat#C2005
-
-(Continued on next page)
 
 [表格] REAGENT or RESOURCE | SOURCE | IDENTIFIER TUNEL Apoptosis Detection Kit (YSFluorTM 640) | Yeasen | Cat#40308ES20 Zinc (Zn) Colorimetric Assay Kit | Elabscience | Cat#E-BC-K137-M Mito-Tracker Deep Red 633 | Beyotime | Cat#C1034 ER-Tracker Red | Beyotime | Cat#C1041S Zinquin ethyl ester | Sigma-Aldrich | Cat#Z2251 TSQ | MedChem Express | Cat#HY-119287 7-AAD Viability Staining Solution | Invitrogen | Cat#00-6993-50 NucRedTM Live 647 ReadyProbesTM Reagent | Invitrogen | Cat#R37106 Reactive Oxygen Species Assay Kit | Beyotime | Cat#S0033S 7-AAD Viability Staining Solution | Yeasen | Cat#40745ES64 Deposited data Single-cell RNA-seq dataset | This Paper | GEO: GSE293322 Single-nucleus ATAC-seq dataset | This Paper | GEO: GSE293322 Experimental models: Cell lines Wildtype HuES8 | Shanghai Institute of Nutrition and Health | human embryonic stem cell line SLC30A8-/- HuES8 | Tongji University | human embryonic stem cell line Mel1 (INSGFP/W-NKX6.1mCherry/mCherry hESC) reporter line | Shanghai Institute of Biochemistry and Cell Biology | human embryonic stem cell line SLC30A8-/- Mel1 (INSGFP/W-NKX6.1mCherry/mCherry hESC) reporter line | Tongji University | human embryonic stem cell line WFS1-/- Mel1 (INSGFP/W-NKX6.1mCherry/mCherry hESC) reporter line | Tongji University | human embryonic stem cell line Mel1 ZnT8::RFP reporter line | Tongji University | human embryonic stem cell line Wildtype AD-B | Shanghai East Hospital | human embryonic stem cell line SLC30A8-/- AD-B | Tongji University | human embryonic stem cell line HUVEC | Shanghai East Hospital | Human Umbilical Vein Endothelial Cells Experimental models: Organisms/strains Mouse: CB17.Cg-PrkdcscidLystbg-J/Crl (SCID/Beige) | Beijing Vital River Laboratory Animal Technology | Immunodeficient mouse model Oligonucleotides Primer: GAPDH Forward: GGAGCCAAACGGGTCATCATCTC | This paper | N/A Primer: GAPDH Reverse: GAGGGGCCATCCACAGTCTTCT | This paper | N/A Primer: HSP90AA1 Forward: CATAACGATGATGAGCAGTACGC | This paper | N/A Primer: HSP90AA1 Reverse: GACCCATAGGTTCACCTGTGT | This paper | N/A Primer: SLC30A8 Forward: TTGCACCAGAGATGCCTTG | This paper | N/A Primer: SLC30A8 Reverse: TCCAAGGGCATGCACAAA | This paper | N/A Software and algorithms
 

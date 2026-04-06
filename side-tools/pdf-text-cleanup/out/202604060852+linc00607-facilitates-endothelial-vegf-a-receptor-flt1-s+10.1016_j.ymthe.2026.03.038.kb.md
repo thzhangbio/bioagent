@@ -277,17 +277,17 @@ Gene Ontology enrichment analysis (powered by PANTHER) of the high-confidence is
 
 Unless otherwise indicated, data are given as means ± standard error of mean (SD). Calculations were performed with Prism 10 or BiAS.10.12. The latter was also used to test for normal distribution and similarity of variance. In case of multiple testing, Bonferroni correction was applied. For multiple group comparisons ANOVA followed by post hoc testing was performed. Individual statistics of dependent samples were performed by paired t-test, of unpaired samples by unpaired t-test and if not normally distributed by Mann-Whitney test. P values of < 0.05 was considered as significant. Unless otherwise indicated, n indicates the number of individual experiments.
 
-# 617 Data and code availability
+# Data and code availability
 
 RNA-seq of LINC00607 KO and NTC was already published by Boos et al., 2023^34 and is publicly available
 
-619 at NCBI GEO with the accession number GSE199878. Other publicly available datasets used in this study
+at NCBI GEO with the accession number GSE199878. Other publicly available datasets used in this study
 
-620 are: placental cell types scRNA-seq dataset - Vento-Tormo et al. ⁶⁸, placental gene expression
+are: placental cell types scRNA-seq dataset - Vento-Tormo et al. ⁶⁸, placental gene expression
 
-621 GSE182381 ⁴², placental tissue GSE256412 ⁴³, iPSC modeling MSC, EVT naïve and EVT prime
+GSE182381 ⁴², placental tissue GSE256412 ⁴³, iPSC modeling MSC, EVT naïve and EVT prime
 
-622 GSE24357944.
+GSE24357944.
 
 # Acknowledgments
 

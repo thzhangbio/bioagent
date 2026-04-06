@@ -475,11 +475,7 @@ Thermogenic adipocytes are a potential therapy to combat obesity, although the p
 
 a b
 
-C d e f g h i j k
-
 1 m n
-
-0 p q r s a
 
 Cold tolerance b
 
@@ -511,11 +507,7 @@ GTT s t
 
 HFD mice
 
-U a b e
-
 Runx2
-
-C d g h i i
 
 K
 
@@ -541,8 +533,6 @@ GO (RUNX2 bind & Up genes)
 
 Generation of precursor metabolites and energy Cellular respiration Aerobic respiration Energy derivation by oxidation of organic compounds Tricarboxylic acid cycle Fatty acid beta-oxidation Purine ribonucleotide metabolic process Ribonucleotide metabolic process Fatty acid catabolic process Fatty acid metabolic process 0 10 20 30 -log10(p adjust) f i j k
 
-1 m a b
-
 C d f
 
 RUNX1&HDAC1 Common (GO)
@@ -560,14 +550,6 @@ OE- RUNX2+NC m a
 Residue Number b
 
 C d e
-
-9 i j (kDa) k rrrnnnne nnnnne m n
-
-263 kb
-
-150 kb a b
-
-C d e f g h i
 
 Mitochondrial j k m
 

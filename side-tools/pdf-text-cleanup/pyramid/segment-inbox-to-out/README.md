@@ -19,6 +19,7 @@
 | --- | --- |
 | `README.md` | 段Ⅰ总览，说明根目录共享文件与一级子目录职责。 |
 | `CLEANUP-HANDBOOK.md` | 非公式类清洗经验手册，沉淀 HTML 残留、页脚、boilerplate 等规则经验。 |
+| `QUALITY-STANDARD.md` | 判定 `out/*.kb.md` 是否达到高质量向量化原材料标准的验收说明。 |
 
 ## 一级子目录
 

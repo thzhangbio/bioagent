@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 
 import { getAnthropicClient } from "../anthropic.js";
@@ -579,6 +580,44 @@ export interface ContentCreateWorkflowOptions {
   skipAlignmentGates?: boolean;
 }
 
+let cachedFallbackSenderOpenId: string | undefined;
+let cachedFallbackSenderOpenIdLoaded = false;
+
+function resolveFallbackSenderOpenId(): string | undefined {
+  if (cachedFallbackSenderOpenIdLoaded) return cachedFallbackSenderOpenId;
+  cachedFallbackSenderOpenIdLoaded = true;
+
+  const envOpenId =
+    process.env.FEISHU_FALLBACK_USER_OPEN_ID?.trim() ||
+    process.env.FEISHU_DEFAULT_USER_OPEN_ID?.trim() ||
+    process.env.LARK_CLI_USER_OPEN_ID?.trim();
+  if (envOpenId) {
+    cachedFallbackSenderOpenId = envOpenId;
+    return cachedFallbackSenderOpenId;
+  }
+
+  try {
+    const raw = execFileSync("lark-cli", ["auth", "status"], {
+      encoding: "utf8",
+      maxBuffer: 1024 * 1024,
+    });
+    const parsed = JSON.parse(raw) as { userOpenId?: string };
+    const fromCli = parsed.userOpenId?.trim();
+    if (fromCli) {
+      cachedFallbackSenderOpenId = fromCli;
+      console.log(
+        `[content-create] 未显式传入 senderOpenId，已回退使用当前登录用户 open_id: ${fromCli}`,
+      );
+      return cachedFallbackSenderOpenId;
+    }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.warn("[content-create] 读取当前登录用户 open_id 失败:", msg.slice(0, 180));
+  }
+
+  return undefined;
+}
+
 async function runMedsciPolishPass(
   model: string,
   userPayload: string,
@@ -622,6 +661,8 @@ export async function runContentCreateWorkflow(
   userText: string,
   workflowOpts: ContentCreateWorkflowOptions = {},
 ): Promise<string> {
+  const effectiveSenderOpenId =
+    workflowOpts.senderOpenId?.trim() || resolveFallbackSenderOpenId();
   const memory = loadMemory();
 
   const medsciLitParsed = parseMedsciLiteratureWechatRequest(userText);
@@ -905,10 +946,10 @@ export async function runContentCreateWorkflow(
     let publicReadableGranted: boolean | undefined;
     let collaboratorGranted: boolean | undefined;
     publicReadableGranted = await setDocxPublicReadable(created.documentId);
-    if (workflowOpts.senderOpenId) {
+    if (effectiveSenderOpenId) {
       collaboratorGranted = await grantDocxCollaboratorFullAccess(
         created.documentId,
-        workflowOpts.senderOpenId,
+        effectiveSenderOpenId,
       );
     }
     const doc = {
@@ -928,7 +969,7 @@ export async function runContentCreateWorkflow(
     const grantLine =
       doc.collaboratorGranted === true ?
         "已为你开通该文档的编辑与管理类权限（飞书「可管理」协作者），可直接在链接内修改。"
-      : doc.collaboratorGranted === false && workflowOpts.senderOpenId ?
+      : doc.collaboratorGranted === false && effectiveSenderOpenId ?
         "（未能自动添加你为协作者：请管理员检查开放平台云文档/云空间权限；你仍可通过分享链接申请编辑。）"
       : "";
 

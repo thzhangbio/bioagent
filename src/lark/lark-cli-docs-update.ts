@@ -3,6 +3,21 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
+function parsePreferredLarkIdentities(): Array<"bot" | "user"> {
+  const raw =
+    process.env.LARK_CLI_AS_CHAIN ??
+    process.env.LARK_CLI_AS ??
+    "bot,user";
+  const items = raw
+    .split(/[,\s]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .filter((s): s is "bot" | "user" => s === "bot" || s === "user");
+  return items.length > 0 ?
+      (Array.from(new Set(items)) as Array<"bot" | "user">)
+    : ["bot", "user"];
+}
+
 /** 改稿失败回退到 Node SDK 纯文本时，粗略去掉常见 Markdown 标记 */
 export function stripMarkdownToPlainFallback(md: string): string {
   let s = md.replace(/\r\n/g, "\n");
@@ -24,40 +39,46 @@ export async function replaceDocumentViaLarkCliOverwrite(
   documentId: string,
   markdown: string,
   options: { newTitle?: string } = {},
-): Promise<{ stdout: string; stderr: string }> {
+): Promise<{ stdout: string; stderr: string; identity: "bot" | "user" }> {
   const bin = process.env.LARK_CLI_BIN ?? "lark-cli";
-  const asArg = process.env.LARK_CLI_AS ?? "user";
-  const args = [
-    "docs",
-    "+update",
-    "--as",
-    asArg,
-    "--doc",
-    documentId.trim(),
-    "--mode",
-    "overwrite",
-    "--markdown",
-    markdown,
-  ];
-  if (options.newTitle?.trim()) {
-    args.push("--new-title", options.newTitle.trim());
+  const identities = parsePreferredLarkIdentities();
+  const failures: string[] = [];
+
+  for (const identity of identities) {
+    const args = [
+      "docs",
+      "+update",
+      "--as",
+      identity,
+      "--doc",
+      documentId.trim(),
+      "--mode",
+      "overwrite",
+      "--markdown",
+      markdown,
+    ];
+    if (options.newTitle?.trim()) {
+      args.push("--new-title", options.newTitle.trim());
+    }
+
+    try {
+      const { stdout, stderr } = await execFileAsync(bin, args, {
+        maxBuffer: 32 * 1024 * 1024,
+        env: { ...process.env },
+      });
+      const out = `${stdout}`.trim();
+      const err = `${stderr}`.trim();
+      const combined = `${out}\n${err}`.trim();
+      if (/\"error\"\s*:/.test(combined) || /\[错误码\]/.test(combined)) {
+        const snippet = combined.slice(0, 800);
+        throw new Error(`lark-cli docs +update 可能失败: ${snippet}`);
+      }
+      return { stdout: out, stderr: err, identity };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      failures.push(`${identity}: ${msg.slice(0, 280)}`);
+    }
   }
 
-  try {
-    const { stdout, stderr } = await execFileAsync(bin, args, {
-      maxBuffer: 32 * 1024 * 1024,
-      env: { ...process.env },
-    });
-    const out = `${stdout}`.trim();
-    const err = `${stderr}`.trim();
-    const combined = `${out}\n${err}`.trim();
-    if (/\"error\"\s*:/.test(combined) || /\[错误码\]/.test(combined)) {
-      const snippet = combined.slice(0, 800);
-      throw new Error(`lark-cli docs +update 可能失败: ${snippet}`);
-    }
-    return { stdout: out, stderr: err };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    throw new Error(`lark-cli 执行失败 (${bin}): ${msg}`);
-  }
+  throw new Error(`lark-cli 执行失败 (${bin}): ${failures.join(" | ")}`);
 }

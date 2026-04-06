@@ -821,10 +821,12 @@ export async function runContentCreateWorkflow(
     });
     const fullMd = [`# ${title.trim()}`, "", body.trim()].join("\n");
     try {
-      await replaceDocumentViaLarkCliOverwrite(created.documentId, fullMd, {
+      const writeResult = await replaceDocumentViaLarkCliOverwrite(created.documentId, fullMd, {
         newTitle: title.trim(),
       });
-      console.log("[content-create] 成稿已通过 lark-cli Lark Markdown 写入");
+      console.log(
+        `[content-create] 成稿已通过 lark-cli Lark Markdown 写入 (identity=${writeResult.identity})`,
+      );
     } catch (e) {
       const em = e instanceof Error ? e.message : String(e);
       console.warn("[content-create] lark-cli 成稿写回失败，回退 OpenAPI 纯文本:", em.slice(0, 180));

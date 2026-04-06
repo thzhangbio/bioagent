@@ -307,11 +307,13 @@ export async function runDocxReviseWorkflow(
   let writeBackMode: "lark_cli_md" | "lark_cli_fallback_sdk";
   const fullMarkdown = [`# ${title.trim()}`, "", body.trim()].join("\n");
   try {
-    await replaceDocumentViaLarkCliOverwrite(documentId, fullMarkdown, {
+    const writeResult = await replaceDocumentViaLarkCliOverwrite(documentId, fullMarkdown, {
       newTitle: title.trim(),
     });
     writeBackMode = "lark_cli_md";
-    console.log("[docx-revise] 已通过 lark-cli docs +update（overwrite）写回 Markdown");
+    console.log(
+      `[docx-revise] 已通过 lark-cli docs +update（overwrite）写回 Markdown (identity=${writeResult.identity})`,
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.warn("[docx-revise] lark-cli 写回失败，回退为 Node SDK 纯文本:", msg);

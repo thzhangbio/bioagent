@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 import { createEmbeddingClient } from "../../knowledge/embeddings.js";
 import { DEFAULT_RAG_STORE_PATH } from "../../knowledge/paths.js";
@@ -84,6 +84,15 @@ export interface VerifyLiteratureResult {
   hits: SearchHit[];
 }
 
+interface LiteratureKbMetadata {
+  title?: string;
+  authors?: string;
+  journal?: string;
+  doi?: string;
+  doiUrl?: string;
+  published?: string;
+}
+
 /**
  * 在 literature 集合中检索并判定是否存在可对齐条目。
  */
@@ -107,8 +116,133 @@ function formatHitsBlock(hits: SearchHit[]): string {
     .map(
       (h, i) =>
         `[#${i + 1} ${h.chunk.collection} | ${h.chunk.sourceLabel}]\n${h.chunk.text}`,
-    )
+      )
     .join("\n\n---\n\n");
+}
+
+function parseLiteratureKbMetadataFromSourcePath(sourcePath: string): LiteratureKbMetadata | null {
+  if (!sourcePath) return null;
+  const absPath = sourcePath.startsWith("/") ?
+      sourcePath
+    : `${process.cwd()}/${sourcePath}`;
+  if (!existsSync(absPath)) return null;
+  try {
+    const raw = readFileSync(absPath, "utf8");
+    const m = raw.match(/^---\n([\s\S]*?)\n---/);
+    if (!m?.[1]) return null;
+    const yaml = m[1];
+    const pick = (key: string): string | undefined => {
+      const mm = yaml.match(new RegExp(`^\\s{2}${key}:\\s*\"([^\"]*)\"`, "m"));
+      return mm?.[1]?.trim() || undefined;
+    };
+    return {
+      title: pick("title"),
+      authors: pick("authors"),
+      journal: pick("journal"),
+      doi: pick("doi"),
+      doiUrl: pick("doi_url"),
+      published: pick("published"),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function formatAuthorToken(name: string): string {
+  const parts = name
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .filter(Boolean);
+  if (parts.length === 0) return "";
+  const last = parts[parts.length - 1]!;
+  const initials = parts
+    .slice(0, -1)
+    .map((p) =>
+      p
+        .replace(/[^A-Za-zÀ-ÿ-]/g, "")
+        .split("-")
+        .filter(Boolean)
+        .map((s) => s[0]?.toUpperCase() ?? "")
+        .join(""),
+    )
+    .join("");
+  return initials ? `${last} ${initials}` : last;
+}
+
+function formatAuthorsVancouver(raw: string | undefined): string {
+  if (!raw) return "";
+  const authors = raw
+    .split(";")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map(formatAuthorToken)
+    .filter(Boolean);
+  if (authors.length === 0) return "";
+  if (authors.length <= 6) return authors.join(", ");
+  return `${authors.slice(0, 6).join(", ")}, et al.`;
+}
+
+function formatPublishedDate(raw: string | undefined): string {
+  if (!raw) return "";
+  const m = raw.match(/^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?$/);
+  if (!m) return raw;
+  const months = [
+    "",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const year = m[1];
+  const month = m[2] ? months[Number(m[2])] : "";
+  const day = m[3] ? String(Number(m[3])) : "";
+  return [year, month, day].filter(Boolean).join(" ");
+}
+
+export function buildMedsciLiteratureReferences(
+  literatureHits: SearchHit[],
+): string {
+  const primary = literatureHits[0]?.chunk;
+  if (!primary) return "";
+  const meta = parseLiteratureKbMetadataFromSourcePath(primary.sourcePath);
+  const title = meta?.title || primary.sourceLabel || "";
+  const authors = formatAuthorsVancouver(meta?.authors);
+  const journal = meta?.journal?.trim() || "";
+  const published = formatPublishedDate(meta?.published);
+  const doi = meta?.doi?.trim() || primary.paperId || "";
+  const doiUrl = meta?.doiUrl?.trim() || primary.sourceUrl || "";
+
+  const line = [
+    authors,
+    title ? `${title}.` : "",
+    journal ? `${journal}.` : "",
+    published ? `${published}.` : "",
+    doi ? `doi:${doi}.` : doiUrl ? `${doiUrl}.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+\./g, ".")
+    .trim();
+
+  if (!line) return "";
+  return ["参考资料：", `[1] ${line}`].join("\n\n");
+}
+
+export function stripGeneratedMedsciReferenceTail(body: string): string {
+  let out = body.trim();
+  out = out.replace(/\n+(?:---\n+)?(?:>\s*)?(?:\*\*)?文献来源[:：](?:\*\*)?[\s\S]*$/m, "");
+  out = out.replace(/\n+(?:>\s*)?(?:\*\*)?参考资料[:：](?:\*\*)?[\s\S]*$/m, "");
+  out = out.replace(/\n+\[\d+\][\s\S]*$/m, "");
+  return out.trim();
 }
 
 /**

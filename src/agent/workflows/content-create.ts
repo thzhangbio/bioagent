@@ -3,8 +3,10 @@ import { existsSync } from "node:fs";
 
 import { getAnthropicClient } from "../anthropic.js";
 import {
+  buildMedsciLiteratureReferences,
   fetchMedsciLiteratureRagContext,
   parseMedsciLiteratureWechatRequest,
+  stripGeneratedMedsciReferenceTail,
   verifyLiteratureForMedsciWechat,
 } from "./medsci-literature-wechat.js";
 import { createEmbeddingClient } from "../../knowledge/embeddings.js";
@@ -16,6 +18,7 @@ import {
   createCloudDocument,
   grantDocxCollaboratorFullAccess,
   replaceDocumentPagePlainText,
+  setDocxPublicReadable,
 } from "../../lark/docx-document.js";
 import {
   replaceDocumentViaLarkCliOverwrite,
@@ -812,6 +815,17 @@ export async function runContentCreateWorkflow(
     }
     return `抱歉，正文生成失败：${msg.slice(0, 200)}`;
   }
+
+  if (medsciLiteratureWechatMode && medsciVerifiedHits.length) {
+    body = stripGeneratedMedsciReferenceTail(body);
+    const referencesBlock = buildMedsciLiteratureReferences(
+      medsciVerifiedHits,
+    );
+    if (referencesBlock && !/参考资料[:：]|参考文献[:：]|^\[\d+\]/m.test(body)) {
+      body = `${body.trim()}\n\n${referencesBlock}`;
+    }
+  }
+
   const folderToken = process.env.FEISHU_DOC_FOLDER_TOKEN;
 
   try {
@@ -819,7 +833,7 @@ export async function runContentCreateWorkflow(
       title,
       folderToken: folderToken || undefined,
     });
-    const fullMd = [`# ${title.trim()}`, "", body.trim()].join("\n");
+    const fullMd = body.trim();
     try {
       const writeResult = await replaceDocumentViaLarkCliOverwrite(created.documentId, fullMd, {
         newTitle: title.trim(),
@@ -835,7 +849,9 @@ export async function runContentCreateWorkflow(
         stripMarkdownToPlainFallback(fullMd),
       );
     }
+    let publicReadableGranted: boolean | undefined;
     let collaboratorGranted: boolean | undefined;
+    publicReadableGranted = await setDocxPublicReadable(created.documentId);
     if (workflowOpts.senderOpenId) {
       collaboratorGranted = await grantDocxCollaboratorFullAccess(
         created.documentId,
@@ -861,6 +877,13 @@ export async function runContentCreateWorkflow(
         "已为你开通该文档的编辑与管理类权限（飞书「可管理」协作者），可直接在链接内修改。"
       : doc.collaboratorGranted === false && workflowOpts.senderOpenId ?
         "（未能自动添加你为协作者：请管理员检查开放平台云文档/云空间权限；你仍可通过分享链接申请编辑。）"
+      : "";
+
+    const publicLine =
+      publicReadableGranted === true ?
+        "已默认开启该文档的互联网可阅读权限。"
+      : publicReadableGranted === false ?
+        "（未能自动开启互联网可阅读：请管理员检查云文档权限设置 scope。）"
       : "";
 
     let complianceBlock = "";
@@ -895,6 +918,7 @@ export async function runContentCreateWorkflow(
       "已写好并保存到飞书云文档（新版 docx）。",
       `标题：${title}`,
       `链接：${doc.url}`,
+      ...(publicLine ? ["", publicLine] : []),
       ...(grantLine ? ["", grantLine] : []),
       "",
       "如需修改语气或补充要点，直接说具体段落即可。",

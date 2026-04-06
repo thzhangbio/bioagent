@@ -305,7 +305,7 @@ export async function runDocxReviseWorkflow(
   }
 
   let writeBackMode: "lark_cli_md" | "lark_cli_fallback_sdk";
-  const fullMarkdown = [`# ${title.trim()}`, "", body.trim()].join("\n");
+  const fullMarkdown = body.trim();
   try {
     const writeResult = await replaceDocumentViaLarkCliOverwrite(documentId, fullMarkdown, {
       newTitle: title.trim(),

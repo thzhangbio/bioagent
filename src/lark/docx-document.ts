@@ -356,6 +356,35 @@ export async function grantDocxCollaboratorFullAccess(
 }
 
 /**
+ * 将 docx 设为“任何人持链接可阅读”。
+ * 当前仅设置 link_share_entity；其余 public 配置保留飞书现状。
+ */
+export async function setDocxPublicReadable(
+  documentToken: string,
+): Promise<boolean> {
+  const token = documentToken.trim();
+  if (!token) return false;
+  try {
+    await withFeishuRetry("permissionPublic.patch", async () => {
+      const client = getFeishuClient();
+      const res = await client.drive.v1.permissionPublic.patch({
+        path: { token },
+        params: { type: "docx" },
+        data: {
+          link_share_entity: "anyone_readable",
+        } as never,
+      });
+      assertOk(res, "drive.permissionPublic.patch");
+    });
+    return true;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[docx] 设置互联网可阅读失败:", msg);
+    return false;
+  }
+}
+
+/**
  * 创建云文档并写入纯文本正文（按空行分段；超长段会截断为多块）。
  */
 export async function createDocumentWithPlainText(

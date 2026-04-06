@@ -2,10 +2,12 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { KB_SHORT_INLINE_MATH_MAX_INNER_LEN } from "../../segment-inbox-to-out/segment-inbox-to-out.kb-shared.js";
 import {
   extractPrimaryDoiFromMarkdown,
   slugFromKbMarkdown,
 } from "../../segment-inbox-to-out/segment-inbox-to-out.archive-name-shared.js";
+import { scanMarkdownForUnresolvedInlineFragments } from "../../segment-inbox-to-out/09-formula-fragments/fragment-audit-shared.js";
 import {
   appendSegmentOutToKnowledgeNote,
   type SegmentOutToKnowledgeFileRecord,
@@ -57,6 +59,24 @@ export const segmentOutToKnowledge00PreOutCheckStage: SegmentOutToKnowledgeStage
         .map((fileName) => {
           const outPath = join(outDirPath, fileName);
           const raw = readFileSync(outPath, "utf-8");
+          const unresolved = scanMarkdownForUnresolvedInlineFragments(
+            raw,
+            KB_SHORT_INLINE_MATH_MAX_INNER_LEN,
+          );
+          if (unresolved.length > 0) {
+            const examples = unresolved
+              .slice(0, 5)
+              .map((item) => `line ${item.line}: ${item.fragment}`)
+              .join("\n");
+            throw new Error(
+              [
+                `入库前质量门未通过：${fileName} 仍存在未解析 LaTeX 短碎片，禁止入库。`,
+                `未解析总出现: ${unresolved.length}`,
+                `示例:\n${examples}`,
+                "请先运行碎片审计、补规则并重新生成高质量 out 稿。",
+              ].join("\n"),
+            );
+          }
           return {
             fileName,
             outPath,

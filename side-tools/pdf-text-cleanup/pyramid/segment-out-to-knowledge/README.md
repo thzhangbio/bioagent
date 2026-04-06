@@ -14,7 +14,7 @@
 
 | 子目录 | 根文件 | 作用 |
 | --- | --- | --- |
-| `00-pre-out-check/` | `00-pre-out-check.ts` | 入库前检查 `out` 目录与运行前提。 |
+| `00-pre-out-check/` | `00-pre-out-check.ts` | 入库前检查 `out` 目录与运行前提，并阻断仍含未解析 LaTeX 碎片的稿件。 |
 | `01-copy-to-knowledge/` | `01-copy-to-knowledge.ts` | 将成稿复制到知识库约定目录。 |
 | `02-metadata-id/` | `02-metadata-id.ts` | 对齐 DOI、slug、paperId 等标识。 |
 | `03-ingest-index/` | `03-ingest-index.ts` | 调用知识库 ingest 入口。 |

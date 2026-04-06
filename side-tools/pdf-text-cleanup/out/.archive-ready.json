@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-06T07:04:58.678Z",
+  "generatedAt": "2026-04-06T07:22:17.518Z",
   "outDirPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out",
   "knowledgeDirPath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox",
   "ragStorePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/rag-store.json",
@@ -40,18 +40,32 @@
       "slug": "pre-adaptation-of-stem-cell-derived-islet-organoids-to-h"
     },
     {
-      "fileName": "202604061501+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
-      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604061501+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
-      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604061501+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
+      "fileName": "202604060828+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
+      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604060828+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
+      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604060828+brachio-cervical-inflammatory-myopathy-multilevel-clinic+10.1007_s00401-026-03006-5.kb.md",
       "doi": "10.1007/s00401-026-03006-5",
       "slug": "brachio-cervical-infammatory-myopathy-multilevel-clinica"
     },
     {
-      "fileName": "202604061502+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
-      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604061502+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
-      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604061502+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
+      "fileName": "202604060852+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
+      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604060852+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
+      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604060852+linc00607-facilitates-endothelial-vegf-a-receptor-flt1-s+10.1016_j.ymthe.2026.03.038.kb.md",
       "doi": "10.1016/j.ymthe.2026.03.038",
       "slug": "journal-pre-proof"
+    },
+    {
+      "fileName": "202604061516+myofibroblast-programming-blocks-differentiation-of-tls-+10.1016_j.ccell.2026.03.004.kb.md",
+      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604061516+myofibroblast-programming-blocks-differentiation-of-tls-+10.1016_j.ccell.2026.03.004.kb.md",
+      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604061516+myofibroblast-programming-blocks-differentiation-of-tls-+10.1016_j.ccell.2026.03.004.kb.md",
+      "doi": "10.1016/j.ccell.2026.03.004",
+      "slug": "authors"
+    },
+    {
+      "fileName": "202604061516+radiotherapy-synergizes-with-an-inducible-aav-based-immu+10.1016_j.ccell.2026.02.013.kb.md",
+      "outPath": "/Users/tianhui/Webstart/bioagent/side-tools/pdf-text-cleanup/out/202604061516+radiotherapy-synergizes-with-an-inducible-aav-based-immu+10.1016_j.ccell.2026.02.013.kb.md",
+      "knowledgePath": "/Users/tianhui/Webstart/bioagent/data/knowledge/literature-inbox/202604061516+radiotherapy-synergizes-with-an-inducible-aav-based-immu+10.1016_j.ccell.2026.02.013.kb.md",
+      "doi": "10.1016/j.ccell.2026.02.013",
+      "slug": "radiotherapy-synergizes-with-an-inducible-aavbased-immun"
     }
   ]
 }

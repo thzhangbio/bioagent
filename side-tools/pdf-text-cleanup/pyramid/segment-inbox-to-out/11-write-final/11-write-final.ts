@@ -1,8 +1,12 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { buildKbArchiveBasename } from "../segment-inbox-to-out.archive-name-shared.js";
+import {
+  buildKbArchiveBasename,
+  extractDoiSegmentFromArchiveBasename,
+  extractTimestampFromArchiveBasename,
+} from "../segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,
@@ -11,8 +15,34 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SEGMENT_ROOT = dirname(__dirname);
 
+function pruneOlderOutDuplicates(outDirPath: string, primaryOutPath: string): number {
+  const primaryName = basename(primaryOutPath, ".kb.md");
+  const doiSegment = extractDoiSegmentFromArchiveBasename(primaryName);
+  const primaryTimestamp = extractTimestampFromArchiveBasename(primaryName);
+  if (!doiSegment || !primaryTimestamp) return 0;
+
+  let removed = 0;
+  const candidates = readdirSync(outDirPath).filter(
+    (file) =>
+      file.endsWith(".kb.md") &&
+      file !== basename(primaryOutPath) &&
+      extractDoiSegmentFromArchiveBasename(basename(file, ".kb.md")) === doiSegment,
+  );
+
+  for (const file of candidates) {
+    const candidateBase = basename(file, ".kb.md");
+    const candidateTimestamp = extractTimestampFromArchiveBasename(candidateBase);
+    if (!candidateTimestamp || candidateTimestamp <= primaryTimestamp) {
+      unlinkSync(join(outDirPath, file));
+      removed += 1;
+    }
+  }
+
+  return removed;
+}
+
 export const segmentInboxToOut11WriteFinalStage: SegmentInboxToOutStage = {
-  name: "11-write-final",
+  name: "12-write-final",
   run(context) {
     const outDirPath = join(SEGMENT_ROOT, "..", "..", "out");
     mkdirSync(outDirPath, { recursive: true });
@@ -34,6 +64,8 @@ export const segmentInboxToOut11WriteFinalStage: SegmentInboxToOutStage = {
     }
 
     writeFileSync(primaryOutPath, context.finalMd ?? "", "utf-8");
+    const removedOutDuplicates =
+      context.options.out ? 0 : pruneOlderOutDuplicates(outDirPath, primaryOutPath);
 
     let simpleOutPath: string | undefined;
     if (context.options.alsoSimpleOut && !context.options.out && context.options.rawMd) {
@@ -49,7 +81,9 @@ export const segmentInboxToOut11WriteFinalStage: SegmentInboxToOutStage = {
         primaryOutPath,
         simpleOutPath,
       },
-      "11-write-final: wrote final KB markdown output.",
+      removedOutDuplicates > 0 ?
+        `11-write-final: wrote final KB markdown output and pruned ${removedOutDuplicates} older out duplicate(s).`
+      : "11-write-final: wrote final KB markdown output.",
     );
   },
 };

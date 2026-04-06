@@ -259,6 +259,102 @@ export const KB_FRAGMENT_FIXTURES: KbFragmentFixture[] = [
     expected: "-80°C",
   },
   {
+    input: "$T =$\n",
+    expected: "T =\n",
+  },
+  {
+    input: "$N = 3 { - } 5$",
+    expected: "N = 3–5",
+  },
+  {
+    input: "$\\zeta n = 8$",
+    expected: "n = 8",
+  },
+  {
+    input: "$T _ { H } \\mathsf { 1 }$",
+    expected: "Th1",
+  },
+  {
+    input: "${ T } { L } { S } ^ { 13 }$",
+    expected: "TLS^13",
+  },
+  {
+    input: "$50 m M$",
+    expected: "50 mM",
+  },
+  {
+    input: "$\\textstyle - 80 ^ { \\circ } C$",
+    expected: "-80°C",
+  },
+  {
+    input: "${ 72 ^ { \\circ } } C$",
+    expected: "72°C",
+  },
+  {
+    input: "$N _ { 2 }$",
+    expected: "N₂",
+  },
+  {
+    input: "$2 ^ { - \\Delta C t }$",
+    expected: "2^(-ΔCt)",
+  },
+  {
+    input: "$100 \\mu \\rho B S$",
+    expected: "100 μL PBS",
+  },
+  {
+    input: "$15 ^ { \\circ } C)$",
+    expected: "15°C)",
+  },
+  {
+    input: "$37 ^ { \\circ } C)$",
+    expected: "37°C)",
+  },
+  {
+    input: "$900 ~ m / z$",
+    expected: "900 m/z",
+  },
+  {
+    input: "$4 ^ { \\circ } C.$",
+    expected: "4°C.",
+  },
+  {
+    input: "$\\cdot \\kappa B \\mathsf { 2 }$",
+    expected: "κB2",
+  },
+  {
+    input: "${ A } – 485 ^ { 44 }$",
+    expected: "A-485",
+  },
+  {
+    input: "$0.3 g / \\mathsf { k g }$",
+    expected: "0.3 g/kg",
+  },
+  {
+    input: "$250 U / m |$",
+    expected: "250 U/ml",
+  },
+  {
+    input: "$1.9 \\ \\mu m$",
+    expected: "1.9 μm",
+  },
+  {
+    input: "$( 5 ~ \\mu \\varrho / m |$",
+    expected: "(5 μg/ml",
+  },
+  {
+    input: "$( 1 \\ \\mu g / m l$",
+    expected: "(1 μg/ml",
+  },
+  {
+    input: "$( 5 ~ \\mu \\varrho / m \\mu$",
+    expected: "(5 μg/ml",
+  },
+  {
+    input: "$10, 000 { - } 25, 000 \\ \\mu m ^ { 2 } )$",
+    expected: "10,000–25,000 μm²)",
+  },
+  {
     input: "$7 \\mathrm { - } \\mu m$",
     expected: "7-μm",
   },

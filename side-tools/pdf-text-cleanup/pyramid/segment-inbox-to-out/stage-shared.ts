@@ -10,8 +10,9 @@ export const SEGMENT_INBOX_TO_OUT_STAGE_NAMES = [
   "08-cleanup-kb-specific",
   "09-formula-fragments",
   "10-metadata-fetch",
-  "11-write-final",
-  "12-inbox-sync",
+  "11-quality-gate",
+  "12-write-final",
+  "13-inbox-sync",
 ] as const;
 
 export type SegmentInboxToOutStageName =

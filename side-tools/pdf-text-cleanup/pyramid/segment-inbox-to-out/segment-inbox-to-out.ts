@@ -18,6 +18,7 @@ import { segmentInboxToOut07CleanupGenericStage } from "./07-cleanup-generic/07-
 import { segmentInboxToOut08CleanupKbSpecificStage } from "./08-cleanup-kb-specific/08-cleanup-kb-specific.js";
 import { segmentInboxToOut09FormulaFragmentsStage } from "./09-formula-fragments/09-formula-fragments.js";
 import { segmentInboxToOut10MetadataFetchStage } from "./10-metadata-fetch/10-metadata-fetch.js";
+import { segmentInboxToOut11QualityGateStage } from "./11-quality-gate/11-quality-gate.js";
 import { segmentInboxToOut11WriteFinalStage } from "./11-write-final/11-write-final.js";
 import { segmentInboxToOut12InboxSyncStage } from "./12-inbox-sync/12-inbox-sync.js";
 
@@ -33,6 +34,7 @@ export const segmentInboxToOutStages: SegmentInboxToOutStage[] = [
   segmentInboxToOut08CleanupKbSpecificStage,
   segmentInboxToOut09FormulaFragmentsStage,
   segmentInboxToOut10MetadataFetchStage,
+  segmentInboxToOut11QualityGateStage,
   segmentInboxToOut11WriteFinalStage,
   segmentInboxToOut12InboxSyncStage,
 ];

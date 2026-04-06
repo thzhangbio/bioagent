@@ -1,0 +1,849 @@
+---
+kb_metadata:
+  title: "Radiotherapy synergizes with an inducible AAV-based immunotherapy platform to program local and systemic antitumor immunity"
+  authors: "Sonia Marco; Myriam Fernández; Beatriz Honorato; Nerea Juanarena; Cristina Sainz; Ainhoa Andueza; David J. Gould; Seth Anderson; Carlos de Andrea; Paulo Pérez Domínguez; Paolo Wong; Carlos Vásquez; Irene Narinda; Carmen Unzu; Sergio Isola; Beatriz Tavira; Mikel Ariz; Gracián Camps; Miguel F. Sanmamed; Julián Pardo; Sara Labiano; Marta M. Alonso; Javier Marco-Sanz; Elizabeth Guruceaga; María Collantes; Jon Ander Simón; Iván Peñuelas; Joaquín Fernández-Irigoyen; Enrique Santamaría; Jesús Prieto; Juan Dubrot"
+  journal: "Cancer Cell"
+  doi: "10.1016/j.ccell.2026.02.013"
+  doi_url: "https://doi.org/10.1016/j.ccell.2026.02.013"
+  published: "2026-03-01"
+  abstract: "Radiotherapy (RT) can prime the immune system against cancer but often fails to generate effective antitumor responses due to concomitant induction of immunosuppressive factors. To overcome this limitation, we built upon the observation that RT enhances adeno-associated vectors (AAVs) tumor transduction through the epigenetic modification of vector episomes. We designed an AAV-based platform to deliver immunostimulatory cytokines through an interferon (IFN)-inducible promoter that allows for spatial control of transgene expression into irradiated tumors. As opposed to a constitutive system, local delivery of a vector encoding for inducible IL-12 (AAV-iIL12) achieves an efficient production of the cytokine without significant toxicity. Combination of RT and AAV-iIL12 generates a highly immunostimulatory tumor microenvironment (TME) leading to robust local and systemic antitumor responses in an IFNγ- and FAS-dependent manner, able to overcome common immune-evasion mechanisms. Our work shows that radiation coupled with AAV-based immune-gene delivery is an efficient and safe approach to treat cancer."
+  provenance:
+    title: crossref
+    authors: crossref
+    journal: crossref
+    doi: crossref
+    published: crossref
+    abstract: europepmc
+---
+# Radiotherapy synergizes with an inducible AAVbased immunotherapy platform to program local and systemic antitumor immunity
+
+# Authors
+
+Sonia Marco, Myriam Ferna´ ndez, Beatriz Honorato,..., Enrique Santamarı´a, Jesu´ s Prieto, Juan Dubrot
+
+# Correspondence jprieto@unav.es (J.P.), jdubrot@unav.es (J.D.)
+
+# In brief
+
+Marco et al. demonstrate that radiotherapy epigenetically reprograms AAV episomes to enhance transgene expression. They present an inducible AAV platform that allows tumor-restricted cytokine delivery. Intratumoral AAV-iIL12 injection following irradiation safely induces robust local and systemic antitumor immunity, revealing a synergy between radiotherapy and an AAV-based immunotherapy for cancer treatment.
+
+# Highlights
+
+• RT enhances AAV-mediated transduction via epigenetic remodeling of the AAV episome
+
+• IFN-inducible AAV system allows spatial control of cytokine expression
+
+• Local RT+AAV-iIL12 safely triggers local and systemic antitumor immunity
+
+• Combination therapy overcomes common immune-evasion mechanisms
+
+# Article
+
+# Radiotherapy synergizes with an inducible AAV-based immunotherapy platform to program local and systemic antitumor immunity
+
+Sonia Marco,1 Myriam Ferna´ ndez,1 Beatriz Honorato,1 Nerea Juanarena,1 Cristina Sainz,1 Ainhoa Andueza, David J. Gould,2 Seth Anderson,3 Carlos de Andrea,4,5 Paulo Pe´ rez Domı´nguez,4,5 Paolo Wong,1 Carlos Va´ squez, Irene Narinda,1 Carmen Unzu,6 Sergio Isola,6 Beatriz Tavira,1 Mikel Ariz,7 Gracia´ n Camps,4,8 Miguel F. Sanmamed,4,8,9 Julia´ n Pardo,10 Sara Labiano,1,4,11 Marta M. Alonso,1,4,11 Javier Marco-Sanz,1,4,11 Elizabeth Guruceaga,4,12 Marı´a Collantes, ³,¹³ Jon Ander Simo´ n,4,13 Iva´ n Pen˜ uelas,4,13 Joaquı´n Ferna´ ndez-Irigoyen,14 Enrique Santamarı´a,14 Jesu´ s Prieto,1,15, * and Juan Dubrot1,15,16, *
+
+1Solid Tumors Program, Cima-Cancer Center Clı´nica Universidad de Navarra (CCUN), Pamplona, Spain
+
+2Centre for Biochemical Pharmacology, William Harvey Research Institute, Queen Mary University of London, London, UK
+
+3Broad Institute, Cambridge, MA, USA
+
+4Navarra Institute for Health Research (IdiSNA), Pamplona, Spain
+
+5Department of Pathology, CUN-Cancer Center Clı´nica Universidad de Navarra (CCUN), Pamplona, Spain
+
+6Gene Therapy for Rare Diseases Program, Cima-Universidad de Navarra, Pamplona, Spain
+
+7Department of Electrical, Electronic and Communications Engineering, Public University of Navarra, Pamplona, Spain
+
+8Immunotherapy and Immunology Program, Cima-Universidad de Navarra, Cancer Center Clı´nica Universidad de Navarra (CCUN), Pamplona, Spain
+
+9Department of Medical Oncology, CUN, Cima-Universidad de Navarra, Cancer Center Clı´nica Universidad de Navarra (CCUN), Pamplona, Spain
+
+10CIBER Enfermedades Infecciosas. Instituto de Salud Carlos III. Dpto. Microbiologia Radiologı´a Pediatrı´a y Salud Pu´ blica. Fac Medicina. Universidad de Zaragoza/IIS Aragon, Zaragoza, Spain
+
+11Department of Pediatrics, CUN, Pamplona, Spain
+
+12Bioinformatics Platform, Cima-Universidad de Navarra, Pamplona, Spain
+
+13Translational Molecular Imaging and Radiopharmacy Unit, CUN, Pamplona, Spain
+
+14Proteomics Platform, Navarrabiomed, Hospital Universitario de Navarra (HUN), Universidad Pu´ blica de Navarra (UPNA), IdiSNA, Pamplona, Spain
+
+15Senior author
+
+16Lead contact
+
+*Correspondence: jprieto@unav.es (J.P.), jdubrot@unav.es (J.D.)
+
+https://doi.org/10.1016/j.ccell.2026.02.013
+
+# INTRODUCTION
+
+Radiotherapy (RT) is a mainstay of cancer treatment. Around half of patients with solid tumors receive RT as part of their treatment.1 Nonetheless, radioresistance and tumor recurrence remain significant clinical challenges.2–4 Effective tumor responses to irradiation are critically influenced by the host immune system, particularly T cell responses, with several studies highlighting a link between tumor-infiltrating CD8+ T cells and radiation-induced antitumor effects.5–7 By producing DNA damage and immunogenic cell death of cancer cells, ionizing radiation (IR) increases the release of tumor antigens
+
+Figure 1. Radiotherapy enhances AAV-mediated tumor transduction both in vitro and in vivo (A and B) Percentage of mouse MC38 (A) or human RT-112 (B) GFP+ cells transduced with AAV-cGFP.
+
+(C) GFP mean fluorescence intensity (MFI) levels in GFP+ MC38 (left) and RT-122 (right) 3 days after transduction with AAV-cGFP.
+
+(D) GFP MFI in GFP+ B16 cells 3 days after indicated doses of RT, followed by AAV-cGFP transduction. E) GFP MFI in GFP+ B16 cells 3 days after transduction with AAV-cGFP added at the indicated times after irradiation.
+
+(F) Fold change of luciferase activity in tumor cells transduced with AAV-iLuc or mRNA-Luc lipid nanoparticles (LNPs).
+
+# Cancer Cell and the generation of neoantigens, expanding the immunopeptidome presented to T cells by antigen-presenting cells (APCs).8–12 Likewise, RT increases the production of type I interferon (IFN) through the cGAS-STING pathway and enhances the expression of MHC class I molecules.13,14 However, although RT primes the immune system against the tumor, it also induces of a wide spectrum of immunosuppressive factors, including PD-L1, TGFβ, adenosine, and chemokines that attract a variety of immunoinhibitory cell populations such as immunosuppressive macrophages, myeloid-derived suppressor cells (MDSCs), and Tregs.8,15–22 Furthermore, RT induces vascular damage and exacerbates chronic hypoxia, giving rise to new hypoxic areas infiltrated with immunosuppressive and tumor-promoting macrophages.23 Hence, there is a great need for therapeutic approaches enabling IR to trigger fully effective antitumor immunity and enhance the curative potential of RT.
+
+In this study, we sought to engage tumor irradiation with longterm antitumor immunity using immuno-gene therapy with adeno-associated virus (AAV) which display exceptional safety profile and long-term transgene expression.24 Although their application in oncology has been limited by inefficient tumor transduction, we found that IR reprograms cellular circuits in ways that induce epigenetic modifications on vector episomes, thereby enhancing AAV-mediated gene delivery to tumors. These effects offer an attractive opportunity for combining RT and AAV-based immuno-gene therapy to treat cancer.
+
+By leveraging the biological effects of IR, we designed an AAV-based platform for cytokine delivery that allows spatial control of transgene expression using an IFN-inducible promoter. This system enables the expression of immunostimulatory elements into irradiated tumors to remodel the tumor microenvironment (TME). To test our platform as an effective immunotherapy, we used an AAV vector that encodes for single-chain IL-12, an essential immune activator of both innate and adaptive immune responses,25–28 under the control of the IFN-inducible promoter (AAV-iIL12). Clinical trials using recombinant IL-12 have failed mainly due to systemic toxicity or insufficient levels of active IL-12 in target tissues.29–34 As opposed to vectors expressing IL-12 with a constitutive promoter, which led to fatal toxicity, the IFN-inducible system enabled cytokine expression selectively within the tumors without major adverse effects. This strategy programmed a cooperative IFNγ-dependent and FASL-mediated immune response, causing tumor regression in primary and distant tumor lesions and overcoming classical mechanisms of resistance to immunotherapy. Our work provides compelling evidence of a positive interplay between RT and AAV-based immuno-gene therapy and highlights their considerable antitumor potential when used in combination.
+
+# RESULTS
+
+# RT enhances AAV-mediated tumor transduction both in vitro and in vivo
+
+To analyze the influence of RT on AAV-mediated tumor transduction, we first assessed the transduction efficiency of AAV in irradiated tumor cells in vitro. Tumor cells were irradiated (8Gy) immediately before transduction with an AAV vector (AAV8 serotype) encoding the fluorescent protein GFP under the control of the constitutive promoter CAG (AAV-cGFP). The percentage of GFP-expressing cells was consistently higher in the irradiated condition in both mouse and human cell lines (Figures 1A, 1B, and S1A). Although transgene expression progressively decreased due to cell proliferation, GFP+ cells were detected for more than 10 days after infection in irradiated cells. Moreover, the level of expression of GFP per cell was significantly higher among transduced cells in the irradiated conditions (Figures 1C and S1B). This phenomenon was observed in a dose-dependent manner, as increasing RT doses correlated with higher levels of GFP expression (Figures 1D and S1C). The effect of IR on transgene expression was maintained for at least one hour but progressively decreased thereafter when AAV addition was delayed after RT (Figure 1E). Similar results were obtained with AAV5 and AAV9 serotypes (Figure S1D). Of note, cell irradiation enhanced AAV-mediated transduction but had no effect on expression from non-viral vectors such as mRNA lipid nanoparticles (Figure 1F), consistent with a specific impact on AAV biology.
+
+We did not observe differences in copy numbers of vector genomes (vg) between conditions (Figure 1G), suggesting that RT enhanced transgene expression without altering the entrance of the vector into the cell. Cell transduction was entirely blocked in AAVR-deficient cells, a transmembrane protein essential for efficient intracellular transport of multiple AAV serotypes, including AAV835 (Figure S1E), ruling out alternative trafficking routes triggered by RT. Radiation triggers DNA damage responses (DDRs), which promote the synthesis of the complementary AAV-DNA strand.36–38 However, we observed that IR equally augmented cell transduction by single-stranded (ss) and double-stranded (ds, or self-complementary) AAVs (Figure S1F), indicating that RT triggers alternative mechanisms to boost AAV transgene expression.
+
+We compared the phosphoproteome of irradiated and control B16 cells, identifying epigenetic regulation and chromatin remodeling—histone/DNA modifiers (EZH2, HDAC2, CBP, KDM7A, KAT6A) and SWI/SNF components (ARID1A, ARID1B, PBRM1, SMARCA4, and SMARCC1)—as major pathways altered by RT (Figures S2A and S2B). Recent studies have reported that transduction efficiency is related to epigenetic (G) Quantification of AAV-ITR by qPCR from control or irradiated (8Gy) MC38 cells at the indicated time points after AAV transduction.
+
+(H) CAG qPCR from chromatin immunoprecipitation with anti-H3K27ac.
+
+(I) GFP MFI in B16 cells transduced with AAV-cGFP in the presence of indicated concentrations of A-485. Western blot for H3K27ac and total H3.
+
+(J) ITR qPCR from chromatin immunoprecipitation with anti-YY1 in MC38 cells transduced with AAV WT or YY1-binding site mutant.
+
+(K) GFP MFI levels in GFP+ B16 cells transduced with AAV-GFP WT (left) or YY1-binding site mutant (right) 3 days after transduction.
+
+(L and M) IHC analysis of GFP expression in MC38 (L) or RT112 (M) tumor sections, next to representative images with the indicated conditions. Points represent the mean values from two independent sections from the same tumor. Data are presented as mean ± SEM. *p < 0.05, **p < 0.01, ***p < 0.001, and ***p < 0.0001 (one-way ANOVA followed by Tukey’s test in A, B, C, D, E, I, L, and M; unpaired, two-sided Student’s t test in F, G, H; two-way ANOVA followed by Tukey’s test in J and K). See also Figures S1–S3.
+
+modifications of AAV episomes (primarily circularized dsDNA), which can form chromatin-like structures similarly to genomic DNA.39–42 In particular, AAV-DNA demethylation and histone modification H3K27ac have been linked with active transgene expression.39,40,43 Indeed, the promoter region of the AAV vector exhibited a significant reduction of methylation (Figure S2C) and increased association with activating histone mark H3K27ac in the irradiated conditions (Figure 1H). Selective inhibition of histone acetyl transferases (HAT) p300/CBP with A-485 resulted in a significant reduction of AAV transgene expression in irradiated cells (Figures 1I and S2D). Moreover, radiation promoted the binding of YY1 to the vector genome (Figures 1J and S2E). YY1 is a transcription factor and chromatin organizer with a wide range of functionalities45 that can regulate gene expression through direct interaction with p300/CBP, among others. Mutation of two single nucleotides in the YY1-binding motif reduced the effects of RT on AAV transduction (Figure 1K). Collectively, these findings indicate that epigenetic modification and YY1 recruitment are key mechanisms underlying the stimulatory effect of RT on AAV-mediated transduction.
+
+We next evaluated AAV biodistribution upon intratumor (i.t.) injection. Technetium-99m (Tc-99m)-labelled AAV capsids were analyzed by single-photon emission computed tomography/ computed tomography (SPECT/CT) scan. 3h after i.t. injection, capsids were detected almost exclusively within the tumors as opposed to intravenous (i.v.) delivery, which results in predominant accumulation of AAV8 in liver and spleen (Figure S3A). Tumor irradiation favored capsid retention 24h after vector administration (Figure S3B), although no significant differences were observed in viral genomes between conditions 48h after i.t. delivery of AAV (Figure S3C).
+
+Finally, we measured AAV transgene expression in control or RT-treated tumors in vivo. For that, we implanted MC38 (mouse) or RT112 (human) cells into wild-type (WT) or immunodeficient Rag2−/−; Il2rg−/− mice, respectively. Established tumors were locally irradiated with 8 or 20 Gy before i.t. injection of AAVcGFP. As observed in vitro, RT enhanced transduction of tumors (Figures 1L, 1M, S3D, and S3E) in a YY1-dependent manner (Figure S3F). In summary, local irradiation primes tumors for enhanced AAV transduction, highlighting an interplay that can be exploited for cancer therapy.
+
+# Design of an AAV vector enabling spatial control of transgene expression in irradiated tumors
+
+We then designed a vector that leverages the ability of IR to enhance AAV-mediated tumor transduction to develop an AAV-based immuno-gene therapy for cancer (Figure 2A). Transgene expression was spatially controlled with an inducible promoter containing IFN-stimulated response elements (ISREs) as IR causes the production of type-I IFN through the cGAS-STING pathway.13,46 In addition, the vector genome was equipped with binding sites for the liver-specific miR122 to block transgene expression in hepatocytes,47 a relevant modification based on the strong tropism for the liver (Figure S3C), which continuously produces low levels of type I IFN.48
+
+To test this system, we first performed an in vitro bioluminescence imaging (BLI) assay. B16 cells were transduced with an AAV expressing luciferase under the control of the IFN-inducible promoter (AAV-iLuc) at high multiplicity of infection (MOI). As predicted, luciferase expression was triggered upon IFN stimulation. Notably, IR was sufficient to induce transgene expression with the inducible promoter, although this effect was reduced compared to what was observed with the constitutive promoter CAG (AAV-cLuc) (Figure 2B). However, stimulation with IFNs caused a marked induction of transgene expression in irradiated cells. As expected, the addition of IFN had no effect on cells transduced with AAV-cLuc (Figure 2B). In vivo BLI analysis showed that the local injection of AAV-iLuc into irradiated nodules restricted luciferase expression to the tumor tissue. Conversely, in mice inoculated i.t. with AAV-cLuc, the transgene was expressed in the irradiated tumor but also systemically (Figure 2C). As shown in previous experiments, RT enhanced the transduction of tumors inoculated with AAV-iLuc or AAViGFP (Figures 2D and S4A). Importantly, experiments in mice with two tumors, of which only one received RT, showed that the expression of the transgene was restricted to the irradiated tumor even when AAV-iLuc was given intravenously (Figure 2E). Of note, local injection of AAV-iLuc into irradiated tumors resulted in prolonged transgene expression with increasing levels of luciferase activity during the entire study period (Figure 2F). On the other hand, in the bilateral tumor system, we did not observe luciferase expression in the left tumor treated with RT 3 days after AAV-iLuc injection into the irradiated right tumor, confirming the restricted spatial control achieved with our system (Figure 2F).
+
+# Integration of RT with an AAV-based cytokine delivery for cancer immunotherapy
+
+We then sought to engage tumor irradiation with antitumor immunity by using immuno-gene therapy to demonstrate the potential of an AAV-based platform for immunotherapy of cancer. For that, we generated vectors encoding for single-chain IL-12p70 (AAV-iIL12), IL-15 and IL-15Rα (AAV-iIL15), FLT3L (AAViFLT3L), and a bicistronic construct containing sequences for both IL-12 and IL-15/IL-15Rα separated by a self-cleaving peptide P2A in a single expression cassette (AAV-iIL12-P2A-IL15) (Figure 3A). In all cases, cytokine expression was significantly enhanced by RT both in vitro and in vivo (Figures 3B and 3C). Liver transduction and systemic cytokine release were inhibited by miR122 binding sites, which was effective even upon i.v. administration (Figure S4B). To demonstrate the biological activity of AAV-based cytokine delivery, we analyzed changes within the TME. AAV-mediated expression of IL-12, IL15/IL-15Rα, or FLT3L in irradiated tumors increased infiltration of CD8+ T cells, NK, and dendritic cells (DCs), respectively (Figure 3D). Expression of IL-15/IL-15Rα or FLT3L in combination with RT had no impact on tumor growth (Figure 3E). Conversely, both IL12-encoding vectors induced a marked antitumor control and were well tolerated (Figures 3E and S4C). Importantly, while the inducible expression of IL-12 maintained a long-term antitumor efficacy without evident signs of toxicity, constitutive expression of IL-12 under the control of the CAG promoter (AAV-cIL12) caused a dramatic weight loss in treated animals (Figures 3F and 3G). Finally, the measurement of local and systemic IL-12 confirmed that AAV-iIL12 exhibited a highly selective local expression compared to AAV-cIL12 (Figure 3H).
+
+Altogether, these findings demonstrate that AAV containing an IFN-inducible promoter achieves spatial control of transgene
+
+A
+
+C
+
+D
+
+B
+
+F
+
+Figure 2. IFN-inducible AAV vector system enables selective transgene expression in irradiated tumors (A) Schematic representation of the inducible AAV vector design.
+
+(B) Luciferase activity (relative light units, RLU) in B16 cells. When indicated, cells were irradiated (8Gy) and stimulated with IFN for 6h prior to analysis.
+
+(C) Comparison of in vivo bioluminescence 5days after i.t. injection of AAV-cLuc (left) or AAV-iLuc (right) in MC38 tumor-bearing mice (5 mice per group).
+
+(D) In vivo bioluminescence images taken 5days after AAV inoculation in MC38-bearing mice exposed to 0 or 8 Gy as indicated (5/group). Quantification of the total luciferase signal is shown on the right.
+
+(E) In vivo bioluminescence 2days after treatment. Bilateral MC38 tumor-bearing mice received RT (0, 8, or 20 Gy) in the right tumor, followed by the intravenous injection of AAV-iLuc (5/group). Graph shows the quantification of total luciferase signal in both left (no RT) and right tumors (indicated RT doses).
+
+(F) Schematic design. Right tumors were treated with RT (8 Gy), followed by i.t. injection of AAV-iLuc. Three days later, the left tumor received 8 Gy. After AAV administration, in vivo bioluminescence was monitored at the indicated times. (5/group). Graph shows the quantification of total luciferase activity over time in AAV-treated tumors (red dots) and contralateral tumors (gray). Representative images of bioluminescence emission at the indicated days after initial RT and AAV administration are shown at the bottom. Data are presented as mean ± SEM. *p < 0.05, **p < 0.01, ***p < 0.001, and ***p < 0.0001 (two-way ANOVA followed by Tukey’s test in B, E; unpaired, two-sided Student’s t test in D, F). See also Figure S4.
+
+A
+
+B
+
+E
+
+H
+
+Figure 3. Integration of RT with an AAV-based cytokine delivery for cancer immunotherapy (A) Schematic representation of the AAV vectors with the IFN-inducible promoter.
+
+(B) Cytokine levels in B16 cells 72h after RT. Cells were transduced and stimulated with IFNα for the last 12h of culture.
+
+(C) Cytokine levels in tumors from animals inoculated with B16 tumor cells 3 days after RT (0Gy, 4Gy or 8Gy) followed by i.t. injection of indicated AAVs (5/group).
+
+(D) Tumor-infiltrating cells from B16 tumors analyzed 6 days after treatment with 8 Gy RT and indicated AAV vectors (5/group).
+
+expression into irradiated tumors and can be exploited as an efficient immuno-gene therapy for cancer.
+
+# Combination of RT and AAV-based IL-12 delivery eradicates tumors without systemic toxicity
+
+In order to maximize the therapeutic efficacy of this strategy, we next determined the optimal radiation and vector doses. Both parameters exhibited a dose-dependent effect, as intratumor levels of IL-12 correlated with radiation and vector doses (Figure S5A). As observed in vitro (Figure 1E), the delay between tumor irradiation and vector inoculation beyond 6h resulted in reduced levels of IL-12 (Figure S5B). We then analyzed the antitumor potential of this treatment in several subcutaneous and orthotopic tumor models. RT in combination with a control AAV (AAV-iLuc) had minimal effects in MC38 (colorectal carcinoma), B16 (melanoma), LLC (lung adenocarcinoma), MB49 (bladder cancer), and KPC (pancreatic cancer) tumor-bearing animals (Figures 4A–4D and S5C–S5F). Local injection of AAV-iIL12 into non-irradiated tumors showed a significant reduction of tumor growth in all tumor models, although it led to complete tumor rejection in only a small fraction of the animals. However, administration of AAV-iIL12 into irradiated tumors resulted in complete tumor clearance in all MC38 tumor-bearing mice, ~80% of the animals in KPC and MB49 models, and 33% in the aggressive LLC lung adenocarcinoma model. In the B16 melanoma model, although no tumor rejection was achieved at these doses, RT + AAV-iIL12 induced a robust tumor growth inhibition and a significant increase in overall survival (Figures 4B and S5D). A similar therapeutic effect was observed even when treatment was applied to tumors of 400 mm³ (Figure S5G). The combination of RT and AAV-iIL12 synergized with immune checkpoint blockade (ICB) and the addition of anti-PD-1 or CTLA-4 antibodies improved antitumor responses in B16 tumors (Figure S5H). Moreover, local administration of AAV-iIL12 after RT significantly increased the survival of treated mice in an orthotopic model of glioblastoma (Figure 4E). Finally, we tested a human version of the vector (AAV-ihIL12) in MHC-I and MHC-II double KO NSG (MHC-dKO NSG) mice reconstituted with human PBMCs.49 Intratumor injection of AAV-ihIL12 in irradiated tumors achieved superior antitumor responses compared to control AAV in RT-122-bearing humanized mice (Figure 4F). As expected, the antitumor effects of RT ⁺ AAV-iIL12 were dependent on the immune system (Figure 4G) and were able to generate immune memory (Figure S5I).
+
+The antitumor responses correlated with the local production of IL-12, which peaked at day 3 after treatment and remained detectable at least one week after treatment (Figure 4H). The decline of cytokine levels between days 3 and 7 could reflect tumor regression and consequent loss of AAV-transduced cells, as no reduction of transgene expression was observed in previous BLI assays (Figure 2F). Importantly, elevated intratumoral levels of IL-12 were accompanied by low serum levels that declined to near basal levels over time (Figure 4I). Similar dynamics were observed for IFNγ, a key mediator of IL-12 activity (Figure S6A). As such, treatment was well tolerated, and animals exhibited normal body weight (Figure 3G). Serum transaminases were moderately elevated, but liver function was not altered (Figures S6B and S6C). Only subtle changes were observed in hemograms of treated animals, which showed mild thrombocytopenia and lymphopenia, known side effects of RT (Figure S6D). No tissue damage was detected in the lung, intestine, kidney, or spleen (Figure S6E). Collectively, these data demonstrate that the combination of RT with AAV-mediated inducible delivery of IL-12 is a safe strategy able to activate potent antitumor immunity in a variety of preclinical tumor models.
+
+# Combination of RT and AAV-iIL12 reshapes the immune composition of the TME
+
+We next studied the immunological landscape in B16 tumors treated with radio-immunogene therapy. The combination of RT ⁺ AAV-iIL12 induced a marked inflammatory TME with an increase of total immune cells (CD45+), and significantly augmented proportions of CD8+ T cells, pro-inflammatory tumor-associated macrophages (Inf-Mac), and MHCII-expressing myeloid cells (Figure S7A). Compared to control groups, AAV-iIL12-treated tumors had decreased proportions of regulatory CD4+ T cells (Treg), NK cells, anti-inflammatory macrophages (Supp-Mac), and tumor-associated neutrophils (TANs) significantly. Single-cell RNA-seq (scRNA-seq) of tumor-infiltrating CD45+ immune cells confirmed the rewiring of the TME with a strong repolarization of the myeloid compartment in tumors treated with AAV-iIL12 (Figures 5A and 5B). AAVbased delivery of IL-12 altered the phenotype and proportions of myeloid subsets, with higher frequencies in pro-inflammatory monocytes and Cxcl10+ Isg15+ Inf-Mac (classically referred to as ‘‘M1’’ phenotype) and decreased the presence of suppressive populations such as myeloid-derived suppressor cells (MDSCs) or Arg1+ Spp1+ Supp-Mac (associated with ‘‘M2’’ phenotype) (Figures 5A and 5B). Gene set enrichment analysis (GSEA) performed in the bulk myeloid populations showed enhanced expression of hallmarks associated with response to type I and II IFNs, suggesting a role of these cytokines in the shift observed in AAV-iIL12-treated tumors (Figure 5C). Consequently, tumor-infiltrating myeloid cells expressed higher levels of Ccl5, Cxcl9, and Cxcl10 chemokines (Figure S7B), which are potent T cell chemo-attractants and required for antitumor immune responses.50,51 In addition, treatment with AAV-iIL12 increased the migration of DC from tumors to tumor-draining lymph nodes (Figures 5A, 5B, and S7C).
+
+We identified several subpopulations of T and NK cells, including six distinct subsets of CD8+ T cells representing a (E) Tumor growth of s.c. B16 tumor-bearing individual mice after 8Gy RT and i.t. injection of indicated AAVs (6–7/group) merged with control treatment (AAV-iLuc) (up) and survival curves (down).
+
+(F) B16 tumor growth in mice treated with local RT followed by i.t. injection of AAV-iLuc, AAV-cIL12 (constitutive), or AAV-iIL12 (IFN-inducible).
+
+(G) Percentage of body weight in B16 tumor-bearing mice treated as in F.
+
+(H) Tumor (left) and serum (middle) levels of IL-12 7days after treatment with the indicated AAV. Right panel shows the tumor/serum ratios (6–9/group). Data are presented as mean ± SEM. *p < 0.05, **p < 0.01, ***p < 0.001, and ***p < 0.0001 (one-way ANOVA followed by Tukey’s test in B, C, D, and G; log rank test in E; two-sided Student’s t test in H). See also Figure S4.
+
+Figure 4. Therapeutic efficacy of local RT and AAV-iIL12 across multiple tumor models (A–C) Tumor growth of s.c. MC38 (A), B16 (B), or LLC (C) tumor-bearing mice treated with RT followed by the intratumoral injection of AAV-iLuc or AAV-iIL12 (6– 10/group).
+
+(D) Waterfall plot showing the percentage change in tumor volume at day 21 relative to baseline in orthotopic pancreatic tumors. Images show representative tumors for each group at day 22.
+
+(E) Overall survival of mice implanted with GL261 orthotopic tumors and treated as indicated.
+
+(F) Humanized MHC-dKO NSG mice were inoculated with RT-122 cells and treated with local RT (8 Gy) followed by i.t. injection of AAV-iLuc or AAV-iIL12 (6/group).
+
+(G) MC38 tumor growth in Rag2−/−; Il2rg−/− mice treated with RT followed by i.t. injection of AAV-iLuc or AAV-iIL12 (6/group).
+
+(H) IL-12 levels in MC38 (left) or B16 (right) tumors (4–8/group).
+
+(I) Serum levels of IL-12 in mice with s.c. B16 tumors treated as indicated (8/group). Data are presented as mean ± SEM. *p < 0.05, **p < 0.01, ***p < 0.001, and ***p < 0.0001 (one-way ANOVA followed by Tukey’s test in A, B, C, D, and H; unpaired, two-sided Student’s t test in F, G; log rank test in E). See also Figures S5 and S6.
+
+range of phenotypes from resting to exhausted (Figures 5D and S7D). A comparison between the two treatment conditions revealed higher proportions of proliferative (Mki67+ ), effector (IFNγ+, Gzmb+, and Prf1+ ) and stem-like exhausted CD8+ T cells (Tcf1+, Pdcd1+ ) accompanied by fewer resting (Tcf1+ and Tcf7 + ) and terminally exhausted (Tox+, Pdcd1 +, and Havcr2 + ) CD8+ T cells in the RT ⁺ AAV-iIL12-treated condition (Figures 5D, 5E, and S7D). Additionally, NK cells from tumors treated with RT ⁺ AAV-iIL12 exhibited proliferative and effector phenotypes in sharp contrast with the resting phenotype observed in NK from control tumors (Figures 5D, 5E, and S7D). Moreover, the combined expression score for gene sets of effector signature, cytolytic activity, and IFN response on T and NK clusters was significantly increased in the AAV-iIL12- treated condition (Figure 5F). Accordingly, we found higher production of IFNγ and TNFα in tumor-infiltrating CD8+ T cells from AAV-iIL12-treated tumors, as well as an IL12-dependent expansion of TRP2 tumor-specific CD8+ T cells (Figure S7E).
+
+A
+
+B
+
+D
+
+E
+
+F
+
+Figure 5. Combination of RT and AAV-iIL12 promotes an intense rewiring of the tumor microenvironment (A) UMAP (left) and density projections (middle and right) of immune-infiltrating cells obtained from B16 tumors (3/group).
+
+(B) Relative proportions of cell subsets based on treatment.
+
+(C) GSEA of pathways significantly upregulated in myeloid cells from mice treated with RT ⁺ AAV-iIL12.
+
+# The antitumor effect of RT and AAV-iIL12 is IFNγ-dependent and FAS-mediated
+
+Even upon RT, B16 tumors showed negligible CD8+ T cell infiltration (Figure 6A). However, local administration of AAV-iIL12 triggered a strong recruitment of CD8+ T cells within the tumors, being significantly higher in tumors receiving AAV-iIL12 after radiation (Figure 6A). Although no significant changes in total CD31+ endothelial cells were observed (Figure S8A), tumors treated with AAV-iIL12 showed greater expression of integrin ICAM1 by endothelial cells, resulting in increased interaction with CD8+ T cells (Figure 6A), thereby facilitating lymphocyte extravasation and tumor infiltration. Moreover, RT was unable to elicit relevant changes in proinflammatory cytokines when combined with a control AAV (AAV-iLuc). However, treatment with RT ⁺ AAV-iIL12 triggered the expression of IFNγ together with TNFα, GM-CSF, and IFN-inducible chemokines such as CXCL10 and CXCL16 (Figure 6B). This surge in pro-inflammatory cytokines aligned with the strong CD8+ T cell infiltration observed in treated tumors.
+
+Despite the dense T cell infiltration observed upon treatment, depletion with CD8β-targeting antibodies did not abrogate the therapeutic activity of the combination treatment with RT ⁺ AAV-iIL12 (Figure 6C). Similar antitumor responses were observed in NK-depleted animals. However, the depletion of both CD8+ T cells and NK cells completely annulled the efficacy of the therapy in mice whose tumors received RT ⁺ AAV-iIL12. A partial reduction in treatment efficacy was observed in groups depleted of macrophage (CSFR1) and neutrophils (Ly6G) (Figure 6C). Consistent with the antitumor responses observed in the absence of CD8+ T cells, the combination of RT with AAV-iIL12 elicited tumor regression in Batf3-deficient mice (Figure 6D), which lack cross-presenting dendritic cells (DCs), essential for cytotoxic T cell responses, 5 2 and have shown resistance to other cytokine-based immunotherapies.53,54 Accordingly, PH^-1- mice displayed similar antitumor responses compared to C57BL/6 mice (Figure 6E), suggesting that direct anti-tumor cell cytotoxicity is dispensable for the therapeutic effect of RT ⁺ AAV-iIL12. CD8+ T cells and NK cells are not only direct killers of tumor cells but also constitute the main source of IFNγ downstream IL-12, which elicits multiple immune functions and is essential in tumor immunity.55,56 Indeed, the blockade of IFNγ completely abolished the antitumor responses prompted by RT and local delivery of AAV-iIL12 (Figure 6F). Even though transgene expression is controlled by an IFN-inducible promoter, neutralization of IFNγ did not completely abrogate IL-12 production by AAV-transduced cells. Intratumor IL-12 values at day 3 in mice treated with IFNγ-blocking antibodies were comparable to those observed after injecting AAV-iIL12 into non-irradiated tumors (Figure S8B), a treatment which elicited significant inhibition of tumor growth (Figure 4B).
+
+Transcriptomic analysis of tumor cells obtained from treated animals revealed a marked downregulation of hallmarks of cell proliferation and DNA repair in the AAV-iIL12 condition, suggesting a reinforcement of direct antitumor effects of RT (Figures S8C and S8D). This was accompanied by enhanced response to IFNγ, antigen processing and presentation, and macroautophagy, which are important for immune-mediated antitumor effects. Malignant cells can acquire loss-of-function mutations in the signaling pathway of IFNγ and antigen presentation machinery, both of which have been associated with resistance to immunotherapy.57–59 Despite the strong IFN-sensing signature observed in the tumor cells, the antitumor effects of the RT ⁺ AAV-iIL12 remained intact in mice bearing Ifngr1-and Jak1-null B16 tumors (Figure 6G). We next explored the role of STING, a molecule that connects DNA damage with immune activation by inducing type I IFN upon RT. However, STING expression was dispensable in both stromal and tumor cells (Figure S8E). Likewise, treatment with RT ⁺ AAV-iIL12 was also effective in B16 tumors lacking antigen presentation through MHC class I complex (Figure S8F), a process regulated by IFN. We then reasoned that antigen-independent mechanisms could drive the immune responses elicited by treatment. Among them, FAS-mediated cell death has been previously described to be enhanced by radiotherapy.60 Indeed, we observed strong expression of FAS in tumors treated with RT ⁺ AAV-iIL12 (Figure S8G) and increased the presence of FASL+ CD8+ T and NK cells (Figure S8H). Functionally, FASL blockade completely suppressed the antitumor effect of RT ⁺ AAV-iIL12, indicating a predominant role of FAS-FASL in the antitumor responses elicited by treatment (Figure 6H).
+
+Collectively, these data reveal that the combination of RT and local administration of AAV-iIL12 promotes an intense rewiring of the TME, causing IFNγ-dependent and FAS-mediated immune responses that can overcome mechanisms of resistance to immunotherapy.
+
+# Local treatment with RT and AAV-iIL12 achieves systemic antitumor immunity
+
+We next asked whether the activation of local antitumor responses with RT+AAV-iIL12 therapy could lead to systemic immunity. For that, MC38 or B16 tumors were inoculated on both flanks of the mice. Right tumors treated with RT and AAV-iIL12 responded to the therapy as observed before (Figures 7A and 7B). Although the combination reduced the growth of untreated contralateral tumors, the antitumor activity of RT and AAV-iIL12 was augmented by concomitant radiation of distant tumor nodules (Figures 7B and S9A). These results underpin the involvement of systemic immunity likely enhanced by the immunogenic effect of RT on distal tumors, rather than a potential vector escape, as IL-12 expression was not detected in non-injected contralateral tumors (Figure S9B).
+
+Multiparametric immunofluorescence performed in contralateral tumors (+/- RT but no AAV) revealed an 8-fold increase in CD8+ T cell density in animals treated with AAV-iIL12 vector
+
+A
+
+F
+
+H
+
+Figure 6. The therapeutic effect of RT and AAV-iIL12 is IFNγ-dependent and FAS-mediated (A) Immunofluorescence from B16 tumors obtained 6 days after indicated treatments (4–6/group). Graphs show the quantification of total CD8+ T cell, CD8+ T cell density, percentages of ICAM1-expressing endothelial cells, and CD8+ -CD31+ distance (boxplots represent median and interquartile range ±10–90th percentile).
+
+(B) Cytokine levels 6 days after treatment with RT (8Gy) followed by vector inoculation in B16 tumor-bearing-mice (5–6/group). C) Tumor volume 21 days after tumor inoculation in mice depleted of specific immune cell subsets and treated as indicated (4–6/group).
+
+(D) Tumor volume over time in B16 tumor-bearing C57BL/6 wild-type (left) and Batf3-deficient (right) mice treated with RT (8Gy) and indicated vector.
+
+(Figures 7C and 7D). This effect was further increased by the local radiation of left tumors, which achieved similar levels of T cell infiltration compared to RT+AAV-iIL12-treated tumors. In addition, endothelial cells in these tumors exhibited an activated phenotype as indicated by levels of ICAM1 expression. Notably, radiation of contralateral tumors not only increased CD8+ T cell numbers but also increased Granzyme B (GzB) expression in tumor-infiltrating cytotoxic T cells (Figure 7E). No changes in Treg density were observed across conditions (Figure S9C). As observed before, the depletion of both CD8+ T cells and NK cells also annulled the therapeutic efficacy of the therapy in the distal irradiated tumors (Figure S9D).
+
+Finally, we established a lung metastasis model with luciferaseexpressing B16 cells (B16-Luc cells) that were injected intravenously three days after subcutaneous inoculation of parental B16 cells as primary tumors (Figure 7F). The treatment of primary tumors with RT and AAV-iIL12 induced potent antitumor responses in both treated tumors and lungs, where no tumor activity was detected, becoming long-term survivors (Figures 7F and S9E).
+
+Taken together, these data indicate that local treatment with RT and AAV-iIL12 not only induces the regression of the treated tumor but also triggers systemic immunity that can be amplified by concomitant RT to enhance antitumor responses.
+
+# DISCUSSION
+
+RT is an essential therapy against a large variety of cancers, but radioresistance and relapse of irradiated tumors remain an unmet clinical need. To achieve its full therapeutical potential, radiation injury of cancer cells should be able to prompt an effective immune response against tumor antigens and overcome the immunosuppressive mechanisms elicited by IR.61 Yet, multiple clinical trials testing the combination of RT with immune checkpoint inhibitors have shown little success and new approaches are much needed in particular for metastatic patients.62 The use of cytokines to reshape the inhibitory TME has been evaluated for decades, although their overall clinical benefit in oncology has been limited.32,63,64 This could be explained by their complex biology and the fine balance required to achieve sufficient intratumoral levels with minimal systemic exposure. Different modalities have been explored for tumor-targeted cytokine delivery in combination or not with RT, including adenoviral vectors,65–67 collagen-anchored recombinant protein68 or microspheres.69 However, the short-term expression or the need for repeated intratumor injections are important limitations for their clinical application.32,63,64 Alternative experimental procedures using in vivo or ex vivo cell engineering with lentiviral vectors70,71 are also being investigated.
+
+AAV vectors have gained wide clinical acceptance and are the most commonly used vectors in gene therapy due to their exceptional safety profile and long-term gene expression. However, their use in oncology has been hampered by inefficient transduction of both human and murine tumors.72 Here we demonstrate that RT greatly enhances AAV-mediated tumor transduction due, at least in part, to radiation-induced epigenetic modifications in the AAV episomes. This effect on vector transgene expression is particularly remarkable as it occurs in conditions of cellular stress when transcription is generally reduced.73
+
+Mechanistically, we describe the role of YY1, a transcription factor and chromatin organizer that interacts with several epigenetic modifiers, including p300/CBP45 to regulate gene expression. Moreover, RT has been reported to induce the expression of YY1, which has been associated with radioresistance.74 Further investigation will be required to explore additional mechanisms triggered by RT that can coexist to enhance AAV-mediated tumor transduction.
+
+Thus, we have designed an AAV-based platform that leverages this interplay between IR and AAV-specific biology for cancer immunotherapy. Our system can be used to deliver a diversity of cytokines into irradiated tumors that can reshape the TME. A major concern for any cytokine-based therapy, and particularly with IL-12, is to avoid systemic toxicity. To achieve spatial control of cytokine expression, we designed recombinant AAV vectors with an interferon-inducible promoter. In addition, systemic release was prevented with the incorporation of liver-specific miR122 binding sites in the vector genome.47 We tested our platform as an effective immunotherapy of cancer with an AAV vector that encodes for single-chain IL-12 under the control of the IFN-inducible promoter. In contrast to the unrestricted IL-12 production and lethal toxicity seen with a constitutive promoter, the inducible system boosted intratumor IL-12 while keeping serum cytokines within safe limits. A sustained and gradual release of IL-12 from transduced tumors, as opposed to repeated serum peaks after recombinant cytokine injections,29 could favor the tolerance observed with RT+AAV-iIL12. It remains unclear whether AAV can be repeatedly administered intratumorally if needed. Further development and carefully designed clinical trials should focus on the type and dose of RT, vector dosing, and tumor context.
+
+Our work shows that the combination of RT+AAV-iIL12 causes profound changes within the TME that promote a cooperative effort among different immune populations, with a marked infiltration of CD8+ T cells and an intense rewiring of the myeloid compartment. Intriguingly, we did not find an anti-angiogenic activity of IL-12 in combination with RT, although vascular damage could be a potential mechanism contributing to tumor rejection following RT+AAV-iIL12 therapy. Our data revealed that, even in the absence of antigen-dependent cytotoxicity, IFNγ and FAS-mediated cancer cell death were essential in mediating the antitumor effects of the therapy. Notably, we found that FASL-neutralizing antibody completely abrogated the antitumor efficacy of the combination therapy, supporting a model in which RT and IFNγ cooperatively induce FAS expression in both malignant and stromal cells,60 while IL-12 activates NK and T cells to express FASL and secrete IFNγ. In consonance with these
+
+→RT+AAV-GFP
+
+RT ⁺ AAV-ilL12
+
+Figure 7. Local treatment induces systemic antitumor immunity (A and B) Experimental design. MC38 or B16 tumor cells were s.c. inoculated into the right and left flanks of C57BL6/J mice. When right flank tumors reached 100 mm³, tumors received local irradiation (8Gy) followed by i.t injection of AAV-iLuc or AAV-iIL12 as indicated. Left tumors remained untreated or received RT only as indicated (A). Graphs show tumor growth over time in MC38 (left) and B16 (right) (5–7/group) (B).
+
+(C) Representative images of left and right B16 tumor sections 6days after treatment, as in A), showing immunoreactivity for the indicated markers.
+
+findings, the immune activation achieved by RT+AAV-iIL12 was capable of inducing the regression of tumors where tumor cells have lost IFN signaling or antigen presentation, mutations that have been associated with acquired resistance to immunotherapy in patients with cancer.57,58 On the other hand, the IFN-inducible expression of IL-12 could also reverse immune exhaustion caused by chronic inflammation and IFN exposure, preventing its detrimental effects in antitumor responses.75–78 In this regard, RT+AAV-iIL12, by increasing tumor-infiltrating lymphocytes and by enriching the TME in T cell-attracting chemokines, creates the proper conditions for fruitful combinations with additional immunotherapies. Importantly, the combination of RT and AAV-based immunotherapy generated an antitumor immunity that was able to control tumor growth both locally and systemically. Of note, distal effects were further enhanced by concurrent irradiation. These findings are relevant for patients with oligometastatic disease, where different metastatic lesions are given RT.
+
+In summary, we have developed a therapeutic strategy that leverages complementary interactions between RT and AAV vector at different levels: i) enhanced transgene induction, ii) spatial control of transgene expression, and iii) increased tumor susceptibility to immune-mediated mechanisms of tumor cytotoxicity. Notably, the combination of RT and AAV-based immunotherapy is a versatile therapeutic platform for cancer that enables the use of vectors with different payloads and that can be combined with other forms of cancer immunotherapy.
+
+Overall, RT and AAV-based immunotherapy act synergistically to induce vigorous local and systemic antitumor immune responses resulting in tumor rejection. The immune-activating radiotherapy shown here represents an efficient and safe approach to fighting cancer with significant potential for further clinical development.
+
+# BESOUBCEAVAILABILITY
+
+# Lead contact
+
+Further information and requests for reagents and resources should be directed to the lead contact, Juan Dubrot (jdubrot@unav.es).
+
+# Materials availability
+
+Plasmids used in this study will be made available upon request, pending completion of a material transfer agreement.
+
+# Data and code availability
+
+RNA sequencing data were deposited at the GEO database under accession number GEO:GSE280080 (bulk RNA seq of B16 cells, GEO: GSE280078; scRNA-seq of CD45+ infiltrate, GEO: GSE280079) and are publicly available. The phosphoproteosome dataset was deposited at ProteomeXchange: PXD056537 and jPOST: JPST003410.
+
+# ACKNOWLEDGMENTS
+
+This work was supported by grants PID2024-160227OB-I00 (funded by MICIU/ AEI/10.13039/501100011033 and FEDER, EU), NAIARA Project (ref. 0011-1411-
+
+2025-000144, funded by Gobierno de Navarra and FEDER 2021–2027), PID2020-113963RBI00 from AEI, Aragon Government (B29-20R) and CIBERIN-FEC/Instituto de Salud Carlos III, (CB21/13/00087). We thank Juan Cabrera and Isabel Garcia, Fundacio´ n Ramo´ n Areces, Fundacio´ n Jose Soriano, Fundacio´ n Aciturri, Unicaja, Daniel Amaro and family, Jesu´ s Barderas, Antonio and Javier Catala´ n and Asociacio´ n de la Purı´sima Concepcio´ n de Burgos for financial contribution. We thank Maider Esparza and Xabier Morales from Animal Image Service, Vivarium staff, Flow Cytometry, Laura Guembe from Morphology, and Francesco Marchese from Genomics Platforms at CIMA-Universidad de Navarra for technical assistance, and Sarah Kate Lane-Reticker, Ainhoa Arina, and Ralph Weichselbaum for insightful discussions and feedback on the article. Illustrations were created with BioRender.com.
+
+# AUTHOR CONTRIBUTIONS
+
+Conceptualization, J.D. and J.P.; methodology, S.M., M.F., N.J., B.H., D.J.G., C.S., A.A., P.W., I.N., C.V., B.T., M.C., G.C., J.A.S., I.P., J.F.I., E.S., J.D., and J.P.; investigation, S.M., N.J., B.H., M.F., C.S., A.A., G.J., I.N., S.T., C.V., B.T., E.F.P., J.M.S., M.C., J.A.S., J.F.I., and E.S.; writing, J.D. and J.P.; funding acquisition, J.D. and J.P.; resources, D.J.G., C.U., S.I., J.Pa, M.F.S., and M.M.A.; formal analysis, S.M., M.F., N.J., B.H., M.A., S.A., C.A., P.P.D., E.G, J.F.I., and E.S.; supervision, J.D. and J.P.
+
+# DECLARATION OF INTERESTS
+
+S.M., B.H., D.J.G., J.P., and J.D. are inventors on patents related to this work. J.D. and J.P. receive funding from Insud Pharma. All other authors declare no competing interests.
+
+Zhou, P.-K. (2020). DNA damage response signaling pathways and targets for radiotherapy sensitization. Signal Transduct. Target. Ther. 5, 60.
+
+4. Qian, J.M., and Schoenfeld, J.D. (2020). Radiotherapy and immunotherapy for head and neck cancer: Current evidence and challenges. Front. Oncol. 10, 608772.
+
+5. Lee, Y., Auh, S.L., Wang, Y., Burnette, B., Wang, Y., Meng, Y., Beckett, M., Sharma, R., Chin, R., Tu, T., et al. (2009). Therapeutic effects of ablative radiation on local tumor require CD8+ T cells: changing strategies for cancer treatment. Blood 114,589–595.
+
+6. Weichselbaum, R.R., Liang, H., Deng, L., and Fu, Y.-X. (2017). Radiotherapy and immunotherapy: a beneficial liaison? Nat. Rev. Clin. Oncol. 14,365–379.
+
+7. Wang, Y., Liu, Z.-G., Yuan, H., Deng, W., Li, J., Huang, Y., Kim, B.Y.S., Story, M.D., and Jiang, W. (2019). The reciprocity between radiotherapy and cancer immunotherapy. Clin. Cancer Res. 25, 1709–1717.
+
+8. Charpentier, M., Spada, S., Van Nest, S.J., and Demaria, S. (2022). Radiation therapy-induced remodeling of the tumor immune microenvironment. Semin. Cancer Biol. 86,737–747.
+
+9. Lussier, D.M., Alspach, E., Ward, J.P., Miceli, A.P., Runci, D., White, J.M., Mpoy, C., Arthur, C.D., Kohlmiller, H.N., Jacks, T., et al. (2021). Radiationinduced neoantigens broaden the immunotherapeutic window of cancers with low mutational loads. Proc. Natl. Acad. Sci. USA 118, e2102611118.
+
+10. Reits, E.A., Hodge, J.W., Herberts, C.A., Groothuis, T.A., Chakraborty, M., Wansley, E.K., Camphausen, K., Luiten, R.M., de Ru, A.H., Neijssen, J., et al. (2006). Radiation modulates the peptide repertoire, enhances MHC class I expression, and induces successful antitumor immunotherapy. J. Exp. Med. 203, 1259–1271.
+
+11. Lhuillier, C., Rudqvist, N.-P., Yamazaki, T., Zhang, T., Charpentier, M., Galluzzi, L., Dephoure, N., Clement, C.C., Santambrogio, L., Zhou, X.K., et al. (2021). Radiotherapy-exposed CD8+ and CD4+ neoantigens enhance tumor control. J. Clin. Investig. 131, e138740. https://doi.org/10.1172/jci138740.
+
+12. Tailor, A., Estephan, H., Parker, R., Woodhouse, I., Abdulghani, M., Nicastri, A., Jones, K., Salatino, S., Muschel, R., Humphrey, T., et al. (2022). Ionizing radiation drives key regulators of antigen presentation and a global expansion of the immunopeptidome. Mol. Cell. Proteomics 21, 100410.
+
+13. Deng, L., Liang, H., Xu, M., Yang, X., Burnette, B., Arina, A., Li, X.-D., Mauceri, H., Beckett, M., Darga, T., et al. (2014). STING-Dependent Cytosolic DNA Sensing Promotes Radiation-Induced Type I Interferon-Dependent Antitumor Immunity in Immunogenic Tumors. Immunity 41,843–852.
+
+14. Woo, S.-R., Fuertes, M.B., Corrales, L., Spranger, S., Furdyna, M.J., Leung, M.Y.K., Duggan, R., Wang, Y., Barber, G.N., Fitzgerald, K.A., et al. (2014). STING-dependent cytosolic DNA sensing mediates innate immune recognition of immunogenic tumors. Immunity 41,830–842.
+
+15. Cytlak, U.M., Dyer, D.P., Honeychurch, J., Williams, K.J., Travis, M.A., and Illidge, T.M. (2022). Immunomodulation by radiotherapy in tumour control and normal tissue toxicity. Nat. Rev. Immunol. 22,124–138.
+
+16. Jobling, M.F., Mott, J.D., Finnegan, M.T., Jurukovski, V., Erickson, A.C., Walian, P.J., Taylor, S.E., Ledbetter, S., Lawrence, C.M., Rifkin, D.B., and Barcellos-Hoff, M.H. (2006). Isoform-specific activation of latent transforming growth factor beta (LTGF-beta) by reactive oxygen species. Radiat. Res. 166,839–848.
+
+17. De Martino, M., Daviaud, C., Diamond, J.M., Kraynak, J., Alard, A., Formenti, S.C., Miller, L.D., Demaria, S., and Vanpouille-Box, C. (2021). Activin A promotes regulatory T-cell-mediated immunosuppression in irradiated breast cancer. Cancer Immunol. Res. 9, 89–102.
+
+18. Schaue, D., Xie, M.W., Ratikan, J.A., and McBride, W.H. (2012). Regulatory T cells in radiotherapeutic responses. Front. Oncol. 2, 90.
+
+19. Allard, B., Allard, D., Buisseret, L., and Stagg, J. (2020). The adenosine pathway in immuno-oncology. Nat. Rev. Clin. Oncol. 17,611–629.
+
+20. Kalbasi, A., Komar, C., Tooker, G.M., Liu, M., Lee, J.W., Gladney, W.L., Ben-Josef, E., and Beatty, G.L. (2017). Tumor-derived CCL2 mediates resistance to radiotherapy in pancreatic ductal adenocarcinoma. Clin. Cancer Res. 23,137–148.
+
+21. Ahn, G.-O., Tseng, D., Liao, C.-H., Dorie, M.J., Czechowicz, A., and Brown, J.M. (2010). Inhibition of Mac-1 (CD11b/CD18) enhances tumor response to radiation by reducing myeloid cell recruitment. Proc. Natl. Acad. Sci. USA 107, 8363–8368.
+
+22. Rodriguez-Ruiz, M.E., Vitale, I., Harrington, K.J., Melero, I., and Galluzzi, L. (2020). Immunological impact of cell death signaling driven by radiation on the tumor microenvironment. Nat. Immunol. 21,120–134.
+
+23. Brown, J.M. (2020). Radiation damage to tumor vasculature initiates a program that promotes tumor recurrences. Int. J. Radiat. Oncol. Biol. Phys. 108,734–744.
+
+24. Wang, D., Tai, P.W.L., and Gao, G. (2019). Adeno-associated virus vector as a platform for gene therapy delivery. Nat. Rev. Drug Discov. 18,358–378.
+
+25. Tugues, S., Burkhard, S.H., Ohs, I., Vrohlings, M., Nussbaum, K., Vom Berg, J., Kulig, P., and Becher, B. (2015). New insights into IL-12-mediated tumor suppression. Cell Death Differ. 22,237–246.
+
+26. Nguyen, K.G., Vrabel, M.R., Mantooth, S.M., Hopkins, J.J., Wagner, E.S., Gabaldon, T.A., and Zaharoff, D.A. (2020). Localized interleukin-12 for cancer immunotherapy. Front. Immunol. 11, 575597.
+
+27. Kerkar, S.P., Goldszmid, R.S., Muranski, P., Chinnasamy, D., Yu, Z., Reger, R.N., Leonardi, A.J., Morgan, R.A., Wang, E., Marincola, F.M., et al. (2011). IL-12 triggers a programmatic change in dysfunctional myeloid-derived cells within mouse tumors. J. Clin. Investig. 121, 4746–4757.
+
+28. Trinchieri, G. (1995). Interleukin-12: A proinflammatory cytokine with immunoregulatory functions that bridge innate resistance and antigenspecific adaptive immunity. Annu. Rev. Immunol. 13,251–276.
+
+29. Atkins, M.B., Robertson, M.J., Gordon, M., Lotze, M.T., DeCoste, M., DuBois, J.S., Ritz, J., Sandler, A.B., Edington, H.D., Garzone, P.D., et al. (1997). Phase I evaluation of intravenous recombinant human interleukin 12 in patients with advanced malignancies. Clin. Cancer Res. 3,409–417.
+
+30. Lenzi, R., Edwards, R., June, C., Seiden, M.V., Garcia, M.E., Rosenblum, M., and Freedman, R.S. (2007). Phase II study of intraperitoneal recombinant interleukin-12 (rhIL-12) in patients with peritoneal carcinomatosis (residual disease < 1 cm) associated with ovarian cancer or primary peritoneal carcinoma. J. Transl. Med. 5, 66. https://doi.org/10.1186/1479-5876-5-66.
+
+31. Cohen, J. (1995). IL-12 deaths: Explanation and a puzzle. Science 270,908.
+
+32. Sangro, B., Mazzolini, G., Ruiz, J., Herraiz, M., Quiroga, J., Herrero, I., Benito, A., Larrache, J., Pueyo, J., Subtil, J.C., et al. (2004). Phase I trial of intratumoral injection of an adenovirus encoding interleukin-12 for advanced digestive tumors. J. Clin. Oncol. 22, 1389–1397.
+
+33. Pen˜ uelas, I., Mazzolini, G., Boa´ n, J.F., Sangro, B., Martı´-Climent, J., Ruiz, M., Ruiz, J., Satyamurthy, N., Qian, C., Barrio, J.R., et al. (2005). Positron emission tomography imaging of adenoviral-mediated transgene expression in liver cancer patients. Gastroenterology 128, 1787–1795.
+
+34. Younes, A., Pro, B., Robertson, M.J., Flinn, I.W., Romaguera, J.E., Hagemeister, F., Dang, N.H., Fiumara, P., Loyer, E.M., Cabanillas, F.F., et al. (2004). Phase II clinical trial of Interleukin-12 in patients with relapsed and refractory non-Hodgkin’s lymphoma and Hodgkin’s disease. Clin. Cancer Res. 10, 5432–5438.
+
+35. Pillay, S., Meyer, N.L., Puschnik, A.S., Davulcu, O., Diep, J., Ishikawa, Y., Jae, L.T., Wosen, J.E., Nagamine, C.M., Chapman, M.S., and Carette, J.E. (2016). An essential receptor for adeno-associated virus infection. Nature 530,108–112.
+
+36. Choi, V.W., McCarty, D.M., and Samulski, R.J. (2006). Host cell DNA repair pathways in adeno-associated viral genome processing. J. Virol. 80, 10346–10356.
+
+37. Peng, D., Qian, C., Sun, Y., Barajas, M.A., and Prieto, J. (2000). Transduction of hepatocellular carcinoma (HCC) using recombinant adeno-associated virus (rAAV): in vitro and in vivo effects of genotoxic agents. J. Hepatol. 32,975–985.
+
+38. Schwartz, R.A., Carson, C.T., Schuberth, C., and Weitzman, M.D. (2009). Adeno-associated virus replication induces a DNA damage response coordinated by DNA-dependent protein kinase. J. Virol. 83, 6269–6278.
+
+39. Gonzalez-Sandoval, A., Pekrun, K., Tsuji, S., Zhang, F., Hung, K.L., Chang, H.Y., and Kay, M.A. (2023). The AAV capsid can influence the epigenetic marking of rAAV delivered episomal genomes in a species dependent manner. Nat. Commun. 14, 2448.
+
+40. Loeb, E.J., Havlik, P.L., Elmore, Z.C., Rosales, A., Fergione, S.M., Gonzalez, T.J., Smith, T.J., Benkert, A.R., Fiflis, D.N., and Asokan, A. (2024). Capsid-mediated control of adeno-associated viral transcription determines host range. Cell Rep. 43, 113902.
+
+41. Pekrun, K., Stephens, C.J., Gonzalez-Sandoval, A., Goswami, A., Zhang, F., Tarantal, A.F., Blouse, G., and Kay, M.A. (2024). Correlation of antigen expression with epigenetic modifications after rAAV delivery of a human factor IX variant in mice and rhesus macaques. Mol. Ther. 32, 2064–2079.
+
+42. Maurer, A.C., and Weitzman, M.D. (2020). Adeno-associated virus genome interactions important for vector production and transduction. Hum. Gene Ther. 31,499–511.
+
+43. Chanda, D., Hensel, J.A., Higgs, J.T., Grover, R., Kaza, N., and Ponnazhagan, S. (2017). Effects of cellular methylation on transgene expression and site-specific integration of adeno-associated virus. Genes 8,232.
+
+44. Lasko, L.M., Jakob, C.G., Edalji, R.P., Qiu, W., Montgomery, D., Digiammarino, E.L., Hansen, T.M., Risi, R.M., Frey, R., Manaves, V., et al. (2017). Discovery of a selective catalytic p300/CBP inhibitor that targets lineage-specific tumours. Nature 550,128–132.
+
+45. Gordon, S., Akopyan, G., Garban, H., and Bonavida, B. (2006). Transcription factor YY1: structure, function, and therapeutic implications in cancer biology. Oncogene 25, 1125–1142.
+
+46. Burnette, B.C., Liang, H., Lee, Y., Chlewicki, L., Khodarev, N.N., Weichselbaum, R.R., Fu, Y.-X., and Auh, S.L. (2011). The efficacy of radiotherapy relies upon induction of type i interferon-dependent innate and adaptive immunity. Cancer Res. 71, 2488–2496.
+
+47. Qiao, C., Yuan, Z., Li, J., He, B., Zheng, H., Mayer, C., Li, J., and Xiao, X. (2011). Liver-specific microRNA-122 target sequences incorporated in AAV vectors efficiently inhibits transgene expression in the liver. Gene Ther. 18,403–410.
+
+48. Wu, M.-S., Kuo, Y.-P., Lo, Y.-C., Tsai, D.-J., Lai, C.-Y., Chuang, T.-H., Lin, S.-Y., Tsai, W.-T., Chung, P.-J., and Yu, G.-Y. (2021). Type I interferon signaling accelerates liver regeneration by metabolic modulation in noninfectious conditions. Am. J. Pathol. 191, 1036–1048.
+
+49. Eguren-Santamaria, I., Ferna´ ndez de Pie´ rola, E., Camps, G., Martı´n-Mun˜ oz, P., Campos, M., Cuculescu, D., Aguilera-Buenosvinos, I., Rodrı´guez Lo´ pez, I., Salido-Vallejo, R., Alexandru, R., et al. (2024). MHC class I and II-deficient humanized mice are suitable tools to test the long-term antitumor efficacy of immune checkpoint inhibitors and T-cell engagers. J. Immunother. Cancer 12, e008516.
+
+50. Dangaj, D., Bruand, M., Grimm, A.J., Ronet, C., Barras, D., Duttagupta, P.A., Lanitis, E., Duraiswamy, J., Tanyi, J.L., Benencia, F., et al. (2019). Cooperation between constitutive and inducible chemokines enables T cell engraftment and immune attack in solid tumors. Cancer Cell 35,885–900.e10.
+
+51. Chow, M.T., Ozga, A.J., Servis, R.L., Frederick, D.T., Lo, J.A., Fisher, D.E., Freeman, G.J., Boland, G.M., and Luster, A.D. (2019). Intratumoral activity of the CXCR3 chemokine system is required for the efficacy of anti-PD-1 therapy. Immunity 50, 1498–1512.e5.
+
+52. Hildner, K., Edelson, B.T., Purtha, W.E., Diamond, M., Matsushita, H., Kohyama, M., Calderon, B., Schraml, B.U., Unanue, E.R., Diamond, M.S., et al. (2008). Batf3 deficiency reveals a critical role for CD8alpha+ dendritic cells in cytotoxic T cell immunity. Science 322, 1097–1100.
+
+53. Ghasemi, A., Martinez-Usatorre, A., Li, L., Hicham, M., Guichard, A., Marcone, R., Fournier, N., Torchia, B., Martinez Bedoya, D., Davanture, S., et al. (2024). Cytokine-armed dendritic cell progenitors for antigenagnostic cancer immunotherapy. Nat. Cancer 5,240–261.
+
+54. Santollani, L., Maiorino, L., Zhang, Y.J., Palmeri, J.R., Stinson, J.A., Duhamel, L.R., Qureshi, K., Suggs, J.R., Porth, O.T., Pinney, W., 3rd, et al. (2024). Local delivery of cell surface-targeted immunocytokines programs systemic antitumor immunity. Nat. Immunol. 25, 1820–1829. https://doi.org/10.1038/s41590-024-01925-7.
+
+55. Shankaran, V., Ikeda, H., Bruce, A.T., White, J.M., Swanson, P.E., Old, L.J., and Schreiber, R.D. (2001). IFNgamma and lymphocytes prevent primary tumour development and shape tumour immunogenicity. Nature 410, 1107–1111.
+
+56. Ayers, M., Lunceford, J., Nebozhyn, M., Murphy, E., Loboda, A., Kaufman, D.R., Albright, A., Cheng, J.D., Kang, S.P., Shankaran, V., et al. (2017). IFN-γ-related mRNA profile predicts clinical response to PD-1 blockade. J. Clin. Investig. 127, 2930–2940.
+
+57. Zaretsky, J.M., Garcia-Diaz, A., Shin, D.S., Escuin-Ordinas, H., Hugo, W., Hu-Lieskovan, S., Torrejon, D.Y., Abril-Rodriguez, G., Sandoval, S., Barthly, L., et al. (2016). Mutations associated with acquired resistance to PD-1 blockade in melanoma. N. Engl. J. Med. 375,819–829.
+
+58. Gao, J., Shi, L.Z., Zhao, H., Chen, J., Xiong, L., He, Q., Chen, T., Roszik, J., Bernatchez, C., Woodman, S.E., et al. (2016). Loss of IFN-γ pathway genes in tumor cells as a mechanism of resistance to anti-CTLA-4 therapy. Cell 167,397–404.e9.
+
+59. Sade-Feldman, M., Jiao, Y.J., Chen, J.H., Rooney, M.S., Barzily-Rokni, M., Eliane, J.-P., Bjorgaard, S.L., Hammond, M.R., Vitzthum, H., Blackmon, S.M., et al. (2017). Resistance to checkpoint blockade therapy through inactivation of antigen presentation. Nat. Commun. 8, 1136.
+
+60. Chakraborty, M., Abrams, S.I., Camphausen, K., Liu, K., Scott, T., Coleman, C.N., and Hodge, J.W. (2003). Irradiation of tumor cells up-regulates Fas and enhances CTL lytic activity and CTL adoptive immunotherapy. J. Immunol. 170, 6338–6347.
+
+61. Wang, L., Lynch, C., Pitroda, S.P., Piffko´, A., Yang, K., Huser, A.K., Liang, H.L., and Weichselbaum, R.R. (2024). Radiotherapy and immunology. J. Exp. Med. 221, e20232101. https://doi.org/10.1084/jem.20232101.
+
+62. Lynch, C., Pitroda, S.P., and Weichselbaum, R.R. (2024). Radiotherapy, immunity, and immune checkpoint inhibitors. Lancet Oncol. 25, e352–e362.
+
+63. Sangro, B., Melero, I., Qian, C., and Prieto, J. (2005). Gene therapy of cancer based on interleukin 12. Curr. Gene Ther. 5,573–581.
+
+64. Mazzolini, G., Alfaro, C., Sangro, B., Feijoo´, E., Ruiz, J., Benito, A., Tirapu, I., Arina, A., Sola, J., Herraiz, M., et al. (2005). Intratumoral injection of dendritic cells engineered to secrete interleukin-12 by recombinant adenovirus in patients with metastatic gastrointestinal carcinomas. J. Clin. Oncol. 23,999–1010.
+
+65. Wu, C.-J., Tsai, Y.-T., Lee, I.-J., Wu, P.-Y., Lu, L.-S., Tsao, W.-S., Huang, Y.-J., Chang, C.-C., Ka, S.-M., and Tao, M.-H. (2018). Combination of radiation and interleukin 12 eradicates large orthotopic hepatocellular carcinoma through immunomodulation of tumor microenvironment. OncoImmunology 7, e1477459.
+
+66. Barrett, J.A., Cai, H., Miao, J., Khare, P.D., Gonzalez, P., Dalsing-Hernandez, J., Sharma, G., Chan, T., Cooper, L.J.N., and Lebel, F. (2018). Regulated intratumoral expression of IL-12 using a RheoSwitch Therapeutic System® (RTS®) gene switch as gene therapy for the treatment of glioma. Cancer Gene Ther. 25,106–116.
+
+67. Hallahan, D.E., Mauceri, H.J., Seung, L.P., Dunphy, E.J., Wayne, J.D., Hanna, N.N., Toledano, A., Hellman, S., Kufe, D.W., and Weichselbaum, R.R. (1995). Spatial and temporal control of gene therapy using ionizing radiation. Nat. Med. 1,786–791.
+
+68. Stinson, J.A., Barbosa, M.M.P., Sheen, A., Momin, N., Fink, E., Hampel, J., Selting, K.A., Kamerer, R.L., Bailey, K.L., Wittrup, K.D., and Fan, T.M. (2024). Tumor-localized interleukin-2 and interleukin-12 combine with radiation therapy to safely potentiate regression of advanced malignant melanoma in pet dogs. Clin. Cancer Res. 30, 4029–4043.
+
+69. Mills, B.N., Connolly, K.A., Ye, J., Murphy, J.D., Uccello, T.P., Han, B.J., Zhao, T., Drage, M.G., Murthy, A., Qiu, H., et al. (2019). Stereotactic body radiation and interleukin-12 combination therapy eradicates pancreatic tumors by repolarizing the immune microenvironment. Cell Rep. 29,406–421.e5.
+
+70. Birocchi, F., Cusimano, M., Rossari, F., Beretta, S., Rancoita, P.M.V., Ranghetti, A., Colombo, S., Costa, B., Angel, P., Sanvito, F., et al. (2022). Targeted inducible delivery of immunoactivating cytokines reprograms glioblastoma microenvironment and inhibits growth in mouse models. Sci. Transl. Med. 14, eabl4106.
+
+71. Kerzel, T., Giacca, G., Beretta, S., Bresesti, C., Notaro, M., Scotti, G.M., Balestrieri, C., Canu, T., Redegalli, M., Pedica, F., et al. (2023). In vivo macrophage engineering reshapes the tumor microenvironment leading to eradication of liver metastases. Cancer Cell 41, 1892–1910.e10.
+
+72. Li, C., Bowles, D.E., van Dyke, T., and Samulski, R.J. (2005). Adeno-associated virus vectors: potential applications for cancer gene therapy. Cancer Gene Ther. 12,913–925.
+
+73. Ciccia, A., and Elledge, S.J. (2010). The DNA damage response: making it safe to play with knives. Mol. Cell 40,179–204.
+
+74. Zhao, L., Li, R., Qiu, J.-Z., Yu, J.-B., Cao, Y., and Yuan, R.-T. (2020). YY1- mediated PTEN dephosphorylation antagonizes IR-induced DNA repair contributing to tongue squamous cell carcinoma radiosensitization. Mol. Cell. Probes 53, 101577.
+
+75. Dubrot, J., Du, P.P., Lane-Reticker, S.K., Kessler, E.A., Muscato, A.J., Mehta, A., Freeman, S.S., Allen, P.M., Olander, K.E., Ockerman, K.M., et al. (2022). In vivo CRISPR screens reveal the landscape of immune evasion pathways across cancer. Nat. Immunol. 23, 1495–1506.
+
+76. Benci, J.L., Johnson, L.R., Choa, R., Xu, Y., Qiu, J., Zhou, Z., Xu, B., Ye, D., Nathanson, K.L., June, C.H., et al. (2019). Opposing functions of interferon coordinate adaptive and innate immune responses to cancer immune checkpoint blockade. Cell 178,933–948.e14.
+
+77. Benci, J.L., Xu, B., Qiu, Y., Wu, T.J., Dada, H., Twyman-Saint Victor, C., Cucolo, L., Lee, D.S.M., Pauken, K.E., Huang, A.C., et al. (2016). Tumor interferon signaling regulates a multigenic resistance program to immune checkpoint blockade. Cell 167, 1540–1554.e12.
+
+78. Weichselbaum, R.R., Ishwaran, H., Yoon, T., Nuyten, D.S.A., Baker, S.W., Khodarev, N., Su, A.W., Shaikh, A.Y., Roach, P., Kreike, B., et al. (2008). An interferon-related gene signature for DNA damage resistance is a predictive marker for chemotherapy and radiation for breast cancer. Proc. Natl. Acad. Sci. USA 105, 18490–18495.
+
+79. Mohamed, H., Chernajovsky, Y., and Gould, D. (2016). Assembly PCR synthesis of optimally designed, compact, multi-responsive promoters suited to gene therapy application. Sci. Rep. 6, 29388.
+
+80. Yang, C., Shang, X., Cheng, L., Yang, L., Liu, X., Bai, C., Wei, Z., Hua, J., and Li, G. (2017). DNMT 1 maintains hypermethylation of CAG promoter specific region and prevents expression of exogenous gene in fat-1 transgenic sheep. PLoS One 12, e0171442.
+
+81. Lal, S., Lacroix, M., Tofilon, P., Fuller, G.N., Sawaya, R., and Lang, F.F. (2000). An implantable guide-screw system for brain tumor studies in small animals. J. Neurosurg. 92,326–333.
+
+82. Garate-Soraluze, E., Marco-Sanz, J., Serrano-Mendioroz, I., Marroda´ n, L., Fernandez-Rubio, L., Labiano, S., and Rodrı´guez-Ruiz, M.E. (2024).
+
+Radiotherapy protocols for mouse cancer model. Methods Cell Biol. 185, 99–113.
+
+83. Abengozar-Muela, M., Esparza, M.V., Garcia-Ros, D., Va´ squez, C.E., Echeveste, J.I., Idoate, M.A., Lozano, M.D., Melero, I., and de Andrea, C.E. (2020). Diverse immune environments in human lung tuberculosis granulomas assessed by quantitative multiplexed immunofluorescence. Mod. Pathol. 33, 2507–2519.
+
+84. Lo´ pez-Janeiro, A´., Villalba-Esparza, M., Brizzi, M.E., Jime´ nez-Sa´ nchez, D., Ruz-Caracuel, I., Kadioglu, E., Masetto, I., Goubert, V., Garcia-Ros, D., Melero, I., et al. (2022). The association between the tumor immune microenvironments and clinical outcome in low-grade, early-stage endometrial cancer patients. J. Pathol. 258,426–436.
+
+85. Tyanova, S., Temu, T., Sinitcyn, P., Carlson, A., Hein, M.Y., Geiger, T., Mann, M., and Cox, J. (2016). The Perseus computational platform for comprehensive analysis of (prote)omics data. Nat. Methods 13,731–740.
+
+86. Martinez-Val, A., Bekker-Jensen, D.B., Hogrebe, A., and Olsen, J.V. (2021). Data processing and analysis for DIA-based phosphoproteomics using Spectronaut. Methods Mol. Biol. 2361, 95–107.
+
+87. Zhou, Y., Zhou, B., Pache, L., Chang, M., Khodabakhshi, A.H., Tanaseichuk, O., Benner, C., and Chanda, S.K. (2019). Metascape provides a biologist-oriented resource for the analysis of systems-level datasets. Nat. Commun. 10, 1523.
+
+88. Szklarczyk, D., Morris, J.H., Cook, H., Kuhn, M., Wyder, S., Simonovic, M., Santos, A., Doncheva, N.T., Roth, A., Bork, P., et al. (2017). The STRING database in 2017: quality-controlled protein–protein association networks, made broadly accessible. Nucleic Acids Res. 45, D362–D368.
+
+89. Okuda, S., Watanabe, Y., Moriya, Y., Kawano, S., Yamamoto, T., Matsumoto, M., Takami, T., Kobayashi, D., Araki, N., Yoshizawa, A.C., et al. (2017). jPOSTrepo: an international standard data repository for proteomes. Nucleic Acids Res. 45, D1107–D1111.
+
+90. Bolger, A.M., Lohse, M., and Usadel, B. (2014). Trimmomatic: a flexible trimmer for Illumina sequence data. Bioinformatics 30, 2114–2120.
+
+91. Dobin, A., Davis, C.A., Schlesinger, F., Drenkow, J., Zaleski, C., Jha, S., Batut, P., Chaisson, M., and Gingeras, T.R. (2013). STAR: ultrafast universal RNA-seq aligner. Bioinformatics 29, 15–21.
+
+92. Liao, Y., Smyth, G.K., and Shi, W. (2014). featureCounts: an efficient general purpose program for assigning sequence reads to genomic features. Bioinformatics 30,923–930.
+
+93. Frankish, A., Carbonell-Sala, S., Diekhans, M., Jungreis, I., Loveland, J.E., Mudge, J.M., Sisu, C., Wright, J.C., Arnan, C., Barnes, I., et al. (2023). GENCODE: reference annotation for the human and mouse genomes in 2023. Nucleic Acids Res. 51, D942–D949.
+
+94. Robinson, M.D., McCarthy, D.J., and Smyth, G.K. (2010). edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. Bioinformatics 26,139–140.
+
+95. Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W., and Smyth, G.K. (2015). limma powers differential expression analyses for RNAsequencing and microarray studies. Nucleic Acids Res. 43, e47.
+
+96. Wu, T., Hu, E., Xu, S., Chen, M., Guo, P., Dai, Z., Feng, T., Zhou, L., Tang, W., Zhan, L., et al. (2021). clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. Innovation 2, 100141.
+
+97. Korsunsky, I., Millard, N., Fan, J., Slowikowski, K., Zhang, F., Wei, K., Baglaenko, Y., Brenner, M., Loh, P.-R., and Raychaudhuri, S. (2019). Fast, sensitive and accurate integration of single-cell data with Harmony. Nat. Methods 16, 1289–1296.
+
+98. Ntranos, V., Yi, L., Melsted, P., and Pachter, L. (2019). A discriminative learning approach to differential expression analysis for single-cell RNAseq. Nat. Methods 16,163–166.
+
+Z</td><td>Cell Signaling</td><td>Cat#98941 RRID:AB_2756376</td></tr><tr><td>Rabbit monoclonal anti-mouse FoxP3 clone D608R</td><td>Cell Signaling</td><td>Cat#12653 RRID: AB_2797979</td></tr><tr><td>Rabbit monoclonal anti-mouse CD31 clone D8V9E</td><td>Cell Signaling</td><td>Cat#77699 RRID: AB_2722705</td></tr><tr><td>Rabbit monoclonal anti-mouse ICAM1 clone EPR16608</td><td>Abcam</td><td>Cat#ab179707 RRID:AB_2814769</td></tr><tr><td>Rat monoclonal anti-mouse CD4 BUV496 clone GK1.5</td><td>BD Biosciences</td><td>Cat # 612952; RRID: AB_2813886</td></tr><tr><td>Rat monoclonal anti-mouse CD8α BUV395 clone 53-6.7</td><td>BD Biosciences</td><td>Cat# 563786; RRID: AB_2732919</td></tr></table>
+
+[表格]
+REAGENT or RESOURCE | SOURCE | IDENTIFIER
+Rat monoclonal anti-mouse CD8α PE clone 53-6.7 | Biolegend | Cat# 100707; RRID: AB_312747
+Rat monoclonal anti-mouse CD8α BV510 clone 53-6.7 | Biolegend | Cat# 100751; RRID: AB_2563057
+Rat monoclonal anti-mouse CD11b BUV661 clone M1/70 | BD Biosciences | Cat# 612977; RRID: AB_2870249
+Rat monoclonal anti-mouse CD11b BV510 clone M1/70 | Biolegend | Cat# 101245; RRID: AB_2561390
+Armenian hamster anti-mouse CD11c BV510 clone N418 | Biolegend | Cat# 117337; RRID: AB_2562016
+Armenian hamster anti-mouse CD11c PE/Cyanine7 clone N418 | Biolegend | Cat# 117317; RRID: AB_493569
+Armenian hamster anti-mouse CD11c BUV395 clone HL3 | BD Biosciences | Cat# 564080; RRID: AB_2738580
+Rat monoclonal anti-mouse CD16/CD32 (Mouse BD Fc BlockTM) clone 2.4G2 | BD Biosciences | Cat# 553141; RRID: AB_394656
+Rat monoclonal anti-mouse CD19 BV650 clone 6D5 | Biolegend | Cat# 115541; RRID: AB_11204087
+Rat monoclonal anti-mouse CD19 APC/Cyanine7 clone 6D5 | Biolegend | Cat# 115529; RRID: AB_830706
+Rat monoclonal anti-mouse CD19 APC clone 6D5 | Biolegend | Cat# 115511; RRID: AB_313646
+Rat monoclonal anti-mouse CD24 APC clone M1/69 | Biolegend | Cat# 101813; RRID: AB_439715
+Rat monoclonal anti-mouse CD31 BV421 clone 390 | Biolegend | Cat# 101423; RRID: AB_2562186
+Rat monoclonal anti-mouse CD45 PE/Cyanine7 clone 30-F11 | Biolegend | Cat# 103113; RRID: AB_312978
+Rat monoclonal anti-mouse CD103 BV421 clone 2E7 | Biolegend | Cat# 121422; RRID: AB_10900074
+Armenian hamster anti-mouse CD103 APC/Cyanine7 clone 2E7 | Biolegend | Cat# 121432; RRID: AB_2566551
+Armenian hamster anti-mouse CD178 (FasL) PE, clone MFL3 | Biolegend | Cat# 106606; RRID: AB_313279
+Rat monoclonal anti-mouse CD206 BV786 clone C068C2 | Biolegend | Cat# 141729 RRID: AB_2565823
+Rat monoclonal anti-mouse CD279 (PD-1) BV605 clone 29F.1A12 | Biolegend | Cat# 135220 RRID: AB_11125371
+Rat monoclonal anti-mouse CD279 (PD-1) BV421 clone 29F.1A12 | Biolegend | Cat# 135221 RRID:AB_2562568
+Rat monoclonal anti-mouse F4/80 APC clone BM8 | Biolegend | Cat# 123116 RRID:AB_893481
+Mouse monoclonal anti-mouse/rat/human FOXP3 PE clone 150D | Biolegend | Cat# 320008 RRID: AB_492980
+Rat monoclonal anti-mouse I-A/I-E BV650 clone M5/114.15.2 | Biolegend | Cat# 107641 RRID: AB_2565975
+Rat monoclonal anti-mouse I-A/I-E FITC clone M5/114.15.2 | Biolegend | Cat# 107605 RRID: AB_313321
+Rat monoclonal anti-mouse I-A/I-E BV421 clone M5/114.15.2 | Biolegend | Cat# 107632 RRID: AB_2650896
+Rat monoclonal anti-mouse IFN-y APC clone XMG1.2 | Biolegend | Cat# 505810 RRID: AB_315404
+Rat monoclonal anti-mouse IFN-y PE/Dazzle 594 clone XMG1.2 | Biolegend | Cat# 505845 RRID: AB_2563979
+
+[表格]
+REAGENT or RESOURCE | SOURCE | IDENTIFIER
+Mouse monoclonal anti-human/mouse | Biolegend | Cat# 515408
+Granzyme B Pacific Blue clone GB11 | RRID: AB_2562196
+Rat monoclonal anti-mouse Ly-6C FITC clone HK1.4 | Biolegend | Cat# 128006
+RRID: AB_1186134
+Rat monoclonal anti-mouse Ly-6G PE clone 1A8 | Biolegend | Cat# 127608
+RRID: AB_1186104
+Mouse monoclonal anti-mouse NK1.1 PE clone PK136 | Biolegend | Cat# 108707
+RRID: AB_313394
+Mouse monoclonal anti-mouse NK1.1 BV785 clone PK136 | Biolegend | Cat# 108749
+RRID: AB_2564304
+Mouse monoclonal anti-mouse NK1.1 BVU661 clone PK136 | BD Biosciences | Cat# 741477
+RRID: AB_2870942
+Armenian hamster anti-mouse TCRβ chain APC clone H57-597 | Biolegend | Cat# 109211
+RRID: AB_313434
+Armenian hamster anti-mouse TCRβ chain BV650 clone H57-597 | Biolegend | Cat# 109251
+RRID: AB_2810348
+Armenian hamster anti-mouse TCRβ chain BV421 clone H57-597 | Biolegend | Cat# 109230
+RRID: AB_2562562
+Rat monoclonal anti-mouse TNF-α BV421 clone MP6-XT22 | Biolegend | Cat# 506327
+RRID: AB_2562902
+
+Bacterial and virus strains
+
+[表格]
+Subcloning EfficiencyTM DH5α | Invitrogen | Cat#18265017
+Chemicals, peptides, and recombinant proteins
+Cytofix/Cytoperm fixation | BD Biosciences | Cat # 554714
+permeabilization kit
+cCompleteTM, EDTA-free Protease Inhibitor | Merck | Cat#11873580001
+Cocktail
+PhosSTOP, Phosphatase Inhibitors | Merck | Cat#4906845001
+Zombie NIR Fixable viability Kit | BioLegend | Cat # 423106
+PMA | SIGMA | Cat#P1585
+Ionomycin calcium salt | SIGMA | Cat#I0634
+Protein Transport Inhibitor (containing Brefeldin A) | BD Biosciences | Cat # 555029
+IQTM SYBR Green Supermix | BIO-RAD | Cat#1708882
+Lymphoprep | STEMCELL Technologies | Cat#15257179
+MACS SmartStrainer (70um) | Miltenyi Biotec | Cat#130-098-462
+D-Luciferin | Promega | Cat#L2916
+A485 | MCE | Cat#HY-107455
+PEI 25 kDa | Sigma | Cat # 408727
+PEG8000 | Sigma Aldrich | Cat#P5413
+OPTIPREP (lodixanol) | Axis Shield | Cat # 415468
+Ultra-15 mL Amicon® columns | Millipore | Cat#C7715
+OptiprepTM | Serumwerk Bernburg | Cat#1893
+ACK Lysing Buffer | Invitrogen | Cat# A1049201
+Collagenase D | Roche | Cat# 11088866001
+DNAse I | Roche | 11 284 932 001
+DMEM with Glutamax | Gibco | Cat# 61965-026
+OptiMEM | Gibco | Cat #51985026
+Lipofectamine3000 | Invitrogen | Cat# L3000
+Formaldehyde | PanReac AppliChem | Cas 50-00-0
+Eukitt® Quick-hardening mounting medium | Sigma-Aldrich | Cat#03989 Cas 25608-33-7
+
+[表格]
+REAGENT or RESOURCE | SOURCE | IDENTIFIER
+BondTM Epitope Retrieval 1 | Leica Biosystems | Cat#AR9961
+BondTM Epitope Retrieval 2 | Leica Biosystems | Cat#AR9640
+Akoya Biosciences Antibody diluent/block | Fisher Scientific | Cat#NC1526352
+Akoya Biosciences Spectral DAPI | Fisher Scientific | Cat#NC1526331
+ProLongTM Diamond Antifade Mountant | ThermoFisher Scientific | Cat#P36965
+H-2kb TRP2 PE tetramer | MBL | Cat# TB-5004-1
+Puromycin | CLONTECH | Cat# 631306
+Recombinant mouse IFN alpha | Miltenyi Biotec | Cat#130-093-131
+Recombinant mouse IFN beta | R&D Systems | Cat#8234-MB/CF
+Recombinant mouse IFN gamma | ImmunoTools | Cat#12343536
+Luciferase Assay System | Promega | Cat#E1500
+MycoAlert Micoplasma Detection Kit | Lonza | Cat#LT07-318
+Fetal Bovine Serum | Gibco | Cat#A5256701
+Penicillin/Streptomycin | Gibco | Cat#15140-122
+Trypsin-EDTA | Gibco | Cat#25300-054
+Microvette 500 K3E | Sarstedt | Cat#20.1341
+Lasercell/HT5 V-52D 5.5L Diluent | Scil Animal care Company SLU | 107-409
+Lyse Diff 300 ml Lasercell/HT5 | Scil Animal care Company SLU | 107-411
+Lyse LH 90 ml Lasercell/HT5 | Scil Animal care Company SLU | 107-412
+
+Critical commercial assays
+
+[表格]
+Pierce BCA Protein Assay Kit | Pierce | Cat#23225
+Bradford kit | BioRad | Cat#5000002
+Bond Dewax Solution | Leica Biosystems | Cat#AR0084
+OpalTM 4-Color anti -Rabbit Manual IHC Kit | Akoya Biosciences | Cat#NEL840001KT
+Opal 620 Reagent Pack | Akoya Biosciences | Cat#FP1495001KT
+BD OptEIA Mouse IL-12 (p70) ELISA set | BD Biosciences | Cat # 555256
+BD OptEIA Mouse IFNγ ELISA set | BD Biosciences | Cat # 555138
+Mouse IL-15/IL-15Rα Elisa Kit | Invitrogen | Cat# BMS6023TEN
+Mouse Flt-3 Ligand/FLT3L DuoSet ELISA | R&D Systems | Cat# DY427
+VeriKine-HS Mouse Interferon Beta Serum ELISA | pbl assay science | Cat#42410-2
+Maxwell RSC simplyRNA tissue | Promega | Cat#AS1340
+Mouse Luminex Discovery Assay | R&D Systems | Cat# PPX-15
+NucleoSpin Tissue, Mini kit for DNA from cells and tissue | Macherey-Nagel | Cat # 740952.250
+High Pure Viral Nucleic Acid Kit | Roche | Cat#11858874001
+Tumor Dissociation Kit | Miltenyi Biotec | Cat#130-096-730
+PierceTM Agarose ChIP Kit | Thermo ScientificTM | Cat#26156
+EpiJET DNA Methylation Analysis Kit (MspI/Hpall) | Thermo ScientificTM | Cat#K1441
+PureLink HiPure Plasmid Maxiprep Kit | Invitrogen | Cat#K210007
+
+Deposited data
+
+[表格]
+RNA-seq of B16 cells dataset | This study | GEO: GSE280078
+sc RNA-seq of CD45+infiltrate dataset | This study | GEO: GSE280079
+RNA-seq and scRNA-seq superseries | This study | GEO: GSE280080
+Phosphoproteosome dataset | This study | ProteomeXchange: PXD056537
+Phosphoproteosome dataset | This study | jPOST: JPST003410
+
+Experimental models: Cell lines
+
+[表格]
+Human HEK-293T | ATCC | RRID:CVCL_0063
+
+[表格]
+REAGENT or RESOURCE | SOURCE | IDENTIFIER
+Mouse MC-38 | Kerafast | Cat#ENH204-FP; RRID:CVCL_B288
+Mouse B16F10 | ATCC | RRID:CVCL_0159
+Human RT112 | ATCC | RRID:CVCL_1670
+Mouse MB-49 | Sigma-Aldrich | Cat# SCC148RRID:CVCL_7076
+Mouse GL269 | Gift from Dr Safrany | N/A
+Mouse KPC | Gift from Dr. Manguso | N/A
+Mouse LLC | ATCC | RRID:CVCL_4358
+Experimental models: Organisms/strains
+Mouse: C57BL/6JOlalaHsd | Envigo | RRID:IMSR_ENV:HSD-057
+Mouse: B6;129-Rag2tm1FwaII2rgtm1Rsky/DwlHsd | Envigo | RRID:IMSR_ENV:HSD-021
+Mouse: B6.129S(C)-Batf3tm1Kmm/J | Jackson Laboratory | Strain#: 013755RRID:IMSR_JAX:013755
+Mouse: C57BL/6J-Sting1gt/J | Jackson Laboratory | Strain#: 017537RRID:IMSR_JAX:017537
+Mouse: NOD.Cg-Prkdcscid II2rgtm1WjI/SzJ | Jackson Laboratory | Strain#: 005557RRID:IMSR_JAX:005557
+Mouse: C57BL/6-Prf1tm1Sdz/J | Julián Pardo laboratory | N/A
+Mouse: NOD.Cg-Prkdcscid H2-K1b tm1BpeH2-Ab1g7-em1Mvw H2-D1b-tm1BpeII2rgtm1WjI/SzJ | Jackson Laboratory | Strain#: 025216RRID:IMSR_JAX:025216
+Oligonucleotides
+GGAACCCCTAGTGATGGAGTT (ITR-F) | ThermoFisher Scientific | N/A
+CGGCCTCAGTGAGCGA (ITR-R) | ThermoFisher Scientific | N/A
+CTAAGGCCAACCGTGAAAAG(mActinDNA-F) | ThermoFisher Scientific | N/A
+TGCAAAGATCCAAGGGAGAC(mActinDNA-R) | ThermoFisher Scientific | N/A
+CTGGAGACGCCATCCACGCTGT(CAGp-F) | ThermoFisher Scientific | N/A
+GCGTTCCAATGCACCGTTCCCG(CAGp-R) | ThermoFisher Scientific | N/A
+AGTCCAAGCTAGGCCCTTTTGCT(ChIP CAGp-F) | ThermoFisher Scientific | N/A
+GCCAGCACACAGACCAGCACGT(ChIP CAGp-R) | ThermoFisher Scientific | N/A
+GCGCAGAGAGGGAGTGGCCAAC(ChIP ITR-F) | ThermoFisher Scientific | N/A
+AACTAATGACCCCGTAATTGA(ChIP ITR-R) | ThermoFisher Scientific | N/A
+CAGCGGAGAGTATACAGCCG (sgJak1) | This study | N/A
+CGACTTCAGGGTGAAATACG (sglfngr1) | This study | N/A
+AGTATACTCACGCCACCCCAC (sgB2m) | This study | N/A
+Recombinant DNA
+AAV-ISREx4-sclIL12-5xmiR122T(AAV-iIL12) | This study | N/A
+AAV-ISREx4-Luciferase-5xmiR122T(AAV-iLuc) | This study | N/A
+AAV-CAG-eGFP (AAV-cGFP) | This study | N/A
+AAV-CAG-Luciferase (AAV-cLuc) | This study | N/A
+
+[表格]
+REAGENT or RESOURCE | SOURCE | IDENTIFIER
+AAV-CAG-Luciferase-5xmiR122T (AAV-cLuc-miRT) | This study | N/A
+AAV-ISREx4-sclL12 (AAV-iLL12 no miRT) | This study | N/A
+AAV-ISREx4-IL15-5xmiR122T (AAV-iLL15) | This study | N/A
+AAV-ISREx4-sclL12-P2A-IL15-5xmiR122T (AAV-iLL12-P2A-IL15) | This study | N/A
+AAV-ISREx4-FLT3ligand-miR122T (AAV-iFLT3L) | This study | N/A
+AAV-ITRmut-CAG-eGFP (AAV YY1-mut) | This study | N/A
+pHIV-Luc-ZsGreen | Addgene | Cat#39196;RRID:Addgene_39196
+ds AAV-CMV-GFP (dsAAV) | Dr. Gloria González | N/A
+ss AAV-CMV-eGFP (ssAAV) | Dr. Gloria Gonzalez | N/A
+pAAV-CAG | Dr. Gloria Gonzalez | N/A
+pDP5rs | PlasmidFactory GmbH | Cat#PF405
+pDP8.ape | PlasmidFactory GmbH | Cat#PF478
+pDP9 | Dr. G. González | N/A
+pCDNA-sclL12 | Dr. Rubén Hernández | N/A
+ps PAX2 | Addgene | Cat#12260; RRID:Addgene_12260
+pMD2.G | Addgene | Cat#12259; RRID:Addgene_12259
+pSpCas9 BB-2A-Puro (p X459) v2.0 | Addgene | Cat#62988; RRID:Addgene_62988
+Software and algorithms
+GraphPad Prism v9 | GraphPad | https://www.graphpad.com/
+ImageScope v12.3.2.8013 | Leica Biosystems | https://www.leicabiosystems.com
+QuPath v0.4.4 | https://qupath.github.io | N/A
+FlowJo (v10) | BD Biosciences | https://www.flowjo.com/solutions/flowjo/downloadsRRID:SCR_008520
+Cell Ranger v7.1.0 | 10x Genomics | https://10xgenomics.com
+Scanpy (v1.9.3) | https://scanpy.readthedocs.io/ | N/A
+InForm | Akoya Biosciences | http://www.akoyabio.com/
+
+# EXPERIMENTAL MODELS AND STUDY PARTICIPANT DETAILS
+
+# Mice
+
+Experiments involving mice were approved by the Ethics Committee of the Government of Navarra under Spanish regulations (protocols 051-19,011-23,041-23, and 058-23). Seven-week-old mice were housed for at least 7 days on a 12-hour light/dark cycle before manipulation. Mice had free access to food and water throughout the course of the experiments and were maintained under pathogen-free conditions in the animal facility at CIMA-Universidad de Navarra, Pamplona, Spain). C57BL/6JOlaHsd (referred to as C57BL/6) and B6;129-Rag2tm1FwaIL2rgtm1Rsky/DwlHsd (Rag2−/−; Il2rg−/−) mice were purchased from Envigo (Barcelona, Spain), B6.129S(C)-Batf3tm1Kmm/J (Batf3−/−) and C57BL/6J-Sting ^gt/J (Tmem173−/−) mice were purchased from Jackson Laboratory (The Jackson Laboratory, Bar Harbor, Maine). A colony of NSG (NOD.Cg-Prkdcscid Il2rgtm1Wjl/SzJ) mice was bred in our animal facility (CIMA, Pamplona, Spain). Mice lacking perforin (C57BL/6-Prf1^tm15dz/J) were provided by Dr. J. Pardo (Centro de Investigacio´ n Biome´ dica de Arago´ n, CIBA). MHC-dKO NSG (NOD.Cg-Prkdcscid H2-K1b tm1Bpe H2-Ab1g7-em1Mvw H2-D1b-tm1Bpe Il2rgtm1Wjl/SzJ) mice were purchased from The Jackson Laboratory (Bar Harbor, Maine, USA) and maintained under specific pathogen-free conditions.
+
+# Cell lines
+
+The human embryonic kidney cell line (HEK-293T) and lung adenocarcinoma LLC were obtained from ATCC. B16F10 and MC38 mouse cell lines were kindly provided by I. Melero (CIMA-University of Navarra, Spain. RT112 human bladder cancer cell line was provided by X. Aguirre (CIMA-University of Navarra, Spain). The murine glioma GL261 was a kind gift from Dr. Safrany (Frederic Joliot-Curie National Research Institute for Radiobiology and Radiohygiene, Budapest, Hungary). MB49 mouse bladder carcinoma cell line (cat. number SCC148) was purchased from Sigma-Aldrich. KPC mouse pancreatic cancer cell line was a gift from R. Manguso (Broad Institute, Cambridge, US) and S. Dougan (Dana-Farber Cancer Institute). All cell lines were grown in Dulbecco’s Modified
+
+Eagle’s Medium (DMEM) with Glutamax (Gibco, Invitrogen, Carlsbad, CA, USA) containing 10% heat-inactivated FBS (Sigma-Aldrich, Dorset, UK), 100 IU/mL penicillin, 100 μg/mL streptomycin (Biowhittaker, Walkersville, MD, USA) at 37°C in 5% CO₂. Cell lines were routinely tested for mycoplasma contamination after seven days of culture using the MycoAlert Mycoplasma Detection Kit (Lonza, Basel, Switzerland).
+
+# METHOD DETAILS
+
+# Plasmid design
+
+All plasmids were synthesized by GenScript (GenScript, Piscataway, USA), amplified into DH5ɑ competent cells (Invitrogen, Thermo Fisher Scientific Inc. USA) and purified with PureLink HiPure Plasmid Maxiprep Kit (Invitrogen, Thermo Fisher Scientific Inc). The eGFP sequence was obtained from GeneBank (NZ_CP024869); the firefly luciferase sequence was cloned from the pHIV-Luc-ZsGreen (Addgene Massachusetts, USA); the murine single-chain IL-12 sequence was kindly provided by Dr. Hernandez (CIMA-University of Navarra, Spain); the murine IL15 sequence was kindly provided by Dr. Berraondo (CIMA-University of Navarra); the FLT3L sequence was kindly provided by Dr. Labiano (CIMA-University of Navarra). The YY1-mutant vector was designed by introducing two-nucleotide mutation in the YY1-binding motif in the ITR region (113-116, CCAT to CAAA). The inducible plasmids included an ISREx4 promoter sequence, designed with optimal spacing79 and five miR122 target sites in tandem sequence (5xmiR122T).47 Plasmids for single-stranded AAV-CMV-eGFP (ssAAV) and double-stranded AAV-CMV-GFP (dsAAV) were kindly provided by Dr. Gonzalez (CIMA-University of Navarra, Spain).
+
+# Production of rAAV
+
+AAV serotypes 5, and 8 were produced by co-transfection of pDP5 or pDP8.ape plasmids respectively (PlasmidFactory GmbH & Co. KG, Bielefeld Germany) and pAAV into HEK-293T cells. For the AAV serotype 9, the pDP9 was used, kindly given by Dr. Gonza´ lez (CIMA, University of Navarra, Spain). For each production, a mix of 20 μg of pAAV-expressing protein, 55 μg of pDP, and branched PEI 25 kDa (Sigma-Aldrich) was transfected into HEK-293T cells. Vector particles were obtained from cells and supernatant. After 72 h, the supernatant was treated with polyethylene glycol solution (PEG8000, Sigma-Aldrich) for 24h at 4°C and centrifuged for 15 min at 1400g. Viral particles present in the pellet were resuspended in lysis buffer 50 mM Tris-Cl, 150 mM NaCl, 2 mM MgCl2, 0.1% Triton X-100) and stored at -80°C. Both supernatant and cells were subjected to 3 freeze/thaw cycles, centrifuged, and treated with DNase and RNase solutions. The lysate was purified in an iodixanol gradient (Optiprep, Serumwerk Bernburg AG) by ultracentrifugation (69000 rpm, 16°C, 2.5h) and concentrated by Ultra-15 mL Amicon® columns (Millipore). AAV vector genomes were extracted using the High Pure Viral Nucleic Acid Kit (Roche) following the manufacturer’s specifications. Titration of viral particles was subsequently determined by real-time quantitative PCR using primers specific to the AAV ITR2 consensus sequences Fw: 5′ -GGA ACC CCT AGT GAT GGA GTT-3’ and Rv: 5’-CGG CCT CAG TGA GCG A-3’.
+
+# Generation of cell lines
+
+For CRISPR knockout, cells were transiently transfected with pX459 (Addgene, 62988) targeting control (GCGAGGTATTCGGCTCCGCG), Kiaa0319l (AAVR; CATTCACGTAGCCTTCCCCA), Jak1 (CAGCGGAGAGTATACAGCCG), Ifngr1 (CGACTTCAGGGTGAAATACG), B2m (AGTATACTCACGCCACCCAC) or Tmem173 (TATCTCGGAATCGAATGTTG) with Lipofectamine transfection reagent (Thermo Fisher Scientific, L3000015). Transfected populations were selected in antibiotics for 2–4 d, and bulk transfectant populations were validated by flow cytometry analysis and used for subsequent experiments. The luciferase-B16 cell line was generated by lentiviral infection. Lentiviral particles were produced in HEK293 cells by co-transfection of pHIV-Luc-ZsGreen with psPAX2 and pMD2.G plasmids (Addgene) using Lipofectamine 3000 (Invitrogen, ThermoFisher). Virus-containing 48- and 72-hour post-transfection supernatant was filtered through a 0.45 μm filter (Millipore) and centrifuged at 90000g for 2h at 4°C. The supernatant was discarded and lentiviruses were resuspended in PBS and frozen until use. B16 cells were incubated with lentiviral particles overnight, and transduced cells were sorted by flow cytometry based on the expression of ZsGreen reporter protein one week after infection.
+
+# In vitro AAV transduction assays
+
+For in vitro transduction assays, cells were irradiated in a Nordion Gammacell GC 3000 equipment (Best Theratronics Ltd.) when necessary and generally seeded at a density of 1.2×10^5 cells/well in a 12-well plate. Unless otherwise indicated, cells were transduced with indicated AAV8 vectors immediately after irradiation. In some experiments, serotypes AAV5 or AAV9 were used. GFP+ expression was measured by flow cytometry at indicated time points. When indicated, cells were treated with A-485 (MedChemExpress) 24h before AAV transduction. The drug was maintained at indicated concentrations for the entire duration of the experiment.
+
+For in vitro luciferase activity studies, cells were irradiated as above or remained untreated as control. Cells were immediately seeded at a density of 85,000 cells/well in a 24-well plate and transduced with AAV8-iLuc or AAV8-cLuc (MO 10^5) ). 48h post-infection, cells were incubated for 6-12h with 1,000UI/ml of IFNα, IFNβ or IFNγ (Immunotools). When indicated, cells were transduced with a Luc-mRNA lipid nanoparticle (GeneScript) as control. Luciferase activity was then measured using the Luciferase assay system kit (Promega) following the manufacturer’s instructions in GloMax® Explorer Multimode Microplate Reader (Promega).
+
+# DNA methylation analysis
+
+For the methylation analysis, B16 cells were irradiated and transduced as described above. DNA was extracted from B16 cells using NucleoSpin Tissue, Mini kit for DNA from cells and tissue (Macherey-Nagel, Du¨ ren, Germany). The concentration and purity of extracted DNA were assessed using a NanoDrop One (ThermoFisher Scientific,). DNA methylation status was assessed using the EpiJET DNA Methylation Analysis Kit (MspI/HpaII) (Thermo-Fisher Scientific) following the manufacturer’s protocol. Real-time PCR was performed using a CFX Connect Real-Time PCR Detection System (Bio-Rad Laboratories, Inc.). Primers were designed to amplify a fragment of the determinant differential methylation region of promoter CAG^80:
+
+CAGp Fw: 5’-CTGGAGACGCCATCCACGCTGT-3’
+
+CAGp Rv: 5′ -GCGTTCCAATGCACCGTTCCCG-3’
+
+PCR reactions were performed in a total volume of 10 μL containing 5 μL of iQ SYBR Green Supermix (Bio-Rad Laboratories, Inc.), 0.3 μM each of Fw and Rv primers, 2 μL of MspI or HpaII digested DNA or undigested DNA, and nuclease-free water. The PCR cycling conditions were: initial denaturation at 95°C for 3 minutes, followed by 35 cycles of 95°C for 15 seconds, 60°C for 20 seconds and 72°C for 45 seconds. The percentage of methylated cytosines at the analyzed CCGG sites was calculated using the formula: % of 5 mC = 100 / (1 + E)^(Cq2 - Cq1), being Cq1 the undigested DNA sample, Cq2 the Epi HpaII-digested sample, and E the PCR efficiency. Control reactions using unmethylated and CpG-methylated pUC19/SmaI DNA provided in the kit were included to validate the assay.
+
+# Chromatin immunoprecipitation (ChIP) -PCR
+
+ChIP studies were carried out using Pierce Agarose ChIP kit (Thermo Scientific) following manufacturer’s instructions. Briefly, irradiated (8Gy) or control B16 cells were transduced with AAV8-cGFP at an MOI of 10^4 as described above. 24 h later, chromatin immunoprecipitation was carried out with rabbit anti-H3K27Ac (Abcam 4729), rabbit anti-YY1 (Invitrogen MA5-32052) or normal rabbit IgG using Pierce Agarose ChIP kit (Thermo Scientific) following manufacturer’s instructions. A volume equivalent to 10% of total chromatin was set aside as input. Following chromatin immunoprecipitation, PCR reactions were performed using the eluted DNA and iQ SYBR Green Supermix (Bio-Rad Laboratories, Hercules, CA, USA) according to the manufacturer’s instructions with the following primers:
+
+CAGp Fw: 5’-AGTCCAAGCTAGGCCCTTTTGCT-3’
+
+CAGp Rev:5’-GCCAGCACACAGACCAGCACGT-3’
+
+ITR Fw: 5’-GCGCAGAGAGGGAGTGGCCAAC-3’
+
+ITR Rev: 5’-AACTAATGACCCCGTAATTGA-3’
+
+PCR amplification was performed using a CFX Connect thermocycler (Bio-Rad Laboratories, Hercules, CA, USA). Quantitative PCR data were analyzed applying the comparative Ct method (2 ^(-ΔΔCt)). ΔΔCt being ΔCt(anti-H3K27ac) - ΔCt(control IgG) and ΔCt = Ct (IP anti-H3K27ac) - Ct(Input sample 10% ). The results were expressed as fold enrichment over IgG immunoprecipitation.
+
+# AAV radiolabeling with Technetium-99m ( 99mTc)
+
+A direct SnCl₂ -mediated viral protein radio-labelling method was set up. For this, 40 μL of a 1.5 mg/mL SnCl₂ was added into a clean vial, which was then purged using a flow of N₂ (1,5 bar, 5 minutes) to flush any oxygen. A threefold excess of viral particles, as determined by PCR to compensate for processing losses, were then added in 100 μL of PBS into the vial, followed by 52-100 MBq of [99mTc]NaTcO4 diluted to a final volume of 100 μL with NaCl 0.9%. The reaction was then left for 10 minutes at room temperature in the closed vial. The radio-labelling yield was determined by radio-TLC using iTLC-SG as the stationary phase and 2-butanone as the mobile phase. Radio-labelled viral particles appeared on the seeding zone ({ R } { f } { = } 0), while unreacted [99mTc]NaTcO4 appeared at the solvent front (Rf = 1).
+
+# In vivo tumor models
+
+For single-tumor experiments, 5×10⁵–1×10⁶ tumor cells (MC38, B16, LLC, KPC or MB49) were subcutaneously (s.c.) inoculated into the right flank of C57BL/6 mice. When tumors reached 100 mm³ approximately, mice were randomized and tumors were locally irradiated (8Gy) using a 225 Kv Small Animals Radiation Research Platform (SARRP) (Xstrahl Inc.). Unless otherwise indicated, AAV vectors were administered intratumorally immediately after tumor irradiation. Tumor growth was monitored twice a week with an electronic caliper until endpoint. The tumor volume was calculated according to the formula V = (4/3)×π×(W/2)^2×(L/2). When indicated, mice received i.p. injections of 100 μg anti-PD-1 (29F.1A12) or anti-CTLA-4 (9D9) in 100 μL PBS on days 1, 4, and 7 after treatment. For depletion, anti-CD8β (53-5.8), anti-NK1.1 (PK136) or anti-FasL (MFL3) were given at 200 μg/mouse, and anti-CSF1R (AFS98) and anti-Ly6G (1A8) were administered at 1 mg for the first dose and 0.5 mg thereafter; anti-IFNγ (XMG1.2) was injected i.p. at 500 μg/mouse one day before treatment and then every 3–4 days. InvivoMab rat IgG2b (LTF-2) served as isotype control. All antibodies were started one day before tumor inoculation and then given every 3–4 days. In the humanized model,49 MHCdKO NSG mice were intravenously injected with 10^7 human fresh PBMCs. Seven days later, RT-112 cells (5×10^6 cells/mouse) were s.c. injected into the right flank of mice. Animals were treated as described before.
+
+For the pancreatic cancer orthotopic model, mice were anesthetized with isoflurane for the entire procedure. A ~1 cm subcostal incision was made in the left hemithorax. Pancreas was localized, externalized, and injected with 5×10^5 of KPC cells in PBS before suture. At day 10, pancreatic tumors were locally irradiated with computed tomography (CT) -guided SARRP. Once irradiation was completed, pancreas were surgically exposed for i.t. injection of the AAV. Tumor volumes were monitored by echography (VEVO 3100, Visualsonics) at days 7 (pre-treatment) and 21 (11 days post-treatment) after implantation. On day 22, animals were euthanized and tumors were collected and weighed.
+
+For the glioblastoma orthotopic model, GL261 (5×10^4 cells per mouse in 3 μL of free medium) was administered in the supratentorial region (+2.5 mm lateral, +1 mm anterior and 3mm depth respect to bregma) using a guide-screw system81 of 4-week-old C57Bl/6 mice. After seven days, mice were irradiated using a SARRP as described.82 Briefly, a CT was acquired for each mouse, to determine the target area (PTV) and surrounding healthy tissues. A locoregional dose of 10Gy was selected using a 3x3mm collimator ‘‘nozzle’’ system. Once the treatment was finished, 5×10^10 viral genomes of AAV-iIL12 were administered using the guide-screw system as described above. The animals were checked daily and were sacrificed when symptoms (hemiparesis, loss of weight, or immobility) were visible.
+
+For the abscopal model, 5×10^5 cells on the right flank and 2×10^5 cells on the left flank were implanted subcutaneously. When right tumors reached 100 mm³ they were locally irradiated followed by i.t. AAV injection (5×10^10 vg), while left tumors received only local irradiation.
+
+For the lung metastatic model, tumor burden was monitored by in vivo bioimaging using the IVIS Spectrum Imaging system (PerkinElmer, USA). Three days after the primary tumor inoculation (s.c), 2×10^5 B16-Luciferase or B16 tumor cells were inoculated intravenously. When s.c. tumors reached 100 mm³ and lung metastases are established, animals were treated with local radiotherapy followed by i.t. of AAV vectors (5×10^10 vg). For the antitumor effect, luciferase expression was measured every 2/3 days until the end of the experiment.
+
+# Hemogram and biochemical blood analysis
+
+Blood samples from tumor-bearing mice were collected in tubes with 0.5% heparin (Mayne Pharma) at indicated time points. Hemograms were analyzed using the Drew Scientific HemaVet Hematology Analyzer (CDC Technologies) following the manufacturer’s recommendations. For biochemical analysis, serum levels of aspartate aminotransferase (AST), alanine aminotransferase (ALT), bilirubin, and creatinine (CRE) were measured using an automatic biochemical analyzer (Cobas C711). Mice were euthanized fifteen days after treatment and lungs, spleen, kidneys, intestine, and liver were harvested for cell infiltration analysis.
+
+# AAV biodistribution analysis
+
+On day 12 after tumor inoculation, MC38 tumor-bearing mice received local radiotherapy (8Gy) followed by AAV-iLuc or AAV-cLuc (5x1010 vg/mouse) injection. Five days after treatment, in vivo imaging was performed. For the intravenous biodistribution study, bilateral MC-38 tumor-bearing mice received different doses of radiation (0, 8, or 20 Gy) in the right tumors followed by intravenous injection of AAV-iLuc (1×10^11 vg/mouse). Bioluminescence was measured two days after treatment. To examine the effect of tumor radiation in the dual-flank antitumor model, MC38 tumor-bearing mice received 8Gy in the right tumor, followed by a single injection of AAV-iLuc (5x1010 vg/mouse). Three days later, the left tumors received 8Gy. In vivo bioluminescence was analyzed on days 1, 4, 10, and 15 after treatment. In vivo imaging was performed upon i.p. D-luciferin injection (20 mg/mL) as substrate and visualized using the IVIS Spectrum Imaging System (PerkinElmer). Regions of interest (ROIs) were quantified as average radiance (ph/s/cm²/sr) represented as color-scaled images superposed on grayscale photos of mice using Living Image software (Caliper Life Sciences).
+
+To evaluate the presence of viral particles in tumors, ITR2 DNA sequence copies were determined by Real-Time PCR two days after treatment. Tumors were mechanically disrupted and DNA extraction was performed using the Macherey Nagel NucleoSpin Tissue® kit (Macherey-Nagel). Real-time PCR analysis was performed in a CFX Connect Real-Time PCR System (Bio-Rad, Hercules, CA, USA) with iQ SYBR Green Supermix (Bio-Rad) using specific primers for AAV ITR2. The actine gene was used to standardize (Fw: 5′ -CTA AGG CCA ACC GTG AAG- 3′ and Rev: 5′ -TGC AAA GAT CCA AGG GAG AC-3′ ). The amount of viral DNA was expressed by the formula 2^(-ΔCt) [ct(Actin) – ct(ITR)], Ct being the point at which the fluorescence rises significantly above the background fluorescence.
+
+For SPECT/CT in vivo biodistribution studies, single photon emission computed tomography (SPECT) scans were acquired in a U-SPECT6/E-class (MILabs) 30 minutes, 3 and 24 hours post-administration using a UHR-RM collimator and a multi-mouse bed. Two groups of animals were studied depending on the route of virus administration. In the first group, 99mTc-AAV8 was administered intravenously through the tail vein 110 μL; 11.8 ± 0.8 MBq). In the second group, 99mTc-AAV8 was administered with i.t. injection (40 μL; 3.5 ± 0.3 MBq) in mice bearing control or irradiated tumors. For image acquisition, animals were placed prone on the scanner bed under continuous anesthesia with isoflurane (2% in 100% O₂ gas), and a whole-body scan was acquired over 30 min. Following the SPECT acquisition, CT scans were performed to obtain anatomical information using a tube setting of 55 kV and 0,33 mA. The SPECT images were reconstructed using the technetium-99m photopeak centered at 140 keV with a 20% energy window width and using a calibration factor to obtain the activity information (MBq/mL); then, the attenuation correction was performed using the CT attenuation map. Studies were analyzed using PMOD software (PMOD Technologies Ltd., Adliswil, Switzerland). To properly compare all the images, they were corrected with a numerical factor to compensate for the radioactive decay of 99mTc. After the last image (24 h p.i.), animals were sacrificed and the 99mTc signal was ex vivo measured using a gamma counter (Hidex Automatic Gamma Counter, Hidex Oy, Turuk, Finland) calibrated for 99mTc to calculate the percentage of injected dose in the tumors and in liver and brain samples (used as reference tissues with and without AAV arrival).
+
+# Tissue collection and histological analysis
+
+All tissue samples were harvested, fixed in 4% formaldehyde (PanReac AppliChem) for 48 h, and then in 70% ethanol until being embedded in paraffin blocks. Tissue sections were stained with Hematoxylin and Eosin. Tumor samples were incubated overnight at 4°C with anti-GFP or anti-Fas (Abcam). After rinsing in TBS-T, they were incubated with goat anti-rabbit labeled polymer EnVisionTM+ System (Dako, Glostrup, Denmark) for 30 min at room temperature, and peroxidase activity was revealed using DAB+ (Dako). Sections were lightly counterstained with Harris hematoxylin, dehydrated, coverslipped with Eukitt (Labolan), and scanned using a Scanscope CS2 scanner (Leica Biosystem). Images were analyzed by outlining tumors and determining the percentage of pixels with intense GFP staining according to ‘‘Algoritm9’’ of ImageScope software (Leica Biosystem).
+
+# Multiplex immunofluorescence staining and analysis
+
+Multiplex immunofluorescence staining and analysis was performed as previously described on a Bond RX autostainer.83,84 Fourmicrons-thick FFPE tissue sections were deparaffinized (Bond DeWax, Leica Biosystems) and rehydrated per standard protocols. Antigen retrieval was performed with Bond Epitope Retrieval Solution 1 (ER1, Leica Biosystems) or 2 (ER2, Leica Biosystems, product number AR9640), followed by four sequential cycles of staining with each cycle including a 30-minute combined block and primary antibody incubation (Akoya antibody diluent/block), followed by a secondary HRP-conjugated polymer. Signal amplification was achieved with TSA-Opal fluorophores. Between cycles of staining, tissue sections underwent heat-induced epitope retrieval to remove the primary/secondary-HRP antibody complexes before staining with the next antibody. The primary antibodies and corresponding fluorophores are anti-CD8 (rabbit monoclonal, IgG, clone D4W2Z, dilution: 1:75, product number: 98941; Cell Signaling) in Opal 570; anti-Foxp3 (rabbit monoclonal, clone D6O8R, dilution: 1:200, product number: 12653; Cell Signaling) in Opal 780; anti-CD31 (IgG, rabbit monoclonal, clone D8V9E, dilution: 1:100, product number: 77699; Cell Signaling) in Opal 520; and anti-ICAM (IgG, rabbit monoclonal, clone EPR16608, dilution: 1:2000, product number: Ab179707; Abcam) in Opal 620. Nuclei were counterstained with Spectral DAPI (Akoya Biosciences, FP1490) and mounted the stained tissues with ProLong Diamond Antifade mounting medium (Thermo Fisher Scientific). The stained slides were scanned using the PhenoImager™ HT Automated Quantitative Pathology Imaging System (Akoya Biosciences). After image acquisition, unmixing of the spectral libraries was performed with inForm software (Akoya Biosciences). Unmixed images were then imported into the open-source digital pathology software QuPath version 0.4.4 for stitching, cell segmentation and cell phenotyping. Marker expression was used to identify CD8+, FOXP3+, CD31+ ICAM+, and CD31+ ICAMcells. Total cell counts, cell densities, or cell percentage of each cell population were quantified. Spatial analysis of cell– cell distances were calculated on QuPath software using the Euclidean distances between their centroids.
+
+# Flow cytometry
+
+Tumors and draining lymph nodes were collected 5-6 days after treatment and processed to obtain single-cell suspensions. Tumors were disrupted using the Tumor Dissociation Kit and gentleMACS™ dissociator (Miltenyi Biotec). The resulting suspensions were filtered through 70 μm -cell strainers (Miltenyi Biotec), centrifugated at 300 g at 4°C and resuspended in FACS buffer 1% FBS, 0.5 mM EDTA in Ca²⁺- and Mg²⁺-free PBS. Dissociated cells were centrifuged with Lymphoprep™ density gradient medium (STEMCELL Technologies), making a gradient to eliminate parenchymal cells. Lymph nodes and spleens were disrupted mechanically, followed by incubation with collagenase and DNase (Roche) for 30 min at 37°C. Samples were incubated with ACK buffer (Invitrogen) for 5 minutes at room temperature, followed by centrifugation at 400 g at 4°C for 5 min. Samples were then stained with Zombie NIR (Biolegend) on ice for 15 minutes. To reduce nonspecific staining, samples were pretreated with Fc-Block (anti-CD16/32, eBioscience), followed by staining with mAbs against different markers (see key resources table) for 30 min on ice in the dark. Cytofix/cytoperm fixation permeabilization kit (BD Bioscience) was used for the analysis of transcription factors. Intracellular staining was performed to detect Granzyme B and IFNγ production after T cell stimulation for 4 h with 5 ng/ml of PMA (Sigma-Aldrich) and 0.5 μg/ml ionomycin calcium salt (Sigma-Aldrich), two hours in the presence of the protein secretion inhibitors GolgiPlug and GolgiStop (BD). CytoFlex LX cytometer, Cytoflex XS, and Cytoflex DxFlex (Beckman Coulter) were used for cell acquisition, and data analysis was performed using FlowJo 10 (Tree Star Inc.).
+
+# Phosphoproteomic analysis
+
+# Sample preparation
+
+B16 cells were stimulated overnight with IFNγ before irradiation (8Gy). Pellets from irradiated or control cells were homogenized in a lysis buffer (8 M urea, 50 mM dithiothreitol (DTT), supplemented with protease (cOmplete Mini, Roche) and phosphatase inhibitors (PhosSTOP, Roche). Lysates were centrifuged at 20,000 g (1 h, 15°C), and the resulting supernatant was quantified with the Bradford assay kit (BioRad). To obtain the phosphorylated peptide sample fraction, 600 μg of protein was separated for protein digestion. Proteins were reduced with DTT (final concentration of 20 mM; room temperature, 30 min), alkylated with iodoacetamide (final concentration of 30 mM; room temperature, 30 min in the dark), diluted to 0.9 M with ABC and digested with trypsin (Promega; 1:20 w/w enzyme protein ratio, 18 h, 37°C). Protein digestion was interrupted by acidification (pH < 6, acetic acid), and the resulting peptides were cleaned-up using Pierce™ Peptide Desalting Spin Columns (ThermoFisher Sci.). The following phosphorylated peptide enrichment was performed using the High-Select™ TiO2 Phosphopeptide enrichment Kit (ThermoFisher Sci.) according to the manufacturer’s instructions. Finally, the enriched phosphopeptide sample fraction was cleanedup as described before and dried down in a Speed-Vac system. A 10 μg aliquot of cleaned-up peptides from protein digestion was set aside for total protein analyses.
+
+# Data independent acquisition (DIA)-mass spectrometry
+
+Dried down peptide samples were reconstituted with 2% ACN- 0.1% FA (Acetonitrile-Formic acid), spiked with internal retention time peptide standards (iRT, Biognosys), and quantified by NanoDropTM spectrophometer (ThermoFisher Sci.) prior to LC-MS/MS analysis using an EVOSEP ONE system coupled to an Exploris 480 mass spectrometer (ThermoFisher Sci.). Peptides were resolved using C18 Performance column ( 75 μm x 15cm, 1.9 μm particles; Evosep) with a predefined Xcalibur Whisper100 20 SPD (58min, IonOpticks Aurora Elite, EV1112) method. Peptides were ionized using 1.6 kV spray voltage at a capillary temperature of 275°C. Sample data were acquired in data-independent acquisition (DIA) mode with full MS scans (scan range: 400 to 900 m/z; resolution: 60,000; maximum injection time: 22 ms; normalized AGC target: 300% ) and 24 periodical MS/MS segments applying 20 Th isolation windows (0.5 Th overlap: Resolution: 15000; maximum injection time: 22 ms; normalized AGC target: 100% ). Peptides were fragmented using a normalized HCD collision energy of 30%.
+
+# Bioinformatics and statistical analysis
+
+Mass spectrometry data files were analyzed using Spectronaut (Biognosys) by direct DIA analysis (dDIA). MS/MS spectra were searched against the Uniprot proteome reference from human database using standard settings. Enzyme was set to trypsin in a specific mode. On the one hand, Carbamidomethyl (C) was set as a fixed modification, and oxidation (M), acetyl (protein N-term), deamidation (N), and Gln→pyro-Glu as variable modifications for total protein analysis. On the other hand, Carbamidomethyl (C) was set as a fixed modification, and oxidation (M), acetyl (protein N-term), and Phospho (STY) as variable modifications for phospho-proteome analysis. Identifications were filtered by a 1% Q-value. The obtained quantitative data for total protein were exported to Perseus software (version 1.6.15.0)^85 for statistical analysis and data visualization. For total protein analysis, unpaired Student’s t test was used for direct comparisons. Statistical significance was set at p-value lower than 0.05 in all cases and 1% peptide FDR threshold was considered. Differentially expressed proteins were considered significant when their absolute fold change was below 0.77 (downregulated proteins) and above 1.3 (up-regulated proteins) in linear scale. Quantitative data obtained from the phosphoproteome were collapsed using a custom coded plugin Peptide Collapse (v.1.4.4) in Perseus (v.1.6.15.0) that convert a normal Spectronaut report into a site-level report.86 Plugin settings were set as default grouping posttranslational modifications (PTMs) by sample (FileName), collapsing matrix by site-level and setting the PTM localization probabilities filter at more than 0.75. Statistical analyses were conducted following the same protocol as the total protein study. Differential (phospho) proteins was analyzed using Metascape87 using default settings (min. overlap: 3, min. enrichment: |1.5|, P < 0.05) ), and false discovery rate (FDR) adjusted p < 0.05. Specifically, for signature (phospho) proteins, Reactome database was used under the same statistical significance cut-off. Functional protein association networks were generated using STRING.88 Mass-spectrometry data and search results files were deposited in the Proteome Xchange Consortium via the JPOST partner repository (https://repository.jpostdb.org) 89 with the identifiers PXD056537 for ProteomeXchange and JPST003410 for jPOST.
+
+# RNA-seq of and data analysis
+
+For transcriptomic studies of tumor cells, single-cell suspensions from B16 tumors taken 5 days after treatment were stained with antibodies against CD45 and CD31 and Zombie Nir staining. CD45- CD31- cells were sorted in a MoFlo Astrios-EQ cell sorter (Beckman Coulter). RNA was extracted from cell pellets using the Qiagen RNeasy Mini kit according to the manufacturer’s instructions. RNA was subjected to quantity and quality control using Qubit HS RNA Assay Kit (ThermoFisher Scientific) and 4200 Tapestation with High Sensitivity RNA ScreenTape (Agilent Technologies). All RNA samples were high-quality, with RIN values higher than 8. Library preparation was performed using the Illumina Stranded mRNA Prep Ligation kit (Illumina) following the manufacturer’s protocol. All sequencing libraries were constructed from 50 ng of total RNA according to the manufacturer’s instruction. Briefly, the protocol selects and purifies poly(A) containing RNA molecules using magnetic beads coated with poly(T) oligos. Poly(A)-RNAs are fragmented and reverse transcribed into first cDNA strand using random primers. The second cDNA strand is synthesized in the presence of dUTP to ensure strand specificity. Resulting cDNA fragments are purified with AMPure XP beads (Beckman Coulter), adenylated at 3′ ends and then ligated with uniquely indexed sequencing adapters. Ligated fragments are purified and PCR amplified to obtain the final libraries. The quality and quantity of the libraries were verified using Qubit dsDNA HS Assay Kit (Thermo Fisher Scientific) and 4200 Tapestation with High Sensitivity D1000 ScreenTape (Agilent Technologies). Libraries were then sequenced using a NextSeq2000 sequencer (Illumina). 20-30 million pair-end reads (100 bp; Rd1:51; Rd2:51) were sequenced for each sample and demultiplexed using bcl2fastq. RNAseq was carried out at the Genomics Unit of CIMA-Universidad de Navarra.
+
+RNA sequencing data analysis was performed using the following workflow: (1) the quality of the samples was verified using FastQC software (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) and the trimming of the reads with trimmomatic90; (2) alignment against the mouse reference genome (GRCm39) was performed using STAR91; (3) gene expression quantification using read counts of exonic gene regions was carried out with featureCounts92; (4) the gene annotation reference was Gencode vM3293; and (5) differential expression statistical analysis was performed using R/Bioconductor (https://www.R-project.org/). First, gene expression data was normalized with edgeR94 and voom.95 After quality assessment and outlier detection using R/Bioconductor, a filtering process was performed. Genes with read counts lower than 4 in more than the 50% of the samples of all the studied conditions were considered as not expressed in the experiment under study. LIMMA95 was used to identify the genes with significant differential expression between experimental conditions. Further functional and clustering analyses and graphical representations were performed using R/Bioconductor and clusterProfiler.96
+
+# Single cell RNA-seq and data analysis
+
+For scRNAseq studies, single-cell suspensions from tumors taken 6 days after treatment were stained with Zombie Nir and CD45. Viable CD45+ cells were sorted in a MoFlo Astrios-EQ cell sorter (Beckman Coulter). Droplet-based isolation of single cells was performed with the Chromium Controller (10x Genomics). Subsequent generation of 3′ sequencing libraries was performed per the manufacturer’s instructions (10x Genomics). Briefly, 17000 to 20000 cells were loaded at a concentration of 1000 cells/μL on a Chromium X instrument (10X Genomics) to capture single cells in gel bead-in-emulsions (GEMs). In this step, each cell was encapsulated with primers containing a fixed Illumina Read 1 sequence, a cell-identifying 16 nt 10X barcode, a 12 nt Unique Molecular Identifier (UMI) and a poly-dT sequence. Upon cell lysis, reverse transcription yielded full-length, barcoded cDNA. This cDNA was then released from the GEMs, PCR-amplified and purified with magnetic beads (SPRIselect, Beckman Coulter). Enzymatic Fragmentation and Size Selection was used to optimize cDNA size prior to library construction. Fragmented cDNA was then end-repaired, A-tailed and ligated to Illumina adaptors. A final PCR-amplification with barcoded primers allowed sample indexing. Library quality control and quantification was performed using Qubit 3.0 Fluorometer (Life Technologies) and Agilent’s 4200 TapeStation System (Agilent), respectively. Sequencing was performed in a NextSeq2000 (Illumina) using paired-end 91-base pair reads.
+
+Raw sequencing data were demultiplexed with bcl2fastq v2.20.0 and, aligned and quantified using 10× Genomics Cell Ranger v7.1.0 and mm10 reference (2020-A) downloaded from the 10× Genomics website. Downstream quality control, filtering, normalization, and analysis were performed using Scanpy (v1.9.3). Cells with mitochondrial gene content exceeding 10%, with less than 200 detected genes, or with greater than 2,500 detected genes were removed from the dataset. Genes not recovered in at least 1 of the remaining cells were also removed from the dataset. Doublets were computationally predicted and removed using the built-in Scanpy Scrublet function. Raw counts were then normalized to 100,000 and log-transformed with a pseudo-count of 1. Manifold Approximation and Projection (UMAP) plots were generated using the built-in Scanpy Principal Component Analysis (PCA) and nearest neighbor graph functions on the top 10,000 highly variable genes. To minimize technical batch effects, embeddings were corrected using Harmony.97 Cells were then grouped into 29 distinct clusters using the Leiden algorithm. Cluster-level analysis revealed three clusters composed mostly of cells with high predicted doublet scores, so these cells were also removed from the data. The final collection of cells (n = 45,958) was then re-embedded, corrected, and grouped into 26 distinct clusters using the Leiden algorithm. Cluster density (‘‘galaxy’’) plots depict a downsampled quantity of cells to ensure equal representation across treatment groups (n=22,731/group). Sub-clustering was performed on T and NK cells (defined as cells in clusters differentially expressing Cd8a, Cd4, or Ncr1 transcripts based on the built-in Scanpy cluster vs. rest gene expression function). After sub-clustering, new PCA and UMAP embeddings, nearest neighborhood graphs, and Harmony batch corrections were calculated on a new set of 10,000 highly variable genes. T and NK cells (n = 7,635) were then grouped into 17 distinct clusters using the Leiden algorithm. Cluster density (‘‘galaxy’’) plots depict a downsampled quantity of cells to ensure equal representation across treatment groups (n = 2,635/group). Differentially expressed genes between clusters were calculated using a logistic regression model.98 To perform GSEA, ranked lists of differential genes were created using signed p-values calculated by the logistic regression model and passed to GSEA Preranked using GSEApy library (v1.0.4) in Python to search for enriched gene sets.
+
+# Cytokine determination
+
+Blood samples were incubated for 15-30 min at room temperature and centrifuged at 2000 g for 10 min at 4°C.. Tumors were homogenized by mechanic disruption in PBS buffer with Complete Protease Inhibitors and incubated 15 min on ice. Samples were then centrifuged, and the supernatant was collected and stored at -80°C until use. Protein was determined by the BCA method (Pierce BCA Protein Assay Kit). All samples were stored at 0°C until used. IFNβ levels were measured using a VeriKine™ Mouse Interferon Alpha ELISA Kit (PBL Assay Science, Piscataway, NJ) following the manufacturer’s recommendations. Single determinations of IL-12, IFNγ, IL-15/IL-15Rα and FLT3L levels were carried out with BD OptEIA Mouse IL-12 (p70) (BD Biosciences), Mouse IL-15/IL-15Rα (Invitrogen), Mouse FLT3 Ligand Immunoassay (R&D Systems) and BD OptEIA Mouse IFNγ (BD Biosciences) ELISA sets, respectively. For multiple determinations, Mouse Luminex Discovery Assay (R&D Systems, catalog number: LXSAMSM) was used to measure IFNγ, TNF-α, CXCL10, CXCL16, GM-CSF, and IL-12 (p70), in tumor homogenates according to the manufacturer’s instructions. Data were collected by using the Magpix instrument (LuminexCorp.) and expressed in pg/mL. Samples in which beads count was below 50 events per cytokine were excluded for further analysis.
+
+# QUANTIFICATION AND STATISTICAL ANALYSIS
+
+GraphPad Prism version 8.2 software (GraphPad Software, Inc.) was used for statistical analysis. Shapiro-Wilk test was used to confirm normal distribution of the data before the use of parametric tests. Data were analyzed by unpaired two-way Student’s t-test, one-way or two-way ANOVA followed by Tukey’s multiple comparisons as indicated in the figure legends. Kaplan-Meier curves were analyzed by log-rank test.

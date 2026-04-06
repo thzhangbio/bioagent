@@ -43,6 +43,12 @@ export function extractDoiSegmentFromArchiveBasename(basename: string): string |
   return null;
 }
 
+export function extractTimestampFromArchiveBasename(basename: string): string | null {
+  const head = basename.split("+")[0]?.trim();
+  if (head && /^\d{12}$/.test(head)) return head;
+  return null;
+}
+
 /**
  * 由论文标题字符串生成归档 slug（小写、连字符），与终稿 YAML `kb_metadata.title` 一致时使用。
  * 非拉丁或过短时用 `fallbackSlug`（一般为源文件名不含扩展名）。

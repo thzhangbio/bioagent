@@ -10,7 +10,7 @@ import {
 } from "../stage-shared.js";
 
 interface RagStoreLike {
-  chunks?: Array<{ sourcePath?: string }>;
+  chunks?: Array<{ sourcePath?: string; sourceId?: string }>;
 }
 
 export const segmentOutToKnowledge04VerifySearchStage: SegmentOutToKnowledgeStage =
@@ -35,12 +35,15 @@ export const segmentOutToKnowledge04VerifySearchStage: SegmentOutToKnowledgeStag
         readFileSync(DEFAULT_RAG_STORE_PATH, "utf-8"),
       ) as RagStoreLike;
       const sourcePaths = new Set(store.chunks?.map((chunk) => chunk.sourcePath).filter(Boolean));
+      const sourceIds = new Set(store.chunks?.map((chunk) => chunk.sourceId).filter(Boolean));
       for (const file of context.copiedFiles) {
         const knowledgePath = file.knowledgePath ?? file.outPath;
         const relativePath = knowledgePath.startsWith(`${PROJECT_ROOT}/`)
           ? knowledgePath.replace(`${PROJECT_ROOT}/`, "")
           : knowledgePath;
-        if (!sourcePaths.has(relativePath) && !sourcePaths.has(knowledgePath)) {
+        const verifiedByPath = sourcePaths.has(relativePath) || sourcePaths.has(knowledgePath);
+        const verifiedBySourceId = Boolean(file.doi && sourceIds.has(file.doi));
+        if (!verifiedByPath && !verifiedBySourceId) {
           throw new Error(`未在 rag store 中验证到文件: ${relativePath}`);
         }
       }

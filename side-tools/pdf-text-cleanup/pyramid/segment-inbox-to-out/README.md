@@ -39,11 +39,13 @@
 | `08-cleanup-kb-specific/` | `08-cleanup-kb-specific.ts` | KB 专用清洗阶段入口。 |
 | `09-formula-fragments/` | `09-formula-fragments.ts` | 公式碎片规则阶段入口。 |
 | `09-formula-fragments/` | `fragment-audit.ts` | 审计未解析 `$...$` 碎片。 |
+| `09-formula-fragments/` | `fragment-audit-shared.ts` | 碎片审计与质量门共用的未解析片段扫描逻辑。 |
 | `09-formula-fragments/` | `fragment-list.ts` | 列出碎片出现频次，辅助归类。 |
 | `09-formula-fragments/` | `fragment-apply-inplace.ts` | 对已有 `*.kb.md` 套用公式碎片规则。 |
 | `09-formula-fragments/` | `fragment-fixtures.ts` | 疑难碎片案例夹具。 |
 | `09-formula-fragments/` | `fragment-fixtures-check.ts` | 跑碎片夹具回归检查。 |
 | `09-formula-fragments/` | `FRAGMENT-HANDBOOK.md` | 公式碎片处理经验手册。 |
 | `10-metadata-fetch/` | `10-metadata-fetch.ts` | metadata 获取与注入阶段入口。 |
+| `11-quality-gate/` | `11-quality-gate.ts` | 写出前质量门：未解析短 `$...$` 碎片必须为 0，否则禁止生成 `out/*.kb.md`。 |
 | `11-write-final/` | `11-write-final.ts` | 写出 `out/*.kb.md`，并处理 `alsoSimpleOut`。 |
 | `12-inbox-sync/` | `12-inbox-sync.ts` | 对齐 inbox 源稿基名，重命名 `.md` / `.json`。 |

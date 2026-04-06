@@ -21,6 +21,10 @@ import {
   KB_SHORT_INLINE_MATH_MAX_INNER_LEN,
   normalizeMineruInlineLatex,
 } from "../segment-inbox-to-out.kb-shared.js";
+import {
+  scanMarkdownForUnresolvedInlineFragments,
+  shortDollarRegex,
+} from "./fragment-audit-shared.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const PDF_TEXT_CLEANUP_ROOT = resolve(__dirname, "../../..");
@@ -40,16 +44,9 @@ function parseArgs(): { dir: string; maxInner: number; out?: string } {
   return { dir, maxInner, out };
 }
 
-function shortDollarRegex(maxInner: number): RegExp {
-  return new RegExp(
-    `(?<!\$)\\$(?!\\$)([^$\\n]{1,${maxInner}})\\$(?!\\$)`,
-    "g",
-  );
-}
-
 function main(): void {
   const { dir, maxInner, out } = parseArgs();
-  const re = shortDollarRegex(maxInner);
+  const allMatchesRe = shortDollarRegex(maxInner);
 
   const files = readdirSync(dir)
     .filter((f) => f.endsWith(".kb.md"))
@@ -62,23 +59,17 @@ function main(): void {
   for (const file of files) {
     const path = join(dir, file);
     const text = readFileSync(path, "utf-8");
-    const lines = text.split(/\n/);
-    lines.forEach((line, lineIdx) => {
-      const r = new RegExp(re.source, "g");
-      let m: RegExpExecArray | null;
-      while ((m = r.exec(line)) !== null) {
-        const full = m[0];
-        const after = normalizeMineruInlineLatex(full);
-        if (after === full) {
-          const prev = unresolved.get(full) ?? { count: 0, examples: [] };
-          prev.count += 1;
-          if (prev.examples.length < 5)
-            prev.examples.push({ file, line: lineIdx + 1 });
-          unresolved.set(full, prev);
-        } else {
-          resolved.set(full, (resolved.get(full) ?? 0) + 1);
-        }
+    for (const full of text.match(new RegExp(allMatchesRe.source, "g")) ?? []) {
+      if (normalizeMineruInlineLatex(full) !== full) {
+        resolved.set(full, (resolved.get(full) ?? 0) + 1);
       }
+    }
+    const unresolvedMatches = scanMarkdownForUnresolvedInlineFragments(text, maxInner);
+    unresolvedMatches.forEach(({ fragment, line }) => {
+      const prev = unresolved.get(fragment) ?? { count: 0, examples: [] };
+      prev.count += 1;
+      if (prev.examples.length < 5) prev.examples.push({ file, line });
+      unresolved.set(fragment, prev);
     });
   }
 

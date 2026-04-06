@@ -1898,6 +1898,120 @@ export function normalizeMineruInlineLatex(text: string): string {
   /** `$(mm²) $ )` 多余 `)` */
   s = s.replace(/\(\s*mm²\s*\)\s*\$\s*\)/g, "(mm²)");
 
+  /** 两篇 Cancer Cell 新稿：短碎片兜底规则 */
+  s = s.replace(/\$\s*T\s*=\s*\$/g, "T =");
+  s = s.replace(
+    /\$\s*N\s*=\s*((?:\d\s*)+)\s*\{\s*-\s*\}\s*((?:\d\s*)+)\s*\$/gi,
+    (_, a: string, b: string) => `N = ${collapseSpacedChars(a)}–${collapseSpacedChars(b)}`,
+  );
+  s = s.replace(/\$\s*\\zeta\s*n\s*=\s*((?:\d\s*)+)\s*\$/gi, (_, raw: string) =>
+    `n = ${collapseSpacedChars(raw)}`,
+  );
+  s = s.replace(/\$\s*T\s*_\s*\{\s*H\s*\}\s*\\mathsf\s*\{\s*1\s*\}\s*\$/gi, "Th1");
+  s = s.replace(
+    /\$\s*\{\s*T\s*\}\s*_\s*\{\s*H\s*\}\s*\{\s*\\mathsf\s*\{\s*1\s*\}\s*\}\s*\$/gi,
+    "Th1",
+  );
+  s = s.replace(
+    /\$\s*\{\s*T\s*\}\s*\{\s*L\s*\}\s*\{\s*S\s*\}\s*\^\s*\{\s*((?:\d\s*)+)\s*\}\s*\$/gi,
+    (_, raw: string) => `TLS^${collapseSpacedChars(raw)}`,
+  );
+  s = s.replace(/\$\s*\\cdot\s*\\kappa\s*B\s*\\mathsf\s*\{\s*2\s*\}\s*\$/gi, "κB2");
+  s = s.replace(/\$\s*50\s*m\s*M\s*\$/gi, "50 mM");
+  s = s.replace(/\$\s*\\textstyle\s*-\s*80\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\$/gi, "-80°C");
+  s = s.replace(/\$\s*\{\s*72\s*\^\s*\{\s*\\circ\s*\}\s*\}\s*C\s*\$/gi, "72°C");
+  s = s.replace(/\$\s*\\varnothing\s*0\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\$/gi, "0°C");
+  s = s.replace(/\$\s*\\%\s*\$/g, "%");
+  s = s.replace(
+    /\$\s*\\scriptstyle\s*\\mathsf\s*\{\s*m\s*C\s*\}\s*=\s*100\s*\/\s*\(\s*1\s*\+\s*E\s*\)\s*\^\s*\{\s*\\mathsf\s*\{\s*C\s*q\s*2\s*\}\s*-\s*\\mathsf\s*\{\s*C\s*q\s*1\s*\}\s*\}\s*\$/gi,
+    "mC = 100 / (1 + E)^(Cq2 - Cq1)",
+  );
+  s = s.replace(/\$\s*N\s*_\s*\{\s*2\s*\}\s*\$/gi, "N₂");
+  s = s.replace(
+    /\$\s*\[\s*\{\s*99\s*\}\s*m\s*_\s*\{\s*\\mathsf\s*\{\s*T\s*C\s*\}\s*\}\s*\]\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*O\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+  s = s.replace(
+    /\$\s*P\s*\^\s*\{\s*\\mathsf\s*\{\s*99\s*m\s*\}\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*J\s*\\mathsf\s*\{\s*N\s*a\s*T\s*c\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+  s = s.replace(/\$\s*2\s*\^\s*\{\s*-\s*\\Delta\s*C\s*t\s*\}\s*\$/gi, "2^(-ΔCt)");
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\rho\s*B\s*S\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} μL PBS`,
+  );
+  s = s.replace(/\$\s*15\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\)\s*\$/gi, "15°C)");
+  s = s.replace(/\$\s*37\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\)\s*\$/gi, "37°C)");
+  s = s.replace(/\$\s*4\s*\^\s*\{\s*\\circ\s*\}\s*C\.\s*\$/gi, "4°C.");
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*(?:\\\s+)?\s*\\mu\s*m\s*\$/gi,
+    (full, raw: string) => /^\d*\.?\d+$/.test(collapseSpacedChars(raw)) ? `${collapseSpacedChars(raw)} μm` : full,
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*m\s*\/\s*z\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} m/z`,
+  );
+  s = s.replace(/\$\s*_\s*\{\s*P\s*<\s*0\s*\.\s*05\s*\)\s*\}\s*\$/gi, "P < 0.05)");
+  s = s.replace(/\$\s*\{\s*p\s*\}\s*\{\s*<\s*\}\s*0\s*\.\s*05\s*\$/gi, "p < 0.05");
+  s = s.replace(/\$\s*\(\s*n\s*\{\s*=\s*\}\s*7\s*,\s*635\s*\)\s*\$/gi, "(n = 7,635)");
+  s = s.replace(
+    /\$\s*0\s*\.\s*3\s*g\s*\/\s*\\mathsf\s*\{\s*k\s*g\s*\}\s*\$/gi,
+    "0.3 g/kg",
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*U\s*\/\s*m\s*\|\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} U/ml`,
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*m\s*\|\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} ml`,
+  );
+  s = s.replace(
+    /\$\s*\+\s*((?:\d\s*)+)\s*U\s*\/\s*m\s*l\s*\$/gi,
+    (_, raw: string) => `+ ${collapseSpacedChars(raw)} U/ml`,
+  );
+  s = s.replace(
+    /\$\s*<\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\)\s*\$/gi,
+    (_, raw: string) => `< ${raw.replace(/\s+/g, "")} μm²)`,
+  );
+  s = s.replace(
+    /\$\s*>\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\)\s*\$/gi,
+    (_, raw: string) => `> ${raw.replace(/\s+/g, "")} μm²)`,
+  );
+  s = s.replace(
+    /\$\s*>\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\$/gi,
+    (_, raw: string) => `> ${raw.replace(/\s+/g, "")} μm²`,
+  );
+  s = s.replace(
+    /\$\s*\(\s*((?:\d\s*)+)\s*\\mu\s*\\?\s*g\s*\/\s*m\s*[μ\\|l]\s*\$/gi,
+    (_, raw: string) => `(${collapseSpacedChars(raw)} μg/ml`,
+  );
+  s = s.replace(
+    /\$\s*\(\s*((?:\d\s*)+)\s*~\s*\\mu\s*\\varrho\s*\/\s*m\s*(?:\||\\mu)\s*\$/gi,
+    (_, raw: string) => `(${collapseSpacedChars(raw)} μg/ml`,
+  );
+  s = s.replace(
+    /\$\s*\(\s*((?:\d\s*)+)\s*(?:\\\s+)?\s*\\mu\s*g\s*\/\s*m\s*l\s*\$/gi,
+    (_, raw: string) => `(${collapseSpacedChars(raw)} μg/ml`,
+  );
+  s = s.replace(
+    /\$\s*([\d,\s]+)\s*\{\s*-\s*\}\s*([\d,\s]+)\s*(?:\\\s+)?\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\)\s*\$/gi,
+    (_, a: string, b: string) => `${a.replace(/\s+/g, "")}–${b.replace(/\s+/g, "")} μm²)`,
+  );
+  s = s.replace(
+    /\$\s*\{\s*A\s*\}\s*[–-]\s*4\s*8\s*5\s*\^\s*\{\s*4\s*4\s*\}\s*\$/gi,
+    "A-485",
+  );
+  s = s.replace(
+    /\$\s*I\s*\{\s*\\cal\s*\{\s*I\s*\}\s*\}\s*_\s*\{\s*\}\s*\^\s*\{\s*\}\s*-\s*\{\s*\\bf\s*\\nabla\s*\}\s*\^\s*\{\s*\/\s*-\s*\}\s*\$/gi,
+    "Il2rg−/−",
+  );
+  s = s.replace(/\$\s*\^\s*\{\s*\\mathfrak\s*\{\s*g\s*t\s*\}\s*\}\s*\/\s*J\s*\$/gi, "^gt/J");
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*C\s*57\s*B\s*L\s*\}\s*\/\s*6\s*\\mathrm\s*\{\s*-\s*\}\s*\\mathsf\s*\{\s*P\s*r\s*f\s*1\s*\}\s*\^\s*\{\s*\\mathrm\s*\{\s*t\s*m\s*15\s*d\s*z\s*\}\s*\}\s*\/\s*J\s*\)\s*\$/gi,
+    "(C57BL/6-Prf1^tm15dz/J)",
+  );
+
   return s;
 }
 
@@ -3501,6 +3615,135 @@ export function normalizeKbResidualDollarMath(text: string): string {
       return /^\d+$/.test(n) ? `${n} mM` : full;
     },
   );
+
+  /** 本轮两篇 Cancer Cell 新稿残留的短碎片定向收口 */
+  s = s.replace(/\$\s*T\s*=\s*\$/g, "T =");
+  s = s.replace(
+    /\$\s*N\s*=\s*((?:\d\s*)+)\s*\{\s*-\s*\}\s*((?:\d\s*)+)\s*\$/gi,
+    (_, a: string, b: string) => `N = ${collapseSpacedChars(a)}–${collapseSpacedChars(b)}`,
+  );
+  s = s.replace(/\$\s*\\zeta\s*n\s*=\s*((?:\d\s*)+)\s*\$/gi, (_, raw: string) =>
+    `n = ${collapseSpacedChars(raw)}`,
+  );
+  s = s.replace(/\$\s*T\s*_\s*\{\s*H\s*\}\s*\\mathsf\s*\{\s*1\s*\}\s*\$/gi, "Th1");
+  s = s.replace(
+    /\$\s*\{\s*T\s*\}\s*_\s*\{\s*H\s*\}\s*\{\s*\\mathsf\s*\{\s*1\s*\}\s*\}\s*\$/gi,
+    "Th1",
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*\{\s*\\mu\s*m\s*\}\s*\)\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} μm)`,
+  );
+  s = s.replace(/\$\s*h\s*=\s*\\#\s*\$/gi, "n = #");
+  s = s.replace(
+    /\$\s*\{\s*T\s*\}\s*\{\s*L\s*\}\s*\{\s*S\s*\}\s*\^\s*\{\s*((?:\d\s*)+)\s*\}\s*\$/gi,
+    (_, raw: string) => `TLS^${collapseSpacedChars(raw)}`,
+  );
+  s = s.replace(/\$\s*\\cdot\s*\\kappa\s*B\s*\\mathsf\s*\{\s*2\s*\}\s*\$/gi, "κB2");
+  s = s.replace(
+    /\$\s*\\sim\s*((?:[\d\s.])+)\s*m\s*\$/gi,
+    (_, raw: string) => `~${collapseSpacedChars(raw)} ml`,
+  );
+  s = s.replace(
+    /\$\s*\(\s*((?:\d\s*)+)\s*\\mu\s*\\?\s*g\s*\/\s*m\s*[μ\\|l]\s*\$/gi,
+    (_, raw: string) => `(${collapseSpacedChars(raw)} μg/ml`,
+  );
+  s = s.replace(
+    /\$\s*0\s*\.\s*3\s*g\s*\/\s*\\mathsf\s*\{\s*k\s*g\s*\}\s*\$/gi,
+    "0.3 g/kg",
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*m\s*\|\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} ml`,
+  );
+  s = s.replace(
+    /\$\s*\+\s*((?:\d\s*)+)\s*U\s*\/\s*m\s*l\s*\$/gi,
+    (_, raw: string) => `+ ${collapseSpacedChars(raw)} U/ml`,
+  );
+  s = s.replace(
+    /\$\s*<\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\)\s*\$/gi,
+    (_, raw: string) => `< ${raw.replace(/\s+/g, "")} μm²)`,
+  );
+  s = s.replace(
+    /\$\s*>\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\)\s*\$/gi,
+    (_, raw: string) => `> ${raw.replace(/\s+/g, "")} μm²)`,
+  );
+  s = s.replace(
+    /\$\s*>\s*([\d,\s]+)\s*\\mu\s*m\s*\^\s*\{\s*2\s*\}\s*\$/gi,
+    (_, raw: string) => `> ${raw.replace(/\s+/g, "")} μm²`,
+  );
+  s = s.replace(
+    /\$\s*\{\s*A\s*\}\s*[–-]\s*4\s*8\s*5\s*\^\s*\{\s*4\s*4\s*\}\s*\$/gi,
+    "A-485",
+  );
+  s = s.replace(
+    /\$\s*I\s*\{\s*\\cal\s*\{\s*I\s*\}\s*\}\s*_\s*\{\s*\}\s*\^\s*\{\s*\}\s*-\s*\{\s*\\bf\s*\\nabla\s*\}\s*\^\s*\{\s*\/\s*-\s*\}\s*\$/gi,
+    "Il2rg−/−",
+  );
+  s = s.replace(
+    /\$\s*\^\s*\{\s*\\mathfrak\s*\{\s*g\s*t\s*\}\s*\}\s*\/\s*J\s*\$/gi,
+    "^gt/J",
+  );
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*C\s*57\s*B\s*L\s*\}\s*\/\s*6\s*\\mathrm\s*\{\s*-\s*\}\s*\\mathsf\s*\{\s*P\s*r\s*f\s*1\s*\}\s*\^\s*\{\s*\\mathrm\s*\{\s*t\s*m\s*15\s*d\s*z\s*\}\s*\}\s*\/\s*J\s*\)\s*\$/gi,
+    "(C57BL/6-Prf1^tm15dz/J)",
+  );
+  s = s.replace(/\$\s*50\s*m\s*M\s*\$/gi, "50 mM");
+  s = s.replace(/\$\s*\\textstyle\s*-\s*80\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\$/gi, "-80°C");
+  s = s.replace(/\$\s*\{\s*72\s*\^\s*\{\s*\\circ\s*\}\s*\}\s*C\s*\$/gi, "72°C");
+  s = s.replace(/\$\s*\\%\s*\$/g, "%");
+  s = s.replace(
+    /\$\s*\\scriptstyle\s*\\mathsf\s*\{\s*m\s*C\s*\}\s*=\s*100\s*\/\s*\(\s*1\s*\+\s*E\s*\)\s*\^\s*\{\s*\\mathsf\s*\{\s*C\s*q\s*2\s*\}\s*-\s*\\mathsf\s*\{\s*C\s*q\s*1\s*\}\s*\}\s*\$/gi,
+    "mC = 100 / (1 + E)^(Cq2 - Cq1)",
+  );
+  s = s.replace(/\$\s*N\s*_\s*\{\s*2\s*\}\s*\$/gi, "N₂");
+  s = s.replace(
+    /\$\s*\[\s*\{\s*99\s*\}\s*m\s*_\s*\{\s*\\mathsf\s*\{\s*T\s*C\s*\}\s*\}\s*\]\s*\\mathsf\s*\{\s*N\s*a\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*O\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+  s = s.replace(
+    /\$\s*P\s*\^\s*\{\s*\\mathsf\s*\{\s*99\s*m\s*\}\s*\}\s*\\mathsf\s*\{\s*T\s*c\s*\}\s*J\s*\\mathsf\s*\{\s*N\s*a\s*T\s*c\s*O\s*\}\s*_\s*\{\s*4\s*\}\s*\$/gi,
+    "[99mTc]NaTcO4",
+  );
+  s = s.replace(
+    /\$\s*V\s*=\s*\(\s*4\s*\/\s*3\s*\)\s*\\times\s*\\pi\s*\\times\s*\(\s*W\s*\/\s*2\s*\)\s*\^\s*\{\s*2\s*\}\s*\\times\s*\(\s*L\s*\/\s*2\s*\)\s*\$\s*/gi,
+    "V = (4/3)×π×(W/2)^2×(L/2)",
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*\\mu\s*\\rho\s*B\s*S\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} μL PBS`,
+  );
+  s = s.replace(
+    /\$\s*\(\s*\\mathsf\s*\{\s*p\s*h\s*\}\s*\/\s*s\s*\/\s*\\mathsf\s*\{\s*c\s*m\s*\}\s*\^\s*\{\s*2\s*\}\s*\/\s*\\mathsf\s*\{\s*s\s*r\s*\}\s*\$/gi,
+    "(ph/s/cm²/sr",
+  );
+  s = s.replace(/\$\s*2\s*\^\s*\{\s*-\s*\\Delta\s*C\s*t\s*\}\s*\$/gi, "2^(-ΔCt)");
+  s = s.replace(
+    /\$\s*110\s*~\s*\\mu\s*L\s*\/\s*11\s*,\s*8\s*\{\s*\\pm\s*\}\s*0\s*,\s*8\s*~\s*N\s*\$/gi,
+    "110 μL; 11.8 ± 0.8",
+  );
+  s = s.replace(
+    /\$\s*\(\s*40\s*\\mu\s*L\s*\/\s*3\s*,\s*5\s*\{\s*\\pm\s*\}\s*0\s*,\s*3\s*\$/gi,
+    "(40 μL; 3.5 ± 0.3",
+  );
+  s = s.replace(/\$\s*\(\s*2\s*\\%\s*\$/gi, "(2%");
+  s = s.replace(/\$\s*15\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\)\s*\$/gi, "15°C)");
+  s = s.replace(/\$\s*37\s*\^\s*\{\s*\\circ\s*\}\s*C\s*\)\s*\$/gi, "37°C)");
+  s = s.replace(
+    /\$\s*((?:[\d\s.])+)\s*(?:\\\s+)?\s*\\mu\s*m\s*\$/gi,
+    (full, raw: string) => /^\d*\.?\d+$/.test(collapseSpacedChars(raw)) ? `${collapseSpacedChars(raw)} μm` : full,
+  );
+  s = s.replace(
+    /\$\s*((?:\d\s*)+)\s*~\s*m\s*\/\s*z\s*\$/gi,
+    (_, raw: string) => `${collapseSpacedChars(raw)} m/z`,
+  );
+  s = s.replace(/\$\s*_\s*\{\s*P\s*<\s*0\s*\.\s*05\s*\)\s*\}\s*\$/gi, "P < 0.05)");
+  s = s.replace(/\$\s*\{\s*p\s*\}\s*\{\s*<\s*\}\s*0\s*\.\s*05\s*\$/gi, "p < 0.05");
+  s = s.replace(
+    /\$\s*\(\s*n\s*\{\s*=\s*\}\s*7\s*,\s*635\s*\)\s*\$/gi,
+    "(n = 7,635)",
+  );
+  s = s.replace(/\$\s*4\s*\^\s*\{\s*\\circ\s*\}\s*C\.\s*\$/gi, "4°C.");
 
   return s;
 }

@@ -1,13 +1,45 @@
-import { existsSync, renameSync, unlinkSync } from "node:fs";
+import { existsSync, readdirSync, renameSync, unlinkSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 
+import {
+  extractDoiSegmentFromArchiveBasename,
+  extractTimestampFromArchiveBasename,
+} from "../segment-inbox-to-out.archive-name-shared.js";
 import {
   appendSegmentInboxToOutNote,
   type SegmentInboxToOutStage,
 } from "../stage-shared.js";
 
+function pruneOlderInboxDuplicates(dirPath: string, currentTargetMd: string): number {
+  const currentBase = basename(currentTargetMd, ".md");
+  const doiSegment = extractDoiSegmentFromArchiveBasename(currentBase);
+  const currentTimestamp = extractTimestampFromArchiveBasename(currentBase);
+  if (!doiSegment || !currentTimestamp) return 0;
+
+  let removed = 0;
+  const peers = readdirSync(dirPath).filter(
+    (file) =>
+      file.endsWith(".md") &&
+      file !== basename(currentTargetMd) &&
+      file !== "README.md" &&
+      !file.startsWith("MinerU_markdown_") &&
+      extractDoiSegmentFromArchiveBasename(basename(file, ".md")) === doiSegment,
+  );
+
+  for (const file of peers) {
+    const peerBase = basename(file, ".md");
+    const peerTimestamp = extractTimestampFromArchiveBasename(peerBase);
+    if (!peerTimestamp || peerTimestamp <= currentTimestamp) {
+      unlinkSync(join(dirPath, file));
+      removed += 1;
+    }
+  }
+
+  return removed;
+}
+
 export const segmentInboxToOut12InboxSyncStage: SegmentInboxToOutStage = {
-  name: "12-inbox-sync",
+  name: "13-inbox-sync",
   run(context) {
     if (context.options.out || context.options.noRenameInbox) {
       return appendSegmentInboxToOutNote(
@@ -32,6 +64,7 @@ export const segmentInboxToOut12InboxSyncStage: SegmentInboxToOutStage = {
       renameSync(context.rawMdPath, targetMd);
       renamedInboxPaths.push(targetMd);
     }
+    const removedInboxDuplicates = pruneOlderInboxDuplicates(dirname(targetMd), targetMd);
 
     if (context.jsonPath) {
       const targetJson = join(dirname(context.jsonPath), `${archiveBase}.json`);
@@ -47,7 +80,9 @@ export const segmentInboxToOut12InboxSyncStage: SegmentInboxToOutStage = {
         ...context,
         renamedInboxPaths,
       },
-      "12-inbox-sync: aligned inbox source names with archive basename.",
+      removedInboxDuplicates > 0 ?
+        `12-inbox-sync: aligned inbox source names with archive basename and pruned ${removedInboxDuplicates} older inbox duplicate(s).`
+      : "12-inbox-sync: aligned inbox source names with archive basename.",
     );
   },
 };

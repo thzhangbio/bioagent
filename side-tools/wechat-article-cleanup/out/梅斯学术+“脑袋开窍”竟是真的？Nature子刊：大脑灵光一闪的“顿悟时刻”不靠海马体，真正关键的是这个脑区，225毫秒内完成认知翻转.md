@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-02-16T12:11:09.000Z"
 published_at_cn: "2026年2月16日 20:11"
 ---
@@ -32,8 +32,8 @@ published_at_cn: "2026年2月16日 20:11"
 > [风格·小标题-1] 你有没有过这样的经历——
 
 ### 图注
-> [风格·图注-1] 心理物理学实验范式与假设
-> [风格·图注-2] 梭状回是编码知觉先验不变性的关键脑区
+> [风格·图注-general-1] 心理物理学实验范式与假设
+> [风格·图注-general-2] 梭状回是编码知觉先验不变性的关键脑区
 
 ### 结尾
 > [风格·结尾-1] 它不是海马体的功劳，也不是早期视觉皮层被“灌顶”的结果。恰恰相反：早期视觉皮层的变化是晚期的、被动的、是高级皮层教它怎么看的。

@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2025-06-20T12:10:35.000Z"
 published_at_cn: "2025年6月20日 20:10"
 ---
@@ -37,10 +37,10 @@ published_at_cn: "2025年6月20日 20:10"
 > [风格·小标题-5] 四、总结
 
 ### 图注
-> [风格·图注-1] 图1：标题
-> [风格·图注-2] 图2：睡眠期间（NREM 和 REM）的大脑活动模式。
-> [风格·图注-3] 图3：评估非周期分量斜率变化对典型频带中频谱功率的影响。
-> [风格·图注-4] 图4：NREM 和 REM 睡眠期间大脑各区域的特征重要性
+> [风格·图注-paper_title_screenshot-1] 图1：标题
+> [风格·图注-figure_result-2] 图2：睡眠期间（NREM 和 REM）的大脑活动模式。
+> [风格·图注-figure_result-3] 图3：评估非周期分量斜率变化对典型频带中频谱功率的影响。
+> [风格·图注-figure_result-4] 图4：NREM 和 REM 睡眠期间大脑各区域的特征重要性
 
 ### 结尾
 > [风格·结尾-1] 此外，研究显示，咖啡因对年轻人REM睡眠阶段的大脑复杂性与临界性影响更显著，而中年人几乎无反应；NREM阶段两组均有变化，但年轻人反应更强。基线分析表明中年人本身脑电复杂性较高，可能使其对咖啡因敏感性降低，提示年龄会调节咖啡对睡眠脑动态的影响。

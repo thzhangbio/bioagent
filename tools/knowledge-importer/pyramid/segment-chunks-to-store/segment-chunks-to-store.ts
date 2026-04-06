@@ -42,6 +42,10 @@ function toTextChunk(context: KnowledgeImporterContext, record: ImportChunkRecor
       typeof meta.wechatContentSlot === "string" ?
         (meta.wechatContentSlot as TextChunk["wechatContentSlot"])
       : undefined,
+    wechatCaptionKind:
+      typeof meta.wechatCaptionKind === "string" ?
+        (meta.wechatCaptionKind as TextChunk["wechatCaptionKind"])
+      : undefined,
     kbWechatId: typeof meta.kbWechatId === "string" ? meta.kbWechatId : undefined,
     sectionType: typeof meta.sectionType === "string" ? meta.sectionType : undefined,
     sectionPriority:

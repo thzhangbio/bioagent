@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-03-02T12:16:24.000Z"
 published_at_cn: "2026年3月2日 20:16"
 ---
@@ -39,10 +39,10 @@ published_at_cn: "2026年3月2日 20:16"
 > [风格·小标题-3] 拨开迷雾
 
 ### 图注
-> [风格·图注-1] CRISPR筛选出数十种可通过维生素B2和B3治疗的单基因疾病（包括NAXD缺乏症）
-> [风格·图注-2] 饮食中维生素B3缺乏会加剧疾病，而补充维生素B3可挽救疾病
-> [风格·图注-3] 丝氨酸耗竭源于NAD依赖的丝氨酸合成受损
-> [风格·图注-4] 可通过维生素B2和维生素B3治疗的遗传疾病的营养基因组学框架
+> [风格·图注-general-1] CRISPR筛选出数十种可通过维生素B2和B3治疗的单基因疾病（包括NAXD缺乏症）
+> [风格·图注-general-2] 饮食中维生素B3缺乏会加剧疾病，而补充维生素B3可挽救疾病
+> [风格·图注-general-3] 丝氨酸耗竭源于NAD依赖的丝氨酸合成受损
+> [风格·图注-general-4] 可通过维生素B2和维生素B3治疗的遗传疾病的营养基因组学框架
 
 ### 结尾
 > [风格·结尾-1] 总的来说，这项研究提供了一套可复制的、系统性的“营养基因组学”蓝图，解释了如何将历史悠久、安全廉价的维生素，与现代最前沿的基因编辑和测序技术相结合。

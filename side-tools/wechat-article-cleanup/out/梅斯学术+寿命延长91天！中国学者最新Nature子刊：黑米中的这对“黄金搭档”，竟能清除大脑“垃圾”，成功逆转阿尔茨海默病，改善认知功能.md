@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-02-20T12:10:22.000Z"
 published_at_cn: "2026年2月20日 20:10"
 ---
@@ -34,9 +34,9 @@ published_at_cn: "2026年2月20日 20:10"
 > [风格·小标题-2] 大脑“垃圾”被清除
 
 ### 图注
-> [风格·图注-1] 黑米饮食中富集的ALA和EDA对AD模型小鼠认知功能的挽救作用
-> [风格·图注-2] ALA和EDA与GPR120结合并激活其功能
-> [风格·图注-3] ALA和EDA通过激活GPR120–Gαi1–mTORC1通路，增强PAMAs的吞噬能力
+> [风格·图注-figure_mechanism-1] 黑米饮食中富集的ALA和EDA对AD模型小鼠认知功能的挽救作用
+> [风格·图注-general-2] ALA和EDA与GPR120结合并激活其功能
+> [风格·图注-figure_mechanism-3] ALA和EDA通过激活GPR120–Gαi1–mTORC1通路，增强PAMAs的吞噬能力
 
 ### 结尾
 > [风格·结尾-1] 当然，我们也要保持理性的期待。这项研究目前是在小鼠模型上取得的突破，距离转化为人类的临床药物还有很长的路要走。

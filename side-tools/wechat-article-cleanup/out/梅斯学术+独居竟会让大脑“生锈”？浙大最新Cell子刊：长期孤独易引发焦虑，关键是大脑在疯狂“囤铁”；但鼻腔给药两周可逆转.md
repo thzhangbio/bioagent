@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.543Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2026-02-04T12:11:09.000Z"
 published_at_cn: "2026年2月4日 20:11"
 ---
@@ -35,9 +35,9 @@ published_at_cn: "2026年2月4日 20:11"
 > [风格·小标题-3] 有效逆转“生锈”
 
 ### 图注
-> [风格·图注-1] 社交隔离通过腹侧海马神经元信号驱动糖皮质激素受体焦虑样行为
-> [风格·图注-2] 鼻内给药的转化应用价值
-> [风格·图注-3] 社交隔离诱导焦虑的分子通路及干预策略
+> [风格·图注-general-1] 社交隔离通过腹侧海马神经元信号驱动糖皮质激素受体焦虑样行为
+> [风格·图注-general-2] 鼻内给药的转化应用价值
+> [风格·图注-figure_mechanism-3] 社交隔离诱导焦虑的分子通路及干预策略
 
 ### 结尾
 > [风格·结尾-1] 总的来说，这项研究提示，孤独对大脑的伤害是具体、可测、有明确靶点的。它不再是模糊的“心情不好”，而是大脑特定区域在分子层面的“重构”。同时，它也带来了曙光：针对这一通路上的任何一环进行干预（减压、调控铁代谢、调节突触蛋白），都可能成为预防和治疗焦虑的新策略。

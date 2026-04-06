@@ -162,7 +162,7 @@ function chunkWechatDocument(doc: ImportDocument): ImportChunkRecord[] {
   const segments = segmentWechatBody(doc.body);
   const flat = segmentsToChunkTexts(segments);
 
-  return flat.map(({ slot, text }, chunkIndex) => ({
+  return flat.map(({ slot, text, captionKind }, chunkIndex) => ({
     id: `wcs__${idPrefix}__${fileKey}__${slot}__c${chunkIndex}`,
     source: doc.source,
     sourceId: doc.sourceId,
@@ -175,6 +175,7 @@ function chunkWechatDocument(doc: ImportDocument): ImportChunkRecord[] {
       ...doc.metadata,
       wechatStyleVariant: variant,
       wechatContentSlot: slot,
+      wechatCaptionKind: captionKind,
       kbWechatId,
       chunkStrategy: "wechat-slot-aware",
     },

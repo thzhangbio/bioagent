@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2025-10-15T12:10:15.000Z"
 published_at_cn: "2025年10月15日 20:10"
 ---
@@ -36,9 +36,9 @@ published_at_cn: "2025年10月15日 20:10"
 > [风格·小标题-4] 认知改善效果持续了半年
 
 ### 图注
-> [风格·图注-1] LRP1在脑内皮细胞中的穿梭机制
-> [风格·图注-2] A₄₀-POs治疗对AD小鼠脑内Aβ负担的影响
-> [风格·图注-3] A₄₀-POs治疗对AD小鼠行为表现的改善效果
+> [风格·图注-figure_mechanism-1] LRP1在脑内皮细胞中的穿梭机制
+> [风格·图注-general-2] A₄₀-POs治疗对AD小鼠脑内Aβ负担的影响
+> [风格·图注-figure_result-3] A₄₀-POs治疗对AD小鼠行为表现的改善效果
 
 ### 结尾
 > [风格·结尾-1] 总的来说，这项研究重新定义了神经退行性疾病的治疗方式。传统的思路是：“如何绕过BBB把药送进去？”而这项研究提出：“如何修复BBB本身？”A₄₀-POs不是被动地“穿过”屏障，而是主动地“调控”屏障。它通过多价配体设计、空间构型优化、亲和力精准调控，实现了对LRP1运输路径的“重编程”。这是一种从“给药”到“调机”的转变，是从“治标”到“治本”的跃迁。

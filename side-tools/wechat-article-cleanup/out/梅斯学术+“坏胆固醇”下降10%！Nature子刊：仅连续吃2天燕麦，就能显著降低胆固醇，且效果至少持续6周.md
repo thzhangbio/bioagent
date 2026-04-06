@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-02-18T12:10:55.000Z"
 published_at_cn: "2026年2月18日 20:10"
 ---
@@ -35,9 +35,9 @@ published_at_cn: "2026年2月18日 20:10"
 > [风格·小标题] （未提取到稳定片段）
 
 ### 图注
-> [风格·图注-1] 燕麦饮食降低血清胆固醇水平
-> [风格·图注-2] 燕麦饮食会提高血浆（二氢）阿魏酸水平
-> [风格·图注-3] 燕麦通过肠道菌群产生的酚类代谢物降低胆固醇
+> [风格·图注-general-1] 燕麦饮食降低血清胆固醇水平
+> [风格·图注-general-2] 燕麦饮食会提高血浆（二氢）阿魏酸水平
+> [风格·图注-general-3] 燕麦通过肠道菌群产生的酚类代谢物降低胆固醇
 
 ### 结尾
 > [风格·结尾-1] 这项研究不仅揭示了燕麦是如何帮助降低胆固醇的，也为代谢综合征的饮食调理提供了科学依据和实用方法。此外，该研究还为基于肠道微生物的营养疗法开辟了新思路，把微生物产生的酚类代谢物，作为改善肥胖相关代谢问题的潜在手段。

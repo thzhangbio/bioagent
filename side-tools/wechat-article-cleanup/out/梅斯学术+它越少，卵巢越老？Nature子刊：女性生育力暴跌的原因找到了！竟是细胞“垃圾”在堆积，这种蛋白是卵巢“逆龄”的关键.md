@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2025-09-08T12:10:41.000Z"
 published_at_cn: "2025年9月8日 20:10"
 ---
@@ -38,10 +38,10 @@ published_at_cn: "2025年9月8日 20:10"
 > [风格·小标题-6] 结语
 
 ### 图注
-> [风格·图注-1] NCOA7变异与细胞衰老增加相关
-> [风格·图注-2] NCOA7表达下降与卵巢衰老中的颗粒细胞衰老相关
-> [风格·图注-3] NCOA7 的缺失会加速细胞衰老和卵巢老化
-> [风格·图注-4] 通过促进自噬或靶向NCOA7来减轻卵巢颗粒细胞（GC）的衰老
+> [风格·图注-figure_result-1] NCOA7变异与细胞衰老增加相关
+> [风格·图注-figure_result-2] NCOA7表达下降与卵巢衰老中的颗粒细胞衰老相关
+> [风格·图注-general-3] NCOA7 的缺失会加速细胞衰老和卵巢老化
+> [风格·图注-general-4] 通过促进自噬或靶向NCOA7来减轻卵巢颗粒细胞（GC）的衰老
 
 ### 结尾
 > [风格·结尾-1] 你是否听过这样一句话：“女性的生理时钟，滴答不停”？尤其是过了35岁，不仅怀孕变得困难，流产风险增加，连卵巢功能也似乎悄然走下坡路。这背后，到底是什么在“操纵”我们的生殖寿命？

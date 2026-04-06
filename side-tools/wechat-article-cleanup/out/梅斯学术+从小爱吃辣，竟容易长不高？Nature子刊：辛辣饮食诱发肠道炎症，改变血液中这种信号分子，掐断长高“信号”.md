@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "recruitment_or_course"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-03-11T12:10:32.000Z"
 published_at_cn: "2026年3月11日 20:10"
 ---
@@ -37,8 +37,8 @@ published_at_cn: "2026年3月11日 20:10"
 > [风格·小标题-4] 从基础研究到临床实践，
 
 ### 图注
-> [风格·图注-1] 特发性矮小症患儿血浆外泌体抑制人软骨细胞增殖与骨形成
-> [风格·图注-2] 高辣椒素饮食诱导大鼠矮小表型
+> [风格·图注-general-1] 特发性矮小症患儿血浆外泌体抑制人软骨细胞增殖与骨形成
+> [风格·图注-general-2] 高辣椒素饮食诱导大鼠矮小表型
 
 ### 结尾
 > [风格·结尾-1] 总体而言，这项研究从一个饮食习惯入手，层层深入，最终揭示了一条从肠道炎症到骨骼生长的完整生物学通路。对于那些已经处于生长发育关键期的孩子，尤其是那些身高本就不太理想、或者正在接受生长激素治疗的孩子，或许真的需要稍微控制一下辣度了。

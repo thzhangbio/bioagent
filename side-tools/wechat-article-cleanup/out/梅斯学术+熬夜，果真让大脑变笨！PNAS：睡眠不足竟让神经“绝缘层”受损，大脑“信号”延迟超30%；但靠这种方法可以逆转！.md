@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2026-02-25T12:10:57.000Z"
 published_at_cn: "2026年2月25日 20:10"
 ---
@@ -37,10 +37,10 @@ published_at_cn: "2026年2月25日 20:10"
 > [风格·小标题-3] 逆转奇迹！“胆固醇搬运工”拯救大脑
 
 ### 图注
-> [风格·图注-1] 睡眠缺失导致脑白质髓鞘完整性下降
-> [风格·图注-2] 睡眠缺失增加跨胼胝体神经传导延迟
-> [风格·图注-3] 睡眠缺失通过改变少突胶质细胞的转录组，扰乱胆固醇稳态
-> [风格·图注-4] 通过环糊精辅助胆固醇转运，可逆转睡眠缺失导致的髓鞘胆固醇缺乏、神经传导延迟及行为缺陷
+> [风格·图注-general-1] 睡眠缺失导致脑白质髓鞘完整性下降
+> [风格·图注-general-2] 睡眠缺失增加跨胼胝体神经传导延迟
+> [风格·图注-general-3] 睡眠缺失通过改变少突胶质细胞的转录组，扰乱胆固醇稳态
+> [风格·图注-general-4] 通过环糊精辅助胆固醇转运，可逆转睡眠缺失导致的髓鞘胆固醇缺乏、神经传导延迟及行为缺陷
 
 ### 结尾
 > [风格·结尾-1] 总体而言，这项研究揭示了，保证胆固醇能正常运输到髓鞘，能在很大程度上抵御睡眠不足对大脑的伤害。

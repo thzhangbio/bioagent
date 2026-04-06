@@ -6,7 +6,17 @@ export interface WechatStyleSlotExtraction {
   bridge: string[];
   ending: string[];
   subheading: string[];
-  caption: string[];
+  caption: Array<{
+    kind:
+      | "general"
+      | "paper_title_screenshot"
+      | "doi_card"
+      | "reference_card"
+      | "figure_result"
+      | "figure_mechanism"
+      | "figure_summary";
+    text: string;
+  }>;
 }
 
 function stripHeadingPrefix(text: string): string {
@@ -34,6 +44,42 @@ function isValidCaptionSample(text: string): boolean {
     return false;
   }
   return true;
+}
+
+function classifyCaptionKind(text: string):
+  | "general"
+  | "paper_title_screenshot"
+  | "doi_card"
+  | "reference_card"
+  | "figure_result"
+  | "figure_mechanism"
+  | "figure_summary" {
+  const t = text.trim();
+  if (
+    /^(?:图\s*\d+\s*[:：]\s*)?标题$/i.test(t) ||
+    /^(?:title|paper title)$/i.test(t)
+  ) {
+    return "paper_title_screenshot";
+  }
+  if (/^\[\d+\]\s*[A-Z]/.test(t) || /\b(?:JAMA|Nature|Science|Cell|BMJ|Lancet|N Engl J Med)\b/i.test(t)) {
+    return "reference_card";
+  }
+  if (/^DOI[:：]/i.test(t) || /\bdoi\b[:.]/i.test(t)) {
+    return "doi_card";
+  }
+  if (/^(标题|Title)\b/i.test(t)) {
+    return "paper_title_screenshot";
+  }
+  if (/(机制|通路|示意图|模型|轴|信号传导)/.test(t)) {
+    return "figure_mechanism";
+  }
+  if (/(结果|对比|评分|风险|相关|系数|相对偏好|图\d|表\d|效果)/.test(t)) {
+    return "figure_result";
+  }
+  if (/(总结|概览|总览|流程|构成|分布|归属)/.test(t)) {
+    return "figure_summary";
+  }
+  return "general";
 }
 
 function isSubstantiveParagraph(text: string): boolean {
@@ -93,7 +139,11 @@ export function extractWechatStyleSlots(input: {
     .filter((block) => block.slot === "caption")
     .map((block) => stripCaptionPrefix(block.text))
     .filter(isValidCaptionSample)
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((text) => ({
+      kind: classifyCaptionKind(text),
+      text,
+    }));
 
   const intro = input.blocks
     .filter((block) => block.slot === "lead")
@@ -142,6 +192,15 @@ function renderTaggedLines(tag: string, values: string[]): string[] {
   return values.map((value, index) => `> [风格·${tag}-${index + 1}] ${value}`);
 }
 
+function renderCaptionTaggedLines(
+  values: WechatStyleSlotExtraction["caption"],
+): string[] {
+  if (values.length === 0) return ["> [风格·图注] （未提取到稳定片段）"];
+  return values.map(
+    (value, index) => `> [风格·图注-${value.kind}-${index + 1}] ${value.text}`,
+  );
+}
+
 export function renderWechatStyleExtractionSection(
   extraction: WechatStyleSlotExtraction,
 ): string {
@@ -161,7 +220,7 @@ export function renderWechatStyleExtractionSection(
     ...renderTaggedLines("小标题", extraction.subheading),
     "",
     "### 图注",
-    ...renderTaggedLines("图注", extraction.caption),
+    ...renderCaptionTaggedLines(extraction.caption),
     "",
     "### 结尾",
     ...renderTaggedLines("结尾", extraction.ending),

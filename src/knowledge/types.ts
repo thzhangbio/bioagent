@@ -21,12 +21,26 @@ export type WechatStyleVariant = "liangyi_hui" | "medsci";
  * 见 `tools/knowledge-importer` 中的微信风格入库逻辑。
  */
 export type WechatContentSlot =
+  | "title"
+  | "intro"
+  | "bridge"
+  | "subheading"
   | "body"
   | "caption"
+  | "ending"
   | "diversion"
   | "references"
   | "byline"
   | "footer";
+
+export type WechatCaptionKind =
+  | "general"
+  | "paper_title_screenshot"
+  | "doi_card"
+  | "reference_card"
+  | "figure_result"
+  | "figure_mechanism"
+  | "figure_summary";
 
 export type SectionPriority = "high" | "normal" | "low";
 
@@ -52,6 +66,8 @@ export interface TextChunk {
   wechatStyleVariant?: WechatStyleVariant;
   /** 仅 `wechat_style`：槽位（导流 / 文献块 / 署名等），供定向检索 */
   wechatContentSlot?: WechatContentSlot;
+  /** 仅 `wechat_style`：图注细分类型 */
+  wechatCaptionKind?: WechatCaptionKind;
   /** 仅 `wechat_style`：与清洗稿 YAML `kb_wechat_id` 一致 */
   kbWechatId?: string;
   /** 可选：章节/段落语义，如 abstract / results / methods */

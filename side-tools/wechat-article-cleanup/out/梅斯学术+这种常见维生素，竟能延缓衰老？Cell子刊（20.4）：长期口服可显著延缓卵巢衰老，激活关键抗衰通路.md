@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.543Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2025-11-07T12:11:00.000Z"
 published_at_cn: "2025年11月7日 20:11"
 ---

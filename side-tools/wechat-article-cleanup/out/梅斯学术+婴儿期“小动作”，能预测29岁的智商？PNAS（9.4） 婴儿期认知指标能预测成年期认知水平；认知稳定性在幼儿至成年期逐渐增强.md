@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2025-06-23T12:10:24.000Z"
 published_at_cn: "2025年6月23日 20:10"
 ---
@@ -44,9 +44,9 @@ published_at_cn: "2025年6月23日 20:10"
 > [风格·小标题-13] 五、梅斯编辑点评
 
 ### 图注
-> [风格·图注-1] 婴幼儿至成年认知相关系数趋势
-> [风格·图注-2] 遗传、共享环境和非共享环境因素如何随时间变化并影响 GCA 的发展和稳定性
-> [风格·图注-3] 遗传和环境因素对成年期GCA的累积影响
+> [风格·图注-figure_result-1] 婴幼儿至成年认知相关系数趋势
+> [风格·图注-general-2] 遗传、共享环境和非共享环境因素如何随时间变化并影响 GCA 的发展和稳定性
+> [风格·图注-general-3] 遗传和环境因素对成年期GCA的累积影响
 
 ### 结尾
 > [风格·结尾-1] 本研究借助独特的长期双生子队列和先进的基因组学工具，实现了认知发展的纵向全景描绘。相较以往多聚焦童年及成年智力，作者将婴儿期认知纳入分析，填补了早期阶段认知稳定性与遗传环境贡献研究的空白，极具学术价值和实际意义。特别是共享环境影响对成年认知的长效作用，提示我们在推动儿童早期发展政策和支持家庭环境改善时，有重要的理论和实证支持。

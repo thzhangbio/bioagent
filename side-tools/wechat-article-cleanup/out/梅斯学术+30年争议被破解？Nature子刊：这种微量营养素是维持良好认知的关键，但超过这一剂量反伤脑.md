@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "literature_digest"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2025-07-21T12:11:00.000Z"
 published_at_cn: "2025年7月21日 20:11"
 ---
@@ -36,8 +36,8 @@ published_at_cn: "2025年7月21日 20:11"
 > [风格·小标题] （未提取到稳定片段）
 
 ### 图注
-> [风格·图注-1] 膳食铜摄入量（mg/日）与 5 项认知功能指标之间的剂量-反应关系
-> [风格·图注-2] 以Z-score（综合认知得分）为结局，按性别、年龄、BMI、高血压及糖尿病状态进行分层，探讨膳食铜摄入四分位（Q1–Q4）与认知表现之间的关联强度
+> [风格·图注-general-1] 膳食铜摄入量（mg/日）与 5 项认知功能指标之间的剂量-反应关系
+> [风格·图注-general-2] 以Z-score（综合认知得分）为结局，按性别、年龄、BMI、高血压及糖尿病状态进行分层，探讨膳食铜摄入四分位（Q1–Q4）与认知表现之间的关联强度
 
 ### 结尾
 > [风格·结尾-1] 值得期待的是，研究团队已为下一阶段的临床研究画好“路线图”：他们计划以卒中后老年人为干预对象，设定0.8/1.2/1.6/2.0 mg/d不同铜摄入梯度，随访12个月，观察其对MoCA评分、脑灌注水平与白质完整性的影响，并同步检测血铜、铜蓝蛋白、SOD活性、8-OHdG和IL-6等指标，进一步解析“铜-抗氧化-认知保护”之间的潜在通路。

@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "expert_viewpoint"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.543Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2026-02-11T12:10:39.000Z"
 published_at_cn: "2026年2月11日 20:10"
 ---
@@ -35,8 +35,8 @@ published_at_cn: "2026年2月11日 20:10"
 > [风格·小标题] （未提取到稳定片段）
 
 ### 图注
-> [风格·图注-1] 抗氧化类食品防腐剂摄入量与总体癌症、前列腺癌、乳腺癌发病风险的关联
-> [风格·图注-2] 非抗氧化类食品防腐剂摄入量与总体癌症、前列腺癌、乳腺癌发病风险的关联
+> [风格·图注-figure_result-1] 抗氧化类食品防腐剂摄入量与总体癌症、前列腺癌、乳腺癌发病风险的关联
+> [风格·图注-figure_result-2] 非抗氧化类食品防腐剂摄入量与总体癌症、前列腺癌、乳腺癌发病风险的关联
 
 ### 结尾
 > [风格·结尾-1] 既然如此，作为普通消费者，我们该如何看待与行动呢？研究人员也给出了审慎而具建设性的观点。这并非呼吁对所有防腐剂进行无差别的恐惧和抵制。在现代食品工业体系中，合规使用的防腐剂对防止食源性疾病、减少食物浪费仍有不可替代的作用。

@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "activity_promo"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.542Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.615Z"
 published_at: "2026-04-03T12:10:13.000Z"
 published_at_cn: "2026年4月3日 20:10"
 ---
@@ -35,14 +35,14 @@ published_at_cn: "2026年4月3日 20:10"
 > [风格·小标题-3] 三、总结
 
 ### 图注
-> [风格·图注-1] 标题
-> [风格·图注-2] 摘要总结
-> [风格·图注-3] 维生素 D 临床试验、样本采集和处理概述
-> [风格·图注-4] 维生素D可增加IBD患者肠道菌群中IgA的结合，同时降低IgG的结合
-> [风格·图注-5] 维生素 D 对 IgA 和 IgG 结合的肠道菌群的组成和预测的宏基因组功能具有不同的调节作用
-> [风格·图注-6] scRNA-seq揭示了维生素D对IBD患者外周血单核细胞（PBMC）组成以及树突状细胞与B细胞间信号传导的影响
-> [风格·图注-7] scBCR-seq和scTCR-seq揭示了维生素D对免疫库的影响以及与Ig结合的肠道菌群相关的共享BCR和TCR克隆型
-> [风格·图注-8] scRNA-seq揭示了维生素D调控的a4β7+B细胞异质性和a4β7+B细胞免疫表型
+> [风格·图注-paper_title_screenshot-1] 标题
+> [风格·图注-figure_summary-2] 摘要总结
+> [风格·图注-general-3] 维生素 D 临床试验、样本采集和处理概述
+> [风格·图注-general-4] 维生素D可增加IBD患者肠道菌群中IgA的结合，同时降低IgG的结合
+> [风格·图注-general-5] 维生素 D 对 IgA 和 IgG 结合的肠道菌群的组成和预测的宏基因组功能具有不同的调节作用
+> [风格·图注-figure_mechanism-6] scRNA-seq揭示了维生素D对IBD患者外周血单核细胞（PBMC）组成以及树突状细胞与B细胞间信号传导的影响
+> [风格·图注-figure_result-7] scBCR-seq和scTCR-seq揭示了维生素D对免疫库的影响以及与Ig结合的肠道菌群相关的共享BCR和TCR克隆型
+> [风格·图注-general-8] scRNA-seq揭示了维生素D调控的a4β7+B细胞异质性和a4β7+B细胞免疫表型
 
 ### 结尾
 > [风格·结尾-1] 本研究的意义在于：第一，提供了首个前瞻性证据，证明维生素D可通过调控Ig结合菌群恢复肠道免疫耐受；第二，通过多组学整合，描绘了宿主免疫-菌群互作的完整图谱；第三，为IBD的“精准营养”干预提供了理论基础。

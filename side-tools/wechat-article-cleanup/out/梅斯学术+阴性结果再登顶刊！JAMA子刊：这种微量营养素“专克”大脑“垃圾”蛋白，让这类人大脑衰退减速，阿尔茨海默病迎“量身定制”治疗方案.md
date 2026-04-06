@@ -11,7 +11,7 @@ wechat_style_variant: "medsci"
 wechat_source_profile: "medsci"
 wechat_article_category: "recruitment_or_course"
 wechat_style_slot_schema: "medsci-style-slots-v1"
-wechat_style_slot_extracted_at: "2026-04-06T12:46:13.543Z"
+wechat_style_slot_extracted_at: "2026-04-06T13:00:11.616Z"
 published_at: "2026-03-04T12:10:33.000Z"
 published_at_cn: "2026年3月4日 20:10"
 ---
@@ -34,7 +34,7 @@ published_at_cn: "2026年3月4日 20:10"
 > [风格·小标题] （未提取到稳定片段）
 
 ### 图注
-> [风格·图注-1] 两组受试者在认知功能、脑结构和BDNF水平上的变化轨迹
+> [风格·图注-general-1] 两组受试者在认知功能、脑结构和BDNF水平上的变化轨迹
 
 ### 结尾
 > [风格·结尾-1] 尽管如此，这项研究还是有巨大的启示意义和临床应用价值。长期以来，锂的使用一直受到治疗窗口窄、副作用多的困扰。治疗精神疾病需要的血药浓度离中毒浓度并不远，患者需要频繁抽血监测。这种“麻烦”限制了它的使用，也让很多医生和患者对它望而却步。

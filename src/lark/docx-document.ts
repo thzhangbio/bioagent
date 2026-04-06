@@ -42,6 +42,8 @@ const BLOCK_TYPE_TEXT = 2;
 
 /** 单块文本元素大致上限，避免单次请求过大（官方另有总限频） */
 const MAX_TEXT_RUN_CHARS = 8000;
+/** 单次追加的段落批次上限，避免长文一次 create 触发 field validation failed */
+const MAX_PARAGRAPHS_PER_APPEND = 20;
 
 export interface CreateDocumentOptions {
   /** 文档标题 */
@@ -274,31 +276,46 @@ export async function appendTextParagraphsToBlock(options: {
   index?: number;
   documentRevisionId?: number;
 }): Promise<void> {
-  await withFeishuRetry("documentBlockChildren.create", async () => {
-    const client = getFeishuClient();
-    const children = options.paragraphs.map((content) => ({
-      block_type: BLOCK_TYPE_TEXT,
-      text: {
-        elements: [{ text_run: { content } }],
-      },
-    }));
+  const baseIndex = options.index ?? 0;
+  let revisionId = options.documentRevisionId;
 
-    const res = await client.docx.v1.documentBlockChildren.create({
-      path: {
-        document_id: options.documentId,
-        block_id: options.parentBlockId,
-      },
-      data: {
-        children,
-        index: options.index ?? 0,
-      },
-      params: {
-        document_revision_id: options.documentRevisionId,
-        client_token: randomUUID(),
-      },
+  for (
+    let offset = 0;
+    offset < options.paragraphs.length;
+    offset += MAX_PARAGRAPHS_PER_APPEND
+  ) {
+    const batch = options.paragraphs.slice(
+      offset,
+      offset + MAX_PARAGRAPHS_PER_APPEND,
+    );
+
+    await withFeishuRetry("documentBlockChildren.create", async () => {
+      const client = getFeishuClient();
+      const children = batch.map((content) => ({
+        block_type: BLOCK_TYPE_TEXT,
+        text: {
+          elements: [{ text_run: { content } }],
+        },
+      }));
+
+      const res = await client.docx.v1.documentBlockChildren.create({
+        path: {
+          document_id: options.documentId,
+          block_id: options.parentBlockId,
+        },
+        data: {
+          children,
+          index: baseIndex + offset,
+        },
+        params: {
+          document_revision_id: revisionId,
+          client_token: randomUUID(),
+        },
+      });
+      assertOk(res, "docx.documentBlockChildren.create");
+      revisionId = res.data?.document_revision_id ?? revisionId;
     });
-    assertOk(res, "docx.documentBlockChildren.create");
-  });
+  }
 }
 
 /**

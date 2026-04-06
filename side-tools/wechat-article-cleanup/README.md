@@ -70,8 +70,11 @@
 |------|------|
 | `wechat_source_profile` | 公众号来源线，如 `medsci` / `liangyi_hui` / `generic_wechat` |
 | `wechat_article_category` | 文章类别线，如 `literature_digest` / `conference_news` / `activity_promo` 等 |
+| `wechat_style_source` | 风格来源标签；当前通常与 `wechat_source_profile` 一致，用于向量库抗污染 |
+| `wechat_style_genre` | 风格文体标签；当前通常与 `wechat_article_category` 一致 |
+| `wechat_style_task` | 风格任务标签，如 `literature_to_wechat` / `news_to_wechat` / `promo_to_wechat` |
 
-这两个字段用于后续按公众号、按内容类别分别细化清洗规则与入库策略。
+这些字段用于后续按公众号、按内容类别、按生成任务分别细化清洗规则与入库策略，避免不同公众号或同一公众号不同文体混检。
 
 ### 互动数据（可选，`--fetch-stats`）
 
@@ -152,7 +155,8 @@
 | **输入灌库的成品** | 本目录 **`out/*.md`**（含 YAML 与正文；**保留** `> [导流]`、`> [文献]`、`署名·*` 等块，供 `wechat_style` 学结构与槽位形态）。 |
 | **主键** | 文首 **`kb_wechat_id`**，向量化时建议写入块元数据，便于去重与审计。 |
 | **子风格** | 文内 YAML **`wechat_style_variant`**（清洗器按公众号名启发式写入）或 **`.meta.json`**；灌库时写入块级 **`wechatStyleVariant`**。 |
-| **槽位** | **`pnpm run ingest:wechat`** 按段落打 **`wechatContentSlot`**（`body` / `caption` / `diversion` / `references` / `byline` / `footer`），检索时 **`retrieve(..., { wechatContentSlots: [...] })`**。 |
+| **抗污染标签** | 入库时同步写入 **`wechatStyleSource`**、**`wechatStyleGenre`**、**`wechatStyleTask`**，分别对应来源、文体、任务。 |
+| **槽位** | **`pnpm run ingest:wechat`** 按段落打 **`wechatContentSlot`**（`title` / `intro` / `bridge` / `subheading` / `caption` / `ending` / `body` / `references` / `byline` / `footer`），图注另带 **`wechatCaptionKind`**。 |
 | **事实** | 医学事实与可核对引用以 **`literature`** 为准；微信库仅表达层。 |
 | **可选第二步** | 若需「仅窄句」第二条管道，可从同批 md 再导出片段——见《知识库分层》§6.2.2。 |
 

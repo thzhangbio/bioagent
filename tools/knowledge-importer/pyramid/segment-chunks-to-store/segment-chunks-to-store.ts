@@ -38,6 +38,18 @@ function toTextChunk(context: KnowledgeImporterContext, record: ImportChunkRecor
       typeof meta.wechatStyleVariant === "string" ?
         (meta.wechatStyleVariant as TextChunk["wechatStyleVariant"])
       : undefined,
+    wechatStyleSource:
+      typeof meta.wechatStyleSource === "string" ?
+        (meta.wechatStyleSource as TextChunk["wechatStyleSource"])
+      : undefined,
+    wechatStyleGenre:
+      typeof meta.wechatStyleGenre === "string" ?
+        (meta.wechatStyleGenre as TextChunk["wechatStyleGenre"])
+      : undefined,
+    wechatStyleTask:
+      typeof meta.wechatStyleTask === "string" ?
+        (meta.wechatStyleTask as TextChunk["wechatStyleTask"])
+      : undefined,
     wechatContentSlot:
       typeof meta.wechatContentSlot === "string" ?
         (meta.wechatContentSlot as TextChunk["wechatContentSlot"])

@@ -1,4 +1,7 @@
 import {
+  inferWechatStyleTaskFromCategory,
+} from "../segment-inbox-to-out.structure.js";
+import {
   parseMarkdownFrontMatter,
   renderMarkdownFrontMatter,
 } from "../../shared/markdown-frontmatter.js";
@@ -26,6 +29,21 @@ export const segmentInboxToOut04MarkdownRenderStage: SegmentInboxToOutStage = {
       const outMarkdown = renderMarkdownFrontMatter(
         {
           ...parsed.fields,
+          wechat_style_source:
+            parsed.fields.wechat_style_source ??
+            parsed.fields.wechat_source_profile ??
+            draft.sourceProfile,
+          wechat_style_genre:
+            parsed.fields.wechat_style_genre ??
+            parsed.fields.wechat_article_category ??
+            draft.articleCategory,
+          wechat_style_task:
+            parsed.fields.wechat_style_task ??
+            inferWechatStyleTaskFromCategory(
+              typeof parsed.fields.wechat_style_genre === "string" ?
+                parsed.fields.wechat_style_genre
+              : draft.articleCategory,
+            ),
           wechat_style_slot_schema: "medsci-style-slots-v1",
           wechat_style_slot_extracted_at: new Date().toISOString(),
         },

@@ -2,7 +2,7 @@
 
 ## 当前目标
 
-围绕 `side-tools/wechat-article-cleanup` 建立一条可重复执行的“梅斯学术风格槽位提取”流程，先不入库，先产出可审核的 `out/*.md` 中间结果，等确认后再决定最佳入库方式。
+围绕 `side-tools/wechat-article-cleanup` 建立一条可重复执行的“梅斯学术风格槽位提取”流程；当前已经进入**入库前最后确认阶段**：`out/*.md`、importer 与知识库规划文档都已同步到新的标签体系，正式写入 `wechat_style` 仍等待你最后拍板。
 
 ## 当前已完成
 
@@ -21,6 +21,17 @@
 - 已让 `out/*.md` 输出为“风格提取 + 原文正文（清洗版）”的一体文件，便于人工审核。
 - 已实际运行：
   - `pnpm run wechat-article-pipeline -- --clean-only`
+- 已补齐风格库抗污染标签：
+  - `wechat_style_source`
+  - `wechat_style_genre`
+  - `wechat_style_task`
+- 已让 importer 同步带出块级 metadata：
+  - `wechatStyleSource`
+  - `wechatStyleGenre`
+  - `wechatStyleTask`
+- 已实际验证：
+  - `pnpm exec tsc --noEmit`
+  - `pnpm run knowledge-import -- run --source wechat_style --input side-tools/wechat-article-cleanup/out --collection wechat_style --mode replace-collection --dry-run`
 - 已成功生成 39 篇新的 `out` 文件：
   - [side-tools/wechat-article-cleanup/out](/Users/tianhui/Webstart/bioagent/side-tools/wechat-article-cleanup/out)
 
@@ -44,6 +55,9 @@
 
 - 原始 YAML 元信息
 - `wechat_style_slot_schema: "medsci-style-slots-v1"`
+- `wechat_style_source`
+- `wechat_style_genre`
+- `wechat_style_task`
 - `## 风格提取`
   - `### 标题`
   - `### 引入`
@@ -61,25 +75,18 @@
 
 ## 下一步待你拍板
 
-在真正入库前，需要先和你确认这几件事：
+在真正入库前，剩下的就是最后确认执行：
 
-1. `out/*.md` 这种“风格提取 + 原文正文”一体格式，是否就是你要审阅的版本。
-2. 风格槽位是否还要继续细分，例如把 `承接` 再拆成：
-   - `开头过渡`
-   - `中段翻译句`
-   - `结尾升华句`
-3. 图注是否要再细分为：
-   - `DOI/刊头类`
-   - `实验结果图注`
-   - `机制图注`
-4. 入库时到底是：
-   - 直接整篇入 `wechat_style`
-   - 还是按槽位分块入库
-   - 还是“整篇 + 槽位”双轨并存
+1. 是否按当前 `out/*.md` + importer 结构，正式 `replace-collection` 写入 `wechat_style`
+2. 入库后，生成工作流是否先按这四类约束接管风格检索：
+   - `source`
+   - `genre`
+   - `task`
+   - `slot`
 
 ## 回到主线时要做什么
 
-当这批风格提取版本确认后，再决定入库方案。等你明确说“入库”之后，再做知识库导入。入库完成，再回到当前主线任务：
+等你明确说“入库”之后，再做知识库导入。入库完成，再回到当前主线任务：
 
 - 让 `wechat_style(medsci)` 真正主导生成时的：
   - 标题

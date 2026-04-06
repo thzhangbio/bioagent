@@ -222,6 +222,60 @@ function resolveWechatVariant(front: Record<string, string>, sideMeta: Record<st
   return metaVariant || yamlVariant || envVariant || "medsci";
 }
 
+function resolveWechatStyleSource(
+  front: Record<string, string>,
+  sideMeta: Record<string, unknown> | null,
+  variant: string,
+): string {
+  const metaSource =
+    typeof sideMeta?.wechatStyleSource === "string" ? sideMeta.wechatStyleSource : undefined;
+  const yamlSource = front.wechat_style_source?.trim();
+  const legacySource = front.wechat_source_profile?.trim();
+  return metaSource || yamlSource || legacySource || variant;
+}
+
+function resolveWechatStyleGenre(
+  front: Record<string, string>,
+  sideMeta: Record<string, unknown> | null,
+): string {
+  const metaGenre =
+    typeof sideMeta?.wechatStyleGenre === "string" ? sideMeta.wechatStyleGenre : undefined;
+  const yamlGenre = front.wechat_style_genre?.trim();
+  const legacyGenre = front.wechat_article_category?.trim();
+  return metaGenre || yamlGenre || legacyGenre || "generic_article";
+}
+
+function inferWechatStyleTask(genre: string): string {
+  switch (genre) {
+    case "literature_digest":
+      return "literature_to_wechat";
+    case "clinical_news":
+      return "news_to_wechat";
+    case "conference_news":
+      return "conference_to_wechat";
+    case "expert_viewpoint":
+      return "commentary_to_wechat";
+    case "activity_promo":
+    case "recruitment_or_course":
+      return "promo_to_wechat";
+    case "roundup":
+      return "roundup_to_wechat";
+    default:
+      return "generic_to_wechat";
+  }
+}
+
+function resolveWechatStyleTask(
+  front: Record<string, string>,
+  sideMeta: Record<string, unknown> | null,
+  genre: string,
+): string {
+  const metaTask =
+    typeof sideMeta?.wechatStyleTask === "string" ? sideMeta.wechatStyleTask : undefined;
+  const yamlTask = front.wechat_style_task?.trim();
+  return metaTask || yamlTask || inferWechatStyleTask(genre);
+}
+
 function loadWechatDocuments(context: KnowledgeImporterContext): ImportDocument[] {
   const inputPath = resolveInputPath(context);
   if (!inputPath) throw new Error("wechat_style 缺少输入目录");
@@ -234,6 +288,10 @@ function loadWechatDocuments(context: KnowledgeImporterContext): ImportDocument[
     const { front, body } = splitMarkdownFrontMatter(raw);
     const sourceId = (front.kb_wechat_id || buildSourceId(fileName)).replace(/^"|"$/g, "");
     const title = (front.title || buildTitle(raw, fileName)).replace(/^"|"$/g, "");
+    const wechatStyleVariant = resolveWechatVariant(front, sideMeta);
+    const wechatStyleSource = resolveWechatStyleSource(front, sideMeta, wechatStyleVariant);
+    const wechatStyleGenre = resolveWechatStyleGenre(front, sideMeta);
+    const wechatStyleTask = resolveWechatStyleTask(front, sideMeta, wechatStyleGenre);
     return {
       source: context.source,
       sourcePath,
@@ -244,7 +302,10 @@ function loadWechatDocuments(context: KnowledgeImporterContext): ImportDocument[
       metadata: {
         sourceLabel: title,
         kbWechatId: sourceId,
-        wechatStyleVariant: resolveWechatVariant(front, sideMeta),
+        wechatStyleVariant,
+        wechatStyleSource,
+        wechatStyleGenre,
+        wechatStyleTask,
         mpName: front.mp_name?.replace(/^"|"$/g, ""),
         publishedAt: front.published_at,
         url: front.url,

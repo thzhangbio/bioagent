@@ -6,6 +6,7 @@ import {
 import { slugFromMpArticleUrl } from "../../shared/slug.js";
 import {
   extractBlocksFromMarkdown,
+  inferWechatStyleTaskFromCategory,
   renderWechatMarkdownFromExistingMarkdown,
   renderWechatMarkdownFromRaw,
 } from "../segment-inbox-to-out.structure.js";
@@ -45,6 +46,11 @@ export const segmentInboxToOut03StructureBlocksStage: SegmentInboxToOutStage = {
             wechat_style_variant: draft.styleVariant,
             wechat_source_profile: draft.sourceProfile,
             wechat_article_category: draft.articleCategory,
+            wechat_style_source: draft.sourceProfile,
+            wechat_style_genre: draft.articleCategory,
+            wechat_style_task: inferWechatStyleTaskFromCategory(
+              draft.articleCategory,
+            ),
             wechat_style_slot_schema: "medsci-style-slots-v1",
             wechat_style_slot_extracted_at: new Date().toISOString(),
           })
@@ -57,6 +63,7 @@ export const segmentInboxToOut03StructureBlocksStage: SegmentInboxToOutStage = {
             styleVariant: draft.styleVariant,
             sourceProfile: draft.sourceProfile,
             articleCategory: draft.articleCategory,
+            styleTask: inferWechatStyleTaskFromCategory(draft.articleCategory),
           });
       const blocks = extractBlocksFromMarkdown(outMarkdown);
       drafts.push({

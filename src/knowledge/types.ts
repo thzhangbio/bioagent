@@ -17,6 +17,39 @@ export type KnowledgeCollection =
 export type WechatStyleVariant = "liangyi_hui" | "medsci";
 
 /**
+ * `wechat_style` 来源层：区分具体公众号线路，避免后续扩展时把不同账号的风格混为一谈。
+ */
+export type WechatStyleSource =
+  | "medsci"
+  | "liangyi_hui"
+  | "generic_wechat";
+
+/**
+ * `wechat_style` 文体层：区分同一公众号内不同文章类型，避免活动稿、资讯稿与文献解读稿互相污染。
+ */
+export type WechatStyleGenre =
+  | "literature_digest"
+  | "clinical_news"
+  | "conference_news"
+  | "expert_viewpoint"
+  | "activity_promo"
+  | "recruitment_or_course"
+  | "roundup"
+  | "generic_article";
+
+/**
+ * `wechat_style` 任务层：直接对应生成任务，便于在标题 / 引入 / 图注等槽位检索时进一步收窄风格样本。
+ */
+export type WechatStyleTask =
+  | "literature_to_wechat"
+  | "news_to_wechat"
+  | "conference_to_wechat"
+  | "commentary_to_wechat"
+  | "promo_to_wechat"
+  | "roundup_to_wechat"
+  | "generic_to_wechat";
+
+/**
  * 微信成稿内向量槽位：正文 / 图注 / 导流 / 参考文献区 / 署名 / 文末运营与转载等。
  * 见 `tools/knowledge-importer` 中的微信风格入库逻辑。
  */
@@ -64,6 +97,12 @@ export interface TextChunk {
   sourceUrl?: string;
   /** 仅 `collection === "wechat_style"`：区分良医汇 / 梅斯，供检索侧过滤 */
   wechatStyleVariant?: WechatStyleVariant;
+  /** 仅 `wechat_style`：来源层，如 medsci / liangyi_hui */
+  wechatStyleSource?: WechatStyleSource;
+  /** 仅 `wechat_style`：文体层，如 literature_digest / activity_promo */
+  wechatStyleGenre?: WechatStyleGenre;
+  /** 仅 `wechat_style`：任务层，如 literature_to_wechat */
+  wechatStyleTask?: WechatStyleTask;
   /** 仅 `wechat_style`：槽位（导流 / 文献块 / 署名等），供定向检索 */
   wechatContentSlot?: WechatContentSlot;
   /** 仅 `wechat_style`：图注细分类型 */

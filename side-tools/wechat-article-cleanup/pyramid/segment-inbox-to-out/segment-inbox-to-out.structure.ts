@@ -13,6 +13,29 @@ export interface RenderWechatMarkdownOptions {
   styleVariant?: string;
   sourceProfile?: string;
   articleCategory?: string;
+  styleTask?: string;
+}
+
+export function inferWechatStyleTaskFromCategory(
+  articleCategory?: string,
+): string {
+  switch (articleCategory) {
+    case "literature_digest":
+      return "literature_to_wechat";
+    case "clinical_news":
+      return "news_to_wechat";
+    case "conference_news":
+      return "conference_to_wechat";
+    case "expert_viewpoint":
+      return "commentary_to_wechat";
+    case "activity_promo":
+    case "recruitment_or_course":
+      return "promo_to_wechat";
+    case "roundup":
+      return "roundup_to_wechat";
+    default:
+      return "generic_to_wechat";
+  }
 }
 
 export function renderWechatMarkdownFromRaw(
@@ -29,6 +52,11 @@ export function renderWechatMarkdownFromRaw(
       wechat_source_profile: options.sourceProfile,
       wechat_article_category: options.articleCategory,
       wechat_style_variant: options.styleVariant,
+      wechat_style_source: options.sourceProfile,
+      wechat_style_genre: options.articleCategory,
+      wechat_style_task:
+        options.styleTask ??
+        inferWechatStyleTaskFromCategory(options.articleCategory),
     },
   });
 }

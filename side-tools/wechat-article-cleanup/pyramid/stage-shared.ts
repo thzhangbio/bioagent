@@ -20,6 +20,15 @@ export type WechatArticleCategory =
   | "roundup"
   | "generic_article";
 
+export type WechatStyleTask =
+  | "literature_to_wechat"
+  | "news_to_wechat"
+  | "conference_to_wechat"
+  | "commentary_to_wechat"
+  | "promo_to_wechat"
+  | "roundup_to_wechat"
+  | "generic_to_wechat";
+
 export interface WechatCleanupOptions {
   argv: string[];
   cwd: string;
@@ -50,6 +59,7 @@ export interface WechatOutRecord {
   outBaseName: string;
   sourceProfile: WechatSourceProfile;
   articleCategory: WechatArticleCategory;
+  styleTask: WechatStyleTask;
   title?: string;
   mpName?: string;
 }

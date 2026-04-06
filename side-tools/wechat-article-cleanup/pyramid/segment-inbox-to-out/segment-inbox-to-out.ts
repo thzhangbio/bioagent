@@ -15,6 +15,7 @@ import { segmentInboxToOut02ArticleCategoryStage } from "./02-article-category/0
 import { segmentInboxToOut03StructureBlocksStage } from "./03-structure-blocks/03-structure-blocks.js";
 import { segmentInboxToOut04MarkdownRenderStage } from "./04-markdown-render/04-markdown-render.js";
 import { segmentInboxToOut05WriteFinalStage } from "./05-write-final/05-write-final.js";
+import { inferWechatStyleTaskFromCategory } from "./segment-inbox-to-out.structure.js";
 
 function rootPath(cwd: string): string {
   return resolve(cwd, "side-tools/wechat-article-cleanup");
@@ -73,6 +74,7 @@ export const segmentInboxToOutStage: WechatCleanupStage = {
         outBaseName: draft.outBaseName!,
         sourceProfile: draft.sourceProfile!,
         articleCategory: draft.articleCategory!,
+        styleTask: inferWechatStyleTaskFromCategory(draft.articleCategory),
         title: draft.meta.title,
         mpName: draft.meta.mp_name,
       }));

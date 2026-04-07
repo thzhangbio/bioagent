@@ -40,7 +40,8 @@
     "wechat-article-out-to-knowledge": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-knowledge/segment-out-to-knowledge.ts",
     "wechat-article-out-to-archive": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts",
     "wechat-article-archive-inbox": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode inbox-only",
-    "wechat-article-archive-out": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode out-only"
+    "wechat-article-archive-out": "tsx side-tools/wechat-article-cleanup/pyramid/segment-out-to-archive/segment-out-to-archive.ts --mode out-only",
+    "feishu-doc-to-html": "tsx tools/feishu-doc-to-html/render-feishu-doc-to-html.ts"
   },
   "keywords": [
     "feishu",

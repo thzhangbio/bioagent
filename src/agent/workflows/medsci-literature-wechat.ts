@@ -20,7 +20,7 @@ function normalizeUserTextForIntent(raw: string): string {
 const LITERATURE_MIN_SCORE = 0.22;
 
 /**
- * 固定句式：帮我把 … 这篇文献 … 仿梅斯学术 … 微信(公众)号 …
+ * 固定句式：帮我把 … 这篇文献 / 《题名》 … 仿梅斯学术 … 微信(公众)号 / 公众号文章 …
  * 抽取文献指向 XXX（题名关键词或《书名》）。
  */
 export function parseMedsciLiteratureWechatRequest(
@@ -29,8 +29,9 @@ export function parseMedsciLiteratureWechatRequest(
   const t = normalizeUserTextForIntent(raw);
   if (t.length < 12) return null;
   if (!/仿梅斯学术/.test(t)) return null;
-  if (!/微信(?:公众)?号/.test(t)) return null;
-  if (!/文献/.test(t)) return null;
+  if (!/(?:微信(?:公众)?号|微信公众号|公众号文章|公众号)/.test(t)) return null;
+  const hasBookTitle = /《[^》\n]{2,120}》/.test(t);
+  if (!/文献/.test(t) && !hasBookTitle) return null;
   if (!/(?:请|麻烦)?帮我把/.test(t) && !/《[^》]+》/.test(t)) {
     return null;
   }
